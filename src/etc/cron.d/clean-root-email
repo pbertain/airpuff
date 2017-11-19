@@ -1,0 +1,2 @@
+*/30 * * * * root /bin/cat /dev/null > /var/spool/mail/root
+
