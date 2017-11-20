@@ -79,21 +79,19 @@ for AIRPORT in ${AIRPORTS} ; do
     #    echo "${RAW_TEXT}"
     #fi
 
-    echo "<tr>" >> ${TEMPFILE}
-    #echo "<tr style=\"color:#00CC00; border=1;\" >" >> ${TEMPFILE}
-    #if [ ${FLIGHT_CATEGORY} == 'VFR' ]; then
-    #    echo '<tr style="color:#00CC00; border=1;" >' >> ${TEMPFILE}
-    #elif [ ${FLIGHT_CATEGORY} == 'MVFR' ]; then
-    #    echo '<tr style="color:#0000CC; border=1;" >' >> ${TEMPFILE}
-    #elif [ ${FLIGHT_CATEGORY} == 'IFR' ]; then
-    #    echo '<tr style="color:#CC0000; border=1;" >' >> ${TEMPFILE}
-    #elif [ ${FLIGHT_CATEGORY} == 'LIFR' ]; then
-    #    echo '<tr style="color:#FF00FF; border=1;" >' >> ${TEMPFILE}
-    #else
-    #    echo '<tr style="color:#AAAA00; border=1;" >' >> ${TEMPFILE}
-    #fi
+    if [ ${FLIGHT_CATEGORY} == 'VFR' ]; then
+        WX_COLOR="#00FF00"
+    elif [ ${FLIGHT_CATEGORY} == 'MVFR' ]; then
+        WX_COLOR="#0000FF"
+    elif [ ${FLIGHT_CATEGORY} == 'IFR' ]; then
+        WX_COLOR="#FF0000"
+    elif [ ${FLIGHT_CATEGORY} == 'LIFR' ]; then
+        WX_COLOR="#FF00FF"
+    else
+        WX_COLOR="#AAAA00"
+    fi
 
-    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td>${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td>${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
+    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td>${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
     echo >> ${TEMPFILE} ;
 done
