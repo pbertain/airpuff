@@ -97,7 +97,19 @@ for AIRPORT in ${AIRPORTS} ; do
             exit 1
     esac
 
-    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td>${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
+    #VIS_INTEGER=`echo "${VIS}" | bc`
+    VIS_INTEGER=`echo ${VIS%%.*}`
+    if [ "${VIS_INTEGER}" -le 3 ]; then
+            VIS_COLOR="#FF0000"
+    elif [ "${VIS_INTEGER}" > 3 ] && [ "${VIS_INTEGER}" -le 5 ]; then
+            VIS_COLOR="#0000FF"
+    elif [ "${VIS_INTEGER}" > 5 ]; then
+            VIS_COLOR="#00FF00"
+    else
+            VIS_COLOR="333333"
+    fi
+
+    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
     echo >> ${TEMPFILE} ;
 done
