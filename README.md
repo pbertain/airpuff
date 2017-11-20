@@ -1,2 +1,2 @@
 # airpuff
-scripts to pull aviation weather for flight planning
+Tool to pull aviation weather for flight planning and graphing using RRDTool
