@@ -79,17 +79,23 @@ for AIRPORT in ${AIRPORTS} ; do
     #    echo "${RAW_TEXT}"
     #fi
 
-    if [ ${FLIGHT_CATEGORY} == 'VFR' ]; then
-        WX_COLOR="#00FF00"
-    elif [ ${FLIGHT_CATEGORY} == 'MVFR' ]; then
-        WX_COLOR="#0000FF"
-    elif [ ${FLIGHT_CATEGORY} == 'IFR' ]; then
-        WX_COLOR="#FF0000"
-    elif [ ${FLIGHT_CATEGORY} == 'LIFR' ]; then
-        WX_COLOR="#FF00FF"
-    else
-        WX_COLOR="#AAAA00"
-    fi
+    case "${FLIGHT_CATEGORY}" in
+        VFR)
+            WX_COLOR="#00FF00"
+            ;;
+        MVFR)
+            WX_COLOR="#0000FF"
+            ;;
+        IFR)
+            WX_COLOR="#FF0000"
+            ;;
+        LIFR)
+            WX_COLOR="#FF00FF"
+            ;;
+        *)
+            WX_COLOR="#AAAA00"
+            exit 1
+    esac
 
     echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td>${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
