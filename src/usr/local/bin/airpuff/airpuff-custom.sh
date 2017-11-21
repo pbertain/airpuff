@@ -7,7 +7,7 @@
 # $Id: airpuff.sh 720 2012-09-23 16:42:44Z pbertain $
 # $HeadURL: svn+ssh://pbertain@pan.lipadesogesk.name/opt/svn/pbertain/pacman/airpuff/bin/data/pacman/airpuff/bin/airpuff.sh $
 
-# Notes: This is the first pass as a shell script.  Next will be a perl script and then hopefully a python script.
+# Notes: This is the first pass as a shell script.  Next will be hopefully a python script.
 
 ##### CUSTOMIZE HERE #####
 REGION="$1"
@@ -42,8 +42,14 @@ echo '<table style="color: #FFFFFF; border: 1; border-spacing: 3px; bordercolor:
 echo '<tr style="color:yellow; border=1; text-align:center">' >> ${TEMPFILE}
 echo "<th>ARPT</th><th>TIME</th><th>TYPE</th><th>CAT</th><th>TEMP</th><th>DEW PT</th><th>T-DP</th><th>WIND</th><th>VIS</th><th>ALT</th><th>SKY COVER</th><th>ELEV</th>" >> ${TEMPFILE}
 echo '</tr>' >> ${TEMPFILE}
+echo '<tr>' >> ${TEMPFILE}
 
 for AIRPORT in ${AIRPORTS} ; do
+    OBS_TIME=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep observation_time | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | awk -FT '{ print $2 }'` ;
+    if [ -z ${OBS_TIME} ]; then
+       echo "<td style=\"color:#999999; \">${AIRPORT}</td></tr>"  >> ${TEMPFILE} ;
+       continue
+    fi
     FLIGHT_CATEGORY=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep flight_category | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     #RAW_TEXT=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep raw_text | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | sed -e 's/AUTO//' -e 's/RMK.*//'` ;
     TEMP_C=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep temp_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
@@ -69,10 +75,9 @@ for AIRPORT in ${AIRPORTS} ; do
     ELEVATION_M=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep elevation_m | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     ELEVATION_FT=`echo "${ELEVATION_M} * 100 / 2.54 / 12" | bc -l` ;
     ELEVATION_FORMATTED=`printf "%0004.0f" "${ELEVATION_FT}" ` ;
-    OBS_TIME=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep observation_time | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | awk -FT '{ print $2 }'` ;
 
     #echo "Starting ${AIRPORT}: FC=${FLIGHT_CATEGORY}...";
-    #if [ ! -z ${FLIGHT_CATEGORY} ]; then
+    #if [ !-z ${FLIGHT_CATEGORY} ]; then
     #   continue
     #fi
     #if [ ${AIRPORT} == 'KSJC' ]; then
@@ -94,7 +99,6 @@ for AIRPORT in ${AIRPORTS} ; do
             ;;
         *)
             WX_COLOR="#AAAA00"
-            exit 1
     esac
 
     #VIS_INTEGER=`echo "${VIS}" | bc`
