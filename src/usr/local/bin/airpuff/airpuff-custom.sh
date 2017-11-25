@@ -4,10 +4,7 @@
 # Looks up wx for airports on the commute and presents it as a webpage
 # Paul Bertain paul@bertain.net
 # Wed 29 Feb 2012
-# $Id: airpuff.sh 720 2012-09-23 16:42:44Z pbertain $
 # $HeadURL: svn+ssh://pbertain@pan.lipadesogesk.name/opt/svn/pbertain/pacman/airpuff/bin/data/pacman/airpuff/bin/airpuff.sh $
-
-# Notes: This is the first pass as a shell script.  Next will be hopefully a python script.
 
 ##### CUSTOMIZE HERE #####
 REGION="$1"
@@ -82,14 +79,6 @@ for AIRPORT in ${AIRPORTS} ; do
     ELEVATION_FT=`echo "${ELEVATION_M} * 100 / 2.54 / 12" | bc -l` ;
     ELEVATION_FORMATTED=`printf "%0004.0f" "${ELEVATION_FT}" ` ;
 
-    #echo "Starting ${AIRPORT}: FC=${FLIGHT_CATEGORY}...";
-    #if [ !-z ${FLIGHT_CATEGORY} ]; then
-    #   continue
-    #fi
-    #if [ ${AIRPORT} == 'KSJC' ]; then
-    #    echo "${RAW_TEXT}"
-    #fi
-
     case "${FLIGHT_CATEGORY}" in
         VFR)
             WX_COLOR="#00FF00"
@@ -107,16 +96,9 @@ for AIRPORT in ${AIRPORTS} ; do
             WX_COLOR="#AAAA00"
     esac
 
-    #VIS_INTEGER=`echo "${VIS}" | bc`
-    #VIS_INTEGER=`echo "${VIS%%.*}"`
+    # Convert VIS to integer
     VIS_INTEGER=${VIS/.*}
-    # or maybe
-    #VIS_INTEGER=${VIS/\.*}
-    #echo "VIS = ${VIS} - VIS_INTEGER = ${VIS_INTEGER}"
 
-#if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
-    #...
-#fi
     if [ ${VIS_INTEGER} -ge 1 ] && [ "${VIS_INTEGER}" -lt 3 ]; then
             VIS_COLOR="#FF0000"
     elif [ ${VIS_INTEGER} -lt 1 ]; then
@@ -129,82 +111,51 @@ for AIRPORT in ${AIRPORTS} ; do
             VIS_COLOR="333333"
     fi
 
-    #sky_cover="BKN" cloud_base_ft_agl="600" />
-    #SKY_COVER_ARRAY=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
-    #SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
-    #echo "## - ${SKY_COVER_ARRAY}"
-    #echo ${SKY_COVER_ARRAY_LEN}
-    #if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
-        #echo "${AIRPORT} - FONT = GREEN"
-    #elif [ ${SKY_COVER_ARRAY_LEN} -gt 1 ]; then
-        #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
-            #echo "${AIRPORT} - FONT = BLUE"
-        #fi
-    #else
-        #echo "${AIRPORT} - FONT = RED / MAGENTA"
-    #fi
-    #for (( i=0; i<${SKY_COVER_ARRAY_LEN}; i++ ));
-    #do
-        #echo ${SKY_COVER_ARRAY[$i]}
-    #done
-
-    #echo "SKY COVER = ${SKY_COVERAGE} - SKY COVER ARRAY = ${SKY_COVER_ARRAY[0]} & ${SKY_COVER_ARRAY[1]}"
-    #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 1000 || "${SKY_COVER_ARRAY[1]}" > 500 ]]; then
-        #SKY_COVER_COLOR="#FF0000"
-    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" -le 500 ]]; then
-        #SKY_COVER_COLOR="#FF00FF"
-    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
-        #SKY_COVER_COLOR="#3333FF"
-    #else
-        #SKY_COVER_COLOR="#00FF00"
-    #fi
-    #SKY_COVER_COLOR="#CCAACC"
-
-    #my_error_flag=1
-    #my_error_flag_o=1
-    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ] || ([ $my_error_flag -eq 1 ] && [ $my_error_flag_o -eq 2 ]); then
-      #echo "$my_error_flag"
-    #else
-        #echo "no flag"
-    #fi
-    #Although in your case you can discard the last two expressions and just stick with one or operation like this:
-    #my_error_flag=1
-    #my_error_flag_o=1
-    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ]; then
-        #echo "$my_error_flag"
-    #else
-        #echo "no flag"
-    #fi
-
     SKY_COVER=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
     SKY_COVER_ARRAY=(${SKY_COVER// / })
     SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
     # VFR
-    if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
+    if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ] && ([ ${SKY_COVER_ARRAY[0]} == "SKC" ] || [ ${SKY_COVER_ARRAY[0]} == "CLR" ]); then
         SKY_COVER_COLOR="#00FF00"
     # MVFR
-    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${MVFR_MIN} ] || [ ${SKY_COVER_ARRAY[1]} -le ${MVFR_MAX} ]); then
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${MVFR_MIN} ] && [ ${SKY_COVER_ARRAY[1]} -le ${MVFR_MAX} ]); then
         SKY_COVER_COLOR="#3333FF"
-    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${MVFR_MIN} ] || [ ${SKY_COVER_ARRAY[3]} -le ${MVFR_MAX} ]); then
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 4 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${MVFR_MIN} ] && [ ${SKY_COVER_ARRAY[3]} -le ${MVFR_MAX} ]); then
+        SKY_COVER_COLOR="#3333FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 6 ] && ([ ${SKY_COVER_ARRAY[4]} == "BKN" ] || [ ${SKY_COVER_ARRAY[4]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[5]} -ge ${MVFR_MIN} ] && [ ${SKY_COVER_ARRAY[5]} -le ${MVFR_MAX} ]); then
+        SKY_COVER_COLOR="#3333FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 8 ] && ([ ${SKY_COVER_ARRAY[6]} == "BKN" ] || [ ${SKY_COVER_ARRAY[6]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[7]} -ge ${MVFR_MIN} ] && [ ${SKY_COVER_ARRAY[7]} -le ${MVFR_MAX} ]); then
         SKY_COVER_COLOR="#3333FF"
     # IFR
-    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${IFR_MIN} ] || [ ${SKY_COVER_ARRAY[1]} -lt ${IFR_MAX} ]); then
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${IFR_MIN} ] && [ ${SKY_COVER_ARRAY[1]} -lt ${IFR_MAX} ]); then
         SKY_COVER_COLOR="#FF0000"
-    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${IFR_MIN} ] || [ ${SKY_COVER_ARRAY[3]} -lt ${IFR_MAX} ]); then
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 4 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${IFR_MIN} ] && [ ${SKY_COVER_ARRAY[3]} -lt ${IFR_MAX} ]); then
+        SKY_COVER_COLOR="#FF0000"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 6 ] && ([ ${SKY_COVER_ARRAY[4]} == "BKN" ] || [ ${SKY_COVER_ARRAY[4]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[5]} -ge ${IFR_MIN} ] && [ ${SKY_COVER_ARRAY[5]} -lt ${IFR_MAX} ]); then
+        SKY_COVER_COLOR="#FF0000"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 8 ] && ([ ${SKY_COVER_ARRAY[6]} == "BKN" ] || [ ${SKY_COVER_ARRAY[6]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[7]} -ge ${IFR_MIN} ] && [ ${SKY_COVER_ARRAY[7]} -lt ${IFR_MAX} ]); then
         SKY_COVER_COLOR="#FF0000"
     # LIFR
     elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[1]} -lt ${LIFR_MAX} ]; then
         SKY_COVER_COLOR="#FF00FF"
-    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[3]} -lt ${LIFR_MAX} ]; then
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 4 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[3]} -lt ${LIFR_MAX} ]; then
         SKY_COVER_COLOR="#FF00FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 6 ] && ([ ${SKY_COVER_ARRAY[4]} == "BKN" ] || [ ${SKY_COVER_ARRAY[4]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[5]} -lt ${LIFR_MAX} ]; then
+        SKY_COVER_COLOR="#FF00FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 8 ] && ([ ${SKY_COVER_ARRAY[6]} == "BKN" ] || [ ${SKY_COVER_ARRAY[6]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[7]} -lt ${LIFR_MAX} ]; then
+        SKY_COVER_COLOR="#FF00FF"
+    # Remaining VFR conditions
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && [ ${SKY_COVER_ARRAY[1]} -gt ${VFR_MIN} ]; then
+        SKY_COVER_COLOR="#00FF00"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 4 ] && [ ${SKY_COVER_ARRAY[3]} -gt ${VFR_MIN} ]; then
+        SKY_COVER_COLOR="#00FF00"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 6 ] && [ ${SKY_COVER_ARRAY[5]} -gt ${VFR_MIN} ]; then
+        SKY_COVER_COLOR="#00FF00"
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 8 ] && [ ${SKY_COVER_ARRAY[7]} -gt ${VFR_MIN} ]; then
+        SKY_COVER_COLOR="#00FF00"
     else
         SKY_COVER_COLOR="#999999"
     fi 
-    #echo "## ${AIRPORT}"
-    #echo "# Just print the array like a variable: ${SKY_COVER_ARRAY}"
-    #echo "# Properly print the array: ${SKY_COVER_ARRAY[@]}"
-    #echo "# Array length: ${SKY_COVER_ARRAY_LEN}"
-    #echo "# Array [1]: ${SKY_COVER_ARRAY[1]}"
 
     echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td style=\"color:${SKY_COVER_COLOR}; \">${SKY_COVERAGE}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
