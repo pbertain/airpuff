@@ -22,6 +22,12 @@ TEMPFILE="${PRODFILE}.temp"
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
 E_COAST_TIME=`TZ='America/New_York' date +'%T %Z'`
 ZULU_TIMEZONE=`date -u +'%a %F %T %Z/Zulu/Z'`
+VFR_MIN=3000
+MVFR_MIN=1000
+MVFR_MAX=3000
+IFR_MIN=500
+IFR_MAX=1000
+LIFR_MAX=500
 
 cat /dev/null > ${TEMPFILE}
 echo "<html>" > ${TEMPFILE}
@@ -31,7 +37,7 @@ echo "<title>${REGION} AirPuff Airport WX Info</title>" >> ${TEMPFILE}
 echo "</head>" >> ${TEMPFILE}
 echo '<body bgcolor="#333333">' >> ${TEMPFILE}
 echo '<font color="white" face="Tahoma" size=5>' >> ${TEMPFILE}
-echo "${LOC} AirPuff current run:" >> ${TEMPFILE}
+echo "${REGION} AirPuff current run:" >> ${TEMPFILE}
 echo '<font face="Courier" size=3>' >> ${TEMPFILE}
 echo "<br><font color="cornflowerblue">${ZULU_TIMEZONE}" >> ${TEMPFILE}
 echo "<br><font color="lightgreen">${W_COAST_TIME} / ${E_COAST_TIME}" >> ${TEMPFILE}
@@ -71,7 +77,7 @@ for AIRPORT in ${AIRPORTS} ; do
     ALTIMETER=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep altim_in_hg | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     ALTIMETER_FORMATTED=`printf "%.2f" "${ALTIMETER}" ` ;
     METAR_TYPE=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep metar_type | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    SKY_COVER=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
+    SKY_COVERAGE=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
     ELEVATION_M=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep elevation_m | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     ELEVATION_FT=`echo "${ELEVATION_M} * 100 / 2.54 / 12" | bc -l` ;
     ELEVATION_FORMATTED=`printf "%0004.0f" "${ELEVATION_FT}" ` ;
@@ -89,7 +95,7 @@ for AIRPORT in ${AIRPORTS} ; do
             WX_COLOR="#00FF00"
             ;;
         MVFR)
-            WX_COLOR="#0000FF"
+            WX_COLOR="#3333FF"
             ;;
         IFR)
             WX_COLOR="#FF0000"
@@ -102,18 +108,105 @@ for AIRPORT in ${AIRPORTS} ; do
     esac
 
     #VIS_INTEGER=`echo "${VIS}" | bc`
-    VIS_INTEGER=`echo ${VIS%%.*}`
-    if [ "${VIS_INTEGER}" -le 3 ]; then
+    #VIS_INTEGER=`echo "${VIS%%.*}"`
+    VIS_INTEGER=${VIS/.*}
+    # or maybe
+    #VIS_INTEGER=${VIS/\.*}
+    #echo "VIS = ${VIS} - VIS_INTEGER = ${VIS_INTEGER}"
+
+#if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
+    #...
+#fi
+    if [ ${VIS_INTEGER} -ge 1 ] && [ "${VIS_INTEGER}" -lt 3 ]; then
             VIS_COLOR="#FF0000"
-    elif [ "${VIS_INTEGER}" > 3 ] && [ "${VIS_INTEGER}" -le 5 ]; then
-            VIS_COLOR="#0000FF"
-    elif [ "${VIS_INTEGER}" > 5 ]; then
+    elif [ ${VIS_INTEGER} -lt 1 ]; then
+            VIS_COLOR="#FF00FF"
+    elif [ ${VIS_INTEGER} -ge 3 ] && [ "${VIS_INTEGER}" -lt 5 ]; then
+            VIS_COLOR="#3333FF"
+    elif [ ${VIS_INTEGER} -ge 5 ]; then
             VIS_COLOR="#00FF00"
     else
             VIS_COLOR="333333"
     fi
 
-    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
+    #sky_cover="BKN" cloud_base_ft_agl="600" />
+    #SKY_COVER_ARRAY=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
+    #SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
+    #echo "## - ${SKY_COVER_ARRAY}"
+    #echo ${SKY_COVER_ARRAY_LEN}
+    #if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
+        #echo "${AIRPORT} - FONT = GREEN"
+    #elif [ ${SKY_COVER_ARRAY_LEN} -gt 1 ]; then
+        #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
+            #echo "${AIRPORT} - FONT = BLUE"
+        #fi
+    #else
+        #echo "${AIRPORT} - FONT = RED / MAGENTA"
+    #fi
+    #for (( i=0; i<${SKY_COVER_ARRAY_LEN}; i++ ));
+    #do
+        #echo ${SKY_COVER_ARRAY[$i]}
+    #done
+
+    #echo "SKY COVER = ${SKY_COVERAGE} - SKY COVER ARRAY = ${SKY_COVER_ARRAY[0]} & ${SKY_COVER_ARRAY[1]}"
+    #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 1000 || "${SKY_COVER_ARRAY[1]}" > 500 ]]; then
+        #SKY_COVER_COLOR="#FF0000"
+    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" -le 500 ]]; then
+        #SKY_COVER_COLOR="#FF00FF"
+    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
+        #SKY_COVER_COLOR="#3333FF"
+    #else
+        #SKY_COVER_COLOR="#00FF00"
+    #fi
+    #SKY_COVER_COLOR="#CCAACC"
+
+    #my_error_flag=1
+    #my_error_flag_o=1
+    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ] || ([ $my_error_flag -eq 1 ] && [ $my_error_flag_o -eq 2 ]); then
+      #echo "$my_error_flag"
+    #else
+        #echo "no flag"
+    #fi
+    #Although in your case you can discard the last two expressions and just stick with one or operation like this:
+    #my_error_flag=1
+    #my_error_flag_o=1
+    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ]; then
+        #echo "$my_error_flag"
+    #else
+        #echo "no flag"
+    #fi
+
+    SKY_COVER=`curl -s "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
+    SKY_COVER_ARRAY=(${SKY_COVER// / })
+    SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
+    # VFR
+    if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
+        SKY_COVER_COLOR="#00FF00"
+    # MVFR
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${MVFR_MIN} ] || [ ${SKY_COVER_ARRAY[1]} -le ${MVFR_MAX} ]); then
+        SKY_COVER_COLOR="#3333FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${MVFR_MIN} ] || [ ${SKY_COVER_ARRAY[3]} -le ${MVFR_MAX} ]); then
+        SKY_COVER_COLOR="#3333FF"
+    # IFR
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[1]} -ge ${IFR_MIN} ] || [ ${SKY_COVER_ARRAY[1]} -lt ${IFR_MAX} ]); then
+        SKY_COVER_COLOR="#FF0000"
+    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && ([ ${SKY_COVER_ARRAY[3]} -ge ${IFR_MIN} ] || [ ${SKY_COVER_ARRAY[3]} -lt ${IFR_MAX} ]); then
+        SKY_COVER_COLOR="#FF0000"
+    # LIFR
+    elif [ ${SKY_COVER_ARRAY_LEN} -eq 2 ] && ([ ${SKY_COVER_ARRAY[0]} == "BKN" ] || [ ${SKY_COVER_ARRAY[0]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[1]} -lt ${LIFR_MAX} ]; then
+        SKY_COVER_COLOR="#FF00FF"
+    elif [ ${SKY_COVER_ARRAY_LEN} -gt 2 ] && ([ ${SKY_COVER_ARRAY[2]} == "BKN" ] || [ ${SKY_COVER_ARRAY[2]} == "OVC" ]) && [ ${SKY_COVER_ARRAY[3]} -lt ${LIFR_MAX} ]; then
+        SKY_COVER_COLOR="#FF00FF"
+    else
+        SKY_COVER_COLOR="#999999"
+    fi 
+    #echo "## ${AIRPORT}"
+    #echo "# Just print the array like a variable: ${SKY_COVER_ARRAY}"
+    #echo "# Properly print the array: ${SKY_COVER_ARRAY[@]}"
+    #echo "# Array length: ${SKY_COVER_ARRAY_LEN}"
+    #echo "# Array [1]: ${SKY_COVER_ARRAY[1]}"
+
+    echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td style=\"color:${SKY_COVER_COLOR}; \">${SKY_COVERAGE}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
     echo >> ${TEMPFILE} ;
 done
@@ -122,3 +215,4 @@ echo "</table>" >> ${TEMPFILE}
 echo "</body>" >> ${TEMPFILE}
 echo "</html>" >> ${TEMPFILE}
 mv ${TEMPFILE} ${PRODFILE}
+
