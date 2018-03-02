@@ -3,18 +3,19 @@ import requests
 import sys
 from numbers import Number
 
-AIRPORTS = ['ksac', 'kvcb', 'ksuu', 'kccr', 'klvk', 'koak', 'khwd', 'krhv', 'ksjc', 'ksql', 'knuq'] #, 'kpao']
+AIRPORTS = ['kedu', 'kvcb', 'ksuu', 'kccr', 'klvk', 'koak', 'khwd', 'krhv', 'ksjc', 'ksql', 'knuq', 'kpao']
 
-print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:^5} {6:^7} {7:^5} {8:^5} {9:^20}".format("ARPT", "TIME", "CAT", "TEMP", "DEW PT", "T-DP", "WIND", "VIS", "ALT", "SKY COVER"))
+#print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:^5} {6:^7} {7:^5} {8:^5} {9:^20}".format("ARPT", "TIME", "CAT", "TEMP", "DEW PT", "T-DP", "WIND", "VIS", "ALT", "SKY COVER"))
+print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:^6} {6:^5} {7:^5} {8:^20}".format("ARPT", "TIME", "CAT", "TEMP", "DEW PT", "WIND", "VIS", "ALT", "SKY COVER"))
 for AIRPORT in AIRPORTS:
     #print("AIRPORT: ")
     url = "https://avwx.rest/api/metar/{0}".format(AIRPORT)
     req = requests.get(url)
     obj = json.loads(req.text)
 
-    TEMP = int(obj["Temperature"])
-    DP = int(obj["Dewpoint"])
-    T_DP_SPREAD = TEMP - DP
+    #TEMP = int(obj["Temperature"])
+    #DP = int(obj["Dewpoint"])
+    #T_DP_SPREAD = TEMP - DP
     #if obj["Temperature"].isdigit():
         #isinstance(value, Number)
         #TEMP = int(obj["Temperature"])
@@ -35,7 +36,7 @@ for AIRPORT in AIRPORTS:
     #isinstance(n, Number)
     #TEMP = [int(ORIG_TEMP) if ORIG_TEMP.isdigit()]
     
-    print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:^5} {6:>3}@{7:<2} {8:^5} {9:^5} {10:<20}".format(obj["Station"], obj["Time"], obj["Flight-Rules"], TEMP, DP, T_DP_SPREAD, obj["Wind-Direction"], obj["Wind-Speed"], obj["Visibility"], obj["Altimeter"], obj["Cloud-List"]))
+    print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:>3}@{6:<2} {7:^6} {8:^4} {9:<20}".format(obj["Station"], obj["Time"], obj["Flight-Rules"], obj["Temperature"], obj["Dewpoint"], obj["Wind-Direction"], obj["Wind-Speed"], obj["Visibility"], obj["Altimeter"], obj["Cloud-List"]))
     #print("{0:^5} {1:^10} {2:^5} {3:^6} {4:^7} {5:^5} {6:>3}@{7:<2} {8:^5} {9:^5} {10:<20}".format(obj["Station"], obj["Time"], obj["Flight-Rules"], TEMP, DP, T_DP_SPREAD, obj["Wind-Direction"], obj["Wind-Speed"], obj["Visibility"], obj["Altimeter"], obj["Cloud-List"]))
 
 
