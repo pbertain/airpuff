@@ -50,7 +50,7 @@ print(textwrap.dedent("""\
     <html>
     <head>
     <meta http-equiv="refresh" content="300">
-    <link rel="stylesheet" type="text/css" href="airpuff.css">
+    <link rel="stylesheet" type="text/css" href="/airpuff.css">
     <title>%s AirPuff Airport WX Info</title>
     </head>
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
