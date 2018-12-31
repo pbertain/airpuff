@@ -169,7 +169,7 @@ for count in range(0, met_json_results):
     print("<tr class="td">\
     <td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
     <td>%-s</td>\
-    <td class=""%s"">%-s</td>\
+    <td class=\"%s\">%-s</td>\
     <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
     <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
     <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
