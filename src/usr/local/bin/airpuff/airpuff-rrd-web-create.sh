@@ -9,7 +9,7 @@ AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
 AIRPORTS_LOWER_NOSPACE=$(echo -e "${AIRPORTS_LOWER}" | tr -d "[:space:]")
-FILEPATH="/var/www/html/htdocs/airpuff/html/rrdweb"
+FILEPATH="/var/www/html/htdocs/airpuff.info/html/rrdweb"
 W_COAST_TIME=`TZ="America/Los_Angeles" date +"%a %F %T %Z"`
 E_COAST_TIME=`TZ="America/New_York" date +"%T %Z"`
 ZULU_TIMEZONE=`date -u +"%a %F %T %Z/Zulu/Z"`
@@ -37,31 +37,15 @@ for AIRPORT in ${AIRPORTS} ; do
     echo "<br>" >> ${TEMPFILE}
     echo "<font color="white" face="Courier" size=3>" >> ${TEMPFILE}
     echo '<table style="color:#cccccc; font-family: Tahoma; font-size: 10px">' >> ${TEMPFILE}
-    echo "<tr><th></th><th>Altimeter</th><th>Wind Speed & Dir</th><th>Visibility</th></tr>" >> ${TEMPFILE}
+    echo "<tr><th></th><th>Altimeter</th><th>Ceiling</th><th>Visibility</th><th>Wind Speed & Dir</th><th>Temp</th></tr>" >> ${TEMPFILE}
     echo "<tr>" >> ${TEMPFILE}
-    echo "  <td>Day</td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-alti-day.png"><img src="/images/rrd/${AIRPORT_LOWER}-alti-day.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-wind-day.png"><img src="/images/rrd/${AIRPORT_LOWER}-wind-day.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-visi-day.png"><img src="/images/rrd/${AIRPORT_LOWER}-visi-day.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "</tr>" >> ${TEMPFILE}
-    echo "<tr>" >> ${TEMPFILE}
-    echo "  <td>Week</td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-alti-week.png"><img src="/images/rrd/${AIRPORT_LOWER}-alti-week.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-wind-week.png"><img src="/images/rrd/${AIRPORT_LOWER}-wind-week.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-visi-week.png"><img src="/images/rrd/${AIRPORT_LOWER}-visi-week.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "</tr>" >> ${TEMPFILE}
-    echo "<tr>" >> ${TEMPFILE}
-    echo "  <td>Month</td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-alti-month.png"><img src="/images/rrd/${AIRPORT_LOWER}-alti-month.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-wind-month.png"><img src="/images/rrd/${AIRPORT_LOWER}-wind-month.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-visi-month.png"><img src="/images/rrd/${AIRPORT_LOWER}-visi-month.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "</tr>" >> ${TEMPFILE}
-    echo "<tr>" >> ${TEMPFILE}
-    echo "  <td>Year</td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-alti-year.png"><img src="/images/rrd/${AIRPORT_LOWER}-alti-year.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-wind-year.png"><img src="/images/rrd/${AIRPORT_LOWER}-wind-year.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "  <td><a href="/images/rrd/${AIRPORT_LOWER}-visi-year.png"><img src="/images/rrd/${AIRPORT_LOWER}-visi-year.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
-    echo "</tr>" >> ${TEMPFILE}
+    for TIMERANGE in day week month year ; do
+        echo "  <td>${TIMERANGE^}</td>" >> ${TEMPFILE}
+        for METRIC in alti ceil visi wind temp ; do 
+            echo "  <td><a href="/rrdweb/img-link/${AIRPORT_LOWER}-${METRIC}-${TIMERANGE}-rrd.html"><img src="/images/rrd/${AIRPORT_LOWER}-${METRIC}-${TIMERANGE}.png" width="150" height="75"></a></td>" >> ${TEMPFILE}
+        done
+        echo "</tr>" >> ${TEMPFILE}
+    done
     echo >> ${TEMPFILE} ;
 done
 echo "<td colspan=4><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${TEMPFILE}

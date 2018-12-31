@@ -50,7 +50,6 @@ print(textwrap.dedent("""\
     <html>
     <head>
     <meta http-equiv="refresh" content="300">
-    <link rel="stylesheet" type="text/css" href="airpuff.css">
     <title>%s AirPuff Airport WX Info</title>
     </head>
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
@@ -62,8 +61,8 @@ print(textwrap.dedent("""\
     <br>
     <br>
     <font color="white" face="Courier" size=3>
-    <table class="table">
-    <tr class="th">
+    <table style="color: #FFFFFF; border: 1; border-spacing: 3px; bordercolor: black ; text-align: left; ">
+    <tr style="color:yellow; border=1; text-align:center">
     <th>ARPT</th><th>TIME</th><th>CAT</th><th>TEMP</th><th>DEW PT</th><th>T-DP</th><th>WIND</th><th>VIS</th><th>ALT</th><th>SKY COVER</th>
     </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
@@ -166,20 +165,8 @@ for count in range(0, met_json_results):
 #123456781234567812345678123412345678123456781234567812345678123412341234567890121234
 #ARPT	TIME	CAT	TEMP	DEW PT	T-DP	WIND	VIS	ALT	SKY COVER	ELEV
 #    print("<tr><td>%-8s</td><td>%-8s</td><td>%-5s</td><td>%-8d</td><td>%-8d</td><td>%-8d</td><td>%3d@%-4d</td><td>%-4d</td><td>%-4d</td><td>%-4s</td><td>%-8s</td></tr>" % (icao, obs_time_conv, flt_cat, temp_f, dewpt_f, t_dp_spread_f, win_deg, win_spd_kts, vis_mi_tot, bar_hg, ceil_code, ceil_ft))
-    print("<tr class="td">\
-    <td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
-    <td>%-s</td>\
-    <td>%-s</td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
-    <td>%-s %-d</td>\
-    </tr>\n" % (icao_lo, icao, obs_time_conv, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
-
-xprint(textwrap.dedent("""\
+    print("<tr><td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td><td>%-s</td><td>%-s</td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td><td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td><td>%-s %-d</td></tr>\n" % (icao_lo, icao, obs_time_conv, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
+print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
     </table>
     </body>

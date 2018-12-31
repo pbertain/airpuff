@@ -49,7 +49,7 @@ rrdcreate $STOREPATH/${AIRPORT_LOWER}-temp.rrd \
 
 rrdcreate $STOREPATH/${AIRPORT_LOWER}-altimeter.rrd \
   --no-overwrite --start now --step $STEP \
-  DS:altimeter:GAUGE:600:20:35 \
+  DS:altimeter:GAUGE:600:26:35 \
   RRA:AVERAGE:0.5:$DAYAVG:$DAYSTEPS \
   RRA:AVERAGE:0.5:$WEEKAVG:$WEEKSTEPS \
   RRA:AVERAGE:0.5:$MONAVG:$MONSTEPS \
@@ -67,6 +67,14 @@ rrdcreate $STOREPATH/${AIRPORT_LOWER}-wind.rrd \
 rrdcreate $STOREPATH/${AIRPORT_LOWER}-visibility.rrd \
   --no-overwrite --start now --step $STEP \
   DS:visibility:GAUGE:600:0:360 \
+  RRA:AVERAGE:0.5:$DAYAVG:$DAYSTEPS \
+  RRA:AVERAGE:0.5:$WEEKAVG:$WEEKSTEPS \
+  RRA:AVERAGE:0.5:$MONAVG:$MONSTEPS \
+  RRA:AVERAGE:0.5:$YEARAVG:$YEARSTEPS
+
+rrdcreate $STOREPATH/${AIRPORT_LOWER}-ceiling.rrd \
+  --no-overwrite --start now --step $STEP \
+  DS:ceiling:GAUGE:600:0:20000 \
   RRA:AVERAGE:0.5:$DAYAVG:$DAYSTEPS \
   RRA:AVERAGE:0.5:$WEEKAVG:$WEEKSTEPS \
   RRA:AVERAGE:0.5:$MONAVG:$MONSTEPS \
