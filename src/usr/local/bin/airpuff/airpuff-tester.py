@@ -94,6 +94,14 @@ for count in range(0, met_json_results):
         ceil_m            = met_json['data'][count]['ceiling']['meters_agl']
     except:
         ceil_m            = 3,657.6
+    if ceil_ft > 3000:
+        ceil_class = "vfr_std"
+    elif 1000 < ceil_ft <= 3000:
+        ceil_class = "mvfr_std"
+    elif 500 < ceil_ft <= 1000:
+        ceil_class = "ifr_std"
+    elif ceil_ft <= 500:
+        ceil_class = "lifr_std"
     cld_len           = len(met_json['data'][count]['clouds'])
 #   for cld_ct in range(0, cld_len):
 #        cld_code          = met_json['data'][cld_ct]['clouds']['code']
@@ -186,9 +194,9 @@ for count in range(0, met_json_results):
 <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>\
 <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
 <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
-<td>%-s %-d</td>\
+<td class=\"%s\">%-s %-d</td>\
 </tr>\n" % \
-    (flt_cat_class, icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
+    (flt_cat_class, icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
