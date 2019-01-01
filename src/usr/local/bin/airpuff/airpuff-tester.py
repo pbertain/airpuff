@@ -114,7 +114,8 @@ for count in range(0, met_json_results):
     elev_ft           = met_json['data'][count]['elevation']['feet']
     elev_m            = met_json['data'][count]['elevation']['meters']
     flt_cat           = met_json['data'][count]['flight_category']
-    flt_cat_lo        = flt_cat.lower() + "_std"
+    flt_cat_lo        = flt_cat.lower()
+    flt_cat_class     = flt_cat_lo + "_std"
     hum_pct           = met_json['data'][count]['humidity_percent']
     try:
         temp_c            = met_json['data'][count]['temperature']['celsius']
@@ -178,7 +179,8 @@ for count in range(0, met_json_results):
     <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
     <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
     <td>%-s %-d</td>\
-    </tr>\n" % (icao_lo, icao, obs_time_conv, flt_cat_lo, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
+    </tr>\n" % \
+    (icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
