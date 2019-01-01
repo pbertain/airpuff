@@ -45,6 +45,7 @@ met_json          = json.loads(met_data)
 met_json_results  = met_json['results']
 
 time_fmt       = '%H:%M %Z'
+time_comp_fmt  = '%H:%M'
 
 print(textwrap.dedent("""\
     <html>
@@ -71,13 +72,13 @@ print(textwrap.dedent("""\
 for count in range(0, met_json_results):
     met_icao          = met_json['data'][count]['icao']
     cardinal          = count + 1
-
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
     name              = met_json['data'][count]['name']
     obs_time          = met_json['data'][count]['observed']
     obs_time_obj      = datetime.datetime.strptime(obs_time, '%d-%m-%Y @ %H:%MZ')
     obs_time_conv     = obs_time_obj.strftime(time_fmt)
+    obs_time_age     = datetime.strptime(utc_cur_time, time_comp_fmt) - datetime.strptime(obs_time_conv, time_comp_fmt)
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
     bar_kpa           = met_json['data'][count]['barometer']['kpa']
@@ -196,7 +197,7 @@ for count in range(0, met_json_results):
 <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
 <td class=\"%s\">%-s %-d</td>\
 </tr>\n" % \
-    (flt_cat_class, icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
