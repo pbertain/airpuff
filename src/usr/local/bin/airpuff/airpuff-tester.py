@@ -166,7 +166,7 @@ for count in range(0, met_json_results):
 #123456781234567812345678123412345678123456781234567812345678123412341234567890121234
 #ARPT	TIME	CAT	TEMP	DEW PT	T-DP	WIND	VIS	ALT	SKY COVER	ELEV
 #    print("<tr><td>%-8s</td><td>%-8s</td><td>%-5s</td><td>%-8d</td><td>%-8d</td><td>%-8d</td><td>%3d@%-4d</td><td>%-4d</td><td>%-4d</td><td>%-4s</td><td>%-8s</td></tr>" % (icao, obs_time_conv, flt_cat, temp_f, dewpt_f, t_dp_spread_f, win_deg, win_spd_kts, vis_mi_tot, bar_hg, ceil_code, ceil_ft))
-    print("<tr class="td">\
+    print("<tr class=\"td\">\
     <td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
     <td>%-s</td>\
     <td class=\"%s\">%-s</td>\
