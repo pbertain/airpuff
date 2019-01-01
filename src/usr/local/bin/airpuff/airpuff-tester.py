@@ -139,6 +139,14 @@ for count in range(0, met_json_results):
     except:
         vis_mi_frac    = '0.0'
     vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
+    if vis_mi_tot > 5:
+        visi_class = "vfr"
+    elif 3 < vis_mi_tot <= 5:
+        visi_class = "mvfr"
+    elif 1 < vis_mi_tot <= 3:
+        visi_class = "ifr"
+    elif vis_mi_tot <= 1:
+        visi_class = "lifr"
     try:
         win_deg          = met_json['data'][count]["wind"]['degrees']
     except:
@@ -169,18 +177,18 @@ for count in range(0, met_json_results):
 #ARPT	TIME	CAT	TEMP	DEW PT	T-DP	WIND	VIS	ALT	SKY COVER	ELEV
 #    print("<tr><td>%-8s</td><td>%-8s</td><td>%-5s</td><td>%-8d</td><td>%-8d</td><td>%-8d</td><td>%3d@%-4d</td><td>%-4d</td><td>%-4d</td><td>%-4s</td><td>%-8s</td></tr>" % (icao, obs_time_conv, flt_cat, temp_f, dewpt_f, t_dp_spread_f, win_deg, win_spd_kts, vis_mi_tot, bar_hg, ceil_code, ceil_ft))
     print("<tr class=\"td\">\
-    <td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
-    <td>%-s</td>\
-    <td class=\"%s\">%-s</td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
-    <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
-    <td>%-s %-d</td>\
-    </tr>\n" % \
-    (icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
+<td><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
+<td>%-s</td>\
+<td class=\"%s\">%-s</td>\
+<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
+<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
+<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
+<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>\
+<td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
+<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
+<td>%-s %-d</td>\
+</tr>\n" % \
+    (icao_lo, icao, obs_time_conv, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
