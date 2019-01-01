@@ -6,7 +6,7 @@ import sys
 import textwrap
 import urllib.request
 
-from datetime import datetime
+#from datetime import datetime
 from decimal import Decimal
 from numbers import Number
 from fractions import Fraction
@@ -26,10 +26,12 @@ utc               = pytz.timezone("UTC")
 
 full_fmt          = '%a %Y-%m-%d %H:%M %Z'
 time_fmt          = '%H:%M %Z'
+time_comp_fmt     = '%H:%M'
 
 pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
 eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
+utc_cur_comp_time = datetime.datetime.now(utc).strftime(time_comp_fmt)
 
 #print("Work Commute AirPuff current run:\n%s / Zulu / Z\n%s / %s\n" % (utc_cur_time, pac_cur_time, eas_cur_time))
 #print("ARPT	TIME	CAT  TEMP    DEW PT  T-DP    WIND    VIS ALT SKY COVER")
@@ -43,9 +45,6 @@ met_data          = met_res.read()
 #met_dump          = json.dumps(met_data)
 met_json          = json.loads(met_data)
 met_json_results  = met_json['results']
-
-time_fmt       = '%H:%M %Z'
-time_comp_fmt  = '%H:%M'
 
 print(textwrap.dedent("""\
     <html>
@@ -78,7 +77,8 @@ for count in range(0, met_json_results):
     obs_time          = met_json['data'][count]['observed']
     obs_time_obj      = datetime.datetime.strptime(obs_time, '%d-%m-%Y @ %H:%MZ')
     obs_time_conv     = obs_time_obj.strftime(time_fmt)
-    obs_time_age     = datetime.strptime(utc_cur_time, time_comp_fmt) - datetime.strptime(obs_time_conv, time_comp_fmt)
+    obs_time_comp     = obs_time_obj.strftime(time_comp_fmt)
+    obs_time_age      = datetime.datetime.strptime(utc_cur_comp_time, time_comp_fmt) - datetime.datetime.strptime(obs_time_comp, time_comp_fmt)
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
     bar_kpa           = met_json['data'][count]['barometer']['kpa']
