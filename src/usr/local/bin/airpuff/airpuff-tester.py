@@ -114,7 +114,7 @@ for count in range(0, met_json_results):
     elev_ft           = met_json['data'][count]['elevation']['feet']
     elev_m            = met_json['data'][count]['elevation']['meters']
     flt_cat           = met_json['data'][count]['flight_category']
-    flt_cat_lo        = flt_cat.lower()
+    flt_cat_lo        = flt_cat.lower() + "_std"
     hum_pct           = met_json['data'][count]['humidity_percent']
     try:
         temp_c            = met_json['data'][count]['temperature']['celsius']
