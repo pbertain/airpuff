@@ -81,7 +81,7 @@ for count in range(0, met_json_results):
     obs_time_age      = datetime.datetime.strptime(utc_cur_comp_time, time_comp_fmt) - datetime.datetime.strptime(obs_time_comp, time_comp_fmt)
     #obs_time_age_shrt = datetime.striptime(obs_time_age, time_comp_fmt)
     # Following dummy date is pulled from https://stackoverflow.com/questions/100210/what-is-the-standard-way-to-add-n-seconds-to-datetime-time-in-python
-        obs_time_test     = (datetime.datetime(101,1,1,11,34,59) + obs_time_age).strftime(time_comp_fmt)
+    obs_time_test     = (datetime.datetime(101,1,1,11,34,59) + obs_time_age).strftime(time_comp_fmt)
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
     bar_kpa           = met_json['data'][count]['barometer']['kpa']
