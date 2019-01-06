@@ -34,14 +34,8 @@ for AIRPORT in ${AIRPORTS} ; do
         --color BACK#333333 \
         --color FONT#CCCCCC \
         DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
-        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
-        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
         LINE5:alti_avg#00FF00:"Alti - Avg" \
-        LINE1:alti_min#9900FF:"Alti - Min" \
-        LINE1:alti_max#FF0066:"Alti - Max" \
-        GPRINT:alti_avg:AVERAGE:" Current\:%8.2lf\t" \
-        GPRINT:alti_min:MIN:"Min\:%8.2lf %s\t"  \
-        GPRINT:alti_max:MAX:"Max\:%8.2lf %s\n";
+        GPRINT:alti_avg:LAST:"Current\:%8.2lf %s\n";
 
     /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-day.png \
         -s -24h -e now --step 500 --slope-mode \
