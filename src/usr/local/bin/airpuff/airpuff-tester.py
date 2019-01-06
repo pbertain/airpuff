@@ -11,7 +11,7 @@ from decimal import Decimal
 from numbers import Number
 from fractions import Fraction
 
-user_agent        = 'AirPuff/2.0; Python/3.6.5_or_later'
+user_agent        = 'AirPuff/2.0; Python/3.6.5'
 
 region            = sys.argv[1]
 ap_csv            = sys.argv[2]

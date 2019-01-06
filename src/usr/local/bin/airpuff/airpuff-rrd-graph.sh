@@ -23,20 +23,39 @@ for AIRPORT in ${AIRPORTS} ; do
     AIRPORT_LOWER=$(echo -e "${AIRPORT}" | tr '[:upper:]' '[:lower:]')
 
   ## Days
-    /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Altimeter" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -u 31.00 -l 28.00 -r -a PNG -W "AirPuff® 2018" DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE LINE5:alti#00FF00:"Altimeter" GPRINT:alti:LAST:" Current\:%3.1lf\n"
+    /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-day.png \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${AIRPORT} Altimeter" \
+        -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit 31.00 -l 28.00 -r \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
+        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
+        LINE5:alti_avg#00FF00:"Alti - Avg" \
+        LINE1:alti_min#9900FF:"Alti - Min" \
+        LINE1:alti_max#FF0066:"Alti - Max" \
+        GPRINT:alti_avg:AVERAGE:" Current\:%8.2lf\t" \
+        GPRINT:alti_min:MIN:"Min\:%8.2lf %s\t"  \
+        GPRINT:alti_max:MAX:"Max\:%8.2lf %s\n";
+
     /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-day.png \
         -s -24h -e now --step 500 --slope-mode \
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "360" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         --right-axis-label 'Wind Dir' \
-        --right-axis 0.01:0 \
+        --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
-        --upper-limit "360" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
         CDEF:scaled_windspd=windspd,1,* \
@@ -44,7 +63,21 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:windspd:LAST:"%8.1lf\\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
         GPRINT:winddir:LAST:"%10.1lf\\n" ;
-    /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-winddir-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Wind Dir" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC --upper-limit "370" -Y -a PNG -W "AirPuff® 2018" DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE LINE5:winddir#0000FF:"Wind Dir" GPRINT:winddir:LAST:" Current\:%3.1lf\n" ;
+
+    /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-winddir-day.png \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${AIRPORT} Wind Dir" \
+        -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "370" \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
+        LINE5:winddir#0000FF:"Wind Dir" \
+        GPRINT:winddir:LAST:" Current\:%3.1lf\n" ;
+
     /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-windspd-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Wind Speed" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC --upper-limit "40" -Y -a PNG -W "AirPuff® 2018" DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE LINE5:windspd#00FF00:"Wind Speed" GPRINT:windspd:LAST:" Current\:%3.1lf\n" ;
     /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
     /bin/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0.0" --upper-limit "20000.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
@@ -52,12 +85,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -24h -e now --step 500 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --upper-limit "120" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
         DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
         DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
@@ -74,15 +107,15 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -7d -e now --step 3600 --slope-mode \
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "370" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         --right-axis-label 'Wind Speed' \
         --right-axis 0.01:0 \
         --right-axis-format %1.1lf \
-        --upper-limit "370" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
         CDEF:scaled_windspd=windspd,1,* \
@@ -96,12 +129,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -7d -e now --step 3600 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --upper-limit "120" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
         DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
         DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
@@ -118,15 +151,15 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -30d -e now --step 10800 \
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "370" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         --right-axis-label 'Wind Dir' \
         --right-axis 0.01:0 \
         --right-axis-format %1.1lf \
-        --upper-limit "370" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
         CDEF:scaled_windspd=windspd,1,* \
@@ -140,12 +173,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -30d -e now --step 10800 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --upper-limit "120" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
         DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
         DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
@@ -162,15 +195,15 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -365d -e now --step 21600 \
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "360" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         --right-axis-label 'Wind Dir' \
         --right-axis 0.01:0 \
         --right-axis-format %1.1lf \
-        --upper-limit "360" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
         CDEF:scaled_windspd=windspd,1,* \
@@ -184,12 +217,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -s -365d -e now --step 21600 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018" \
+        --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --upper-limit "120" \
-        -Y -a PNG \
-        -W "AirPuff® 2018" \
         DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
         DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
         DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
