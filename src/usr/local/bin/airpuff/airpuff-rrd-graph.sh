@@ -47,12 +47,12 @@ for AIRPORT in ${AIRPORTS} ; do
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --right-axis-label 'Wind Dir' \
+        --right-axis-label 'Wind Speed' \
         --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,1,* \
+        CDEF:scaled_windspd=windspd,10,* \
         LINE5:windspd#00FF00:"Wind Speed" \
         GPRINT:windspd:LAST:"%8.1lf\\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
@@ -108,11 +108,11 @@ for AIRPORT in ${AIRPORTS} ; do
         --color BACK#333333 \
         --color FONT#CCCCCC \
         --right-axis-label 'Wind Speed' \
-        --right-axis 0.01:0 \
+        --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,1,* \
+        CDEF:scaled_windspd=windspd,10,* \
         LINE5:windspd#00FF00:"Wind Speed" \
         GPRINT:windspd:LAST:"%10.1lf\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
@@ -151,12 +151,12 @@ for AIRPORT in ${AIRPORTS} ; do
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --right-axis-label 'Wind Dir' \
-        --right-axis 0.01:0 \
+        --right-axis-label 'Wind Speed' \
+        --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,1,* \
+        CDEF:scaled_windspd=windspd,10,* \
         LINE5:windspd#00FF00:"Wind Speed" \
         GPRINT:windspd:LAST:"%8.1lf\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
@@ -195,12 +195,12 @@ for AIRPORT in ${AIRPORTS} ; do
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        --right-axis-label 'Wind Dir' \
-        --right-axis 0.01:0 \
+        --right-axis-label 'Wind Speed' \
+        --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,1,* \
+        CDEF:scaled_windspd=windspd,10,* \
         LINE5:windspd#00FF00:"Wind Speed" \
         GPRINT:windspd:LAST:"%10.1lf\\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
