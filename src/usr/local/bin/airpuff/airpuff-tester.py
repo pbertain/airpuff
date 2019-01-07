@@ -6,7 +6,6 @@ import sys
 import textwrap
 import urllib.request
 
-#from datetime import datetime
 from decimal import Decimal
 from numbers import Number
 from fractions import Fraction
@@ -26,15 +25,13 @@ utc               = pytz.timezone("UTC")
 
 full_fmt          = '%a %Y-%m-%d %H:%M %Z'
 time_fmt          = '%H:%M %Z'
-time_comp_fmt     = '%H:%M'
+short_fmt         = '%H:%M'
+metar_fmt         = '%d-%m-%Y @ %H:%MZ'
 
 pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
 eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
-utc_cur_comp_time = datetime.datetime.now(utc).strftime(time_comp_fmt)
-
-#print("Work Commute AirPuff current run:\n%s / Zulu / Z\n%s / %s\n" % (utc_cur_time, pac_cur_time, eas_cur_time))
-#print("ARPT	TIME	CAT  TEMP    DEW PT  T-DP    WIND    VIS ALT SKY COVER")
+utc_cur_comp_time = datetime.datetime.now(utc).strftime(short_fmt)
 
 met_url           = 'https://api.checkwx.com/metar/' + ap_csv_lo + '/decoded?pretty=1'
 met_hdrs          = {'X-API-Key'  : 'c5d65ffd02f05ddc608d5f0850',
@@ -64,7 +61,7 @@ print(textwrap.dedent("""\
     <font color="white" face="Courier" size=3>
     <table class="table">
     <tr class="th">
-    <th>ARPT</th><th>TIME</th><th>CAT</th><th>TEMP</th><th>DEW PT</th><th>T-DP</th><th>WIND</th><th>VIS</th><th>ALT</th><th>SKY COVER</th>
+    <th>ARPT</th><th>AGE</th><th>CAT</th><th>TEMP</th><th>DEW PT</th><th>T-DP</th><th>WIND</th><th>VIS</th><th>ALT</th><th>SKY COVER</th>
     </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
@@ -75,13 +72,12 @@ for count in range(0, met_json_results):
     icao_lo           = icao.lower()
     name              = met_json['data'][count]['name']
     obs_time          = met_json['data'][count]['observed']
-    obs_time_obj      = datetime.datetime.strptime(obs_time, '%d-%m-%Y @ %H:%MZ')
-    obs_time_conv     = obs_time_obj.strftime(time_fmt)
-    obs_time_comp     = obs_time_obj.strftime(time_comp_fmt)
-    obs_time_age      = datetime.datetime.strptime(utc_cur_comp_time, time_comp_fmt) - datetime.datetime.strptime(obs_time_comp, time_comp_fmt)
-    #obs_time_age_shrt = datetime.striptime(obs_time_age, time_comp_fmt)
-    # Following dummy date is pulled from https://stackoverflow.com/questions/100210/what-is-the-standard-way-to-add-n-seconds-to-datetime-time-in-python
-    obs_time_test     = (datetime.datetime(101,1,1,11,34,59) + obs_time_age).strftime(time_comp_fmt)
+    obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
+    obs_time_comp     = obs_time_obj.strftime(short_fmt)
+    utc_conv          = datetime.datetime.strptime(str(utc_cur_comp_time), short_fmt)
+    obs_time_conv     = datetime.datetime.strptime(str(obs_time_comp), short_fmt)
+    obs_time_age      = utc_conv - obs_time_conv
+
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
     bar_kpa           = met_json['data'][count]['barometer']['kpa']
@@ -184,10 +180,6 @@ for count in range(0, met_json_results):
     except:
         win_spd_mps      = 0
 
-#    print ("%-6s Temp: %-2d Dew Pt: %-2d T-DP Spread: %-2d - Ceil: %-s / %-d" % (icao, temp_f, dewpt_f, t_dp_spread_f, ceil_code, ceil_ft))
-#123456781234567812345678123412345678123456781234567812345678123412341234567890121234
-#ARPT	TIME	CAT	TEMP	DEW PT	T-DP	WIND	VIS	ALT	SKY COVER	ELEV
-#    print("<tr><td>%-8s</td><td>%-8s</td><td>%-5s</td><td>%-8d</td><td>%-8d</td><td>%-8d</td><td>%3d@%-4d</td><td>%-4d</td><td>%-4d</td><td>%-4s</td><td>%-8s</td></tr>" % (icao, obs_time_conv, flt_cat, temp_f, dewpt_f, t_dp_spread_f, win_deg, win_spd_kts, vis_mi_tot, bar_hg, ceil_code, ceil_ft))
     print("<tr class=\"td\">\
 <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
 <td>%-s</td>\
@@ -200,7 +192,7 @@ for count in range(0, met_json_results):
 <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
 <td class=\"%s\">%-s %-d</td>\
 </tr>\n" % \
-    (flt_cat_class, icao_lo, icao, obs_time_test, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
@@ -208,17 +200,3 @@ print(textwrap.dedent("""\
     </body>
     </html>
     """) % (fqdn))
-
-#https://www.airpuff.info/rrdweb/img-link/kedu-alti-day-rrd.html
-
-#    print("icao:  %-8s" % (icao))
-#    print("time:  %-8s" % (obs_time))
-#    print("cat:   %-4s" % (flt_cat))
-#    print("temp:  %-8d" % (temp_f))
-#    print("dp:    %-8d" % (dewpt_f))
-#    print("t-dp:  %-8d" % (t_dp_spread_f))
-#    print("wind:  %-3d" % (win_deg))
-#    print("spd:   %-4d" % (win_spd_kts))
-#    print("vis:   %-4d" % (vis_mi))
-#    print("alt:   %-4d" % (bar_hg))
-#    print("cld:   %-12s" % (cld_len))
