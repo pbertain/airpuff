@@ -33,13 +33,13 @@ for AIRPORT in ${AIRPORTS} ; do
         -Y -a PNG \
         -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
         --upper-limit 31.00 -l 28.00 -r \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
         --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
         DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
         LINE5:alti_avg#00FF00:"Alti - Avg" \
         GPRINT:alti_avg:LAST:"Current\:%8.2lf %s\n";
@@ -117,7 +117,23 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
 
   ## Weeks
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Altimeter" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -u 31.00 -l 28.00 -r -a PNG -W "AirPuff® 2018" DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE LINE5:alti#00FF00:"Altimeter" GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-week.png \
+        -s -7d -e now --step 3600 \
+        -t "${AIRPORT} Altimeter" \
+        -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --left-axis-format %2.2lf \
+        --right-axis 1:0 \
+        --right-axis-format %2.2lf \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        LINE5:alti#00FF00:"Altimeter" \
+        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-week.png \
         -s -7d -e now --step 3600 --slope-mode \
         -t "${AIRPORT} Wind" \
@@ -161,7 +177,23 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
 
     #Months
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Altimeter" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -u 31.00 -l 28.00 -r -a PNG -W "AirPuff® 2018" DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE LINE5:alti#00FF00:"Altimeter" GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-month.png \
+        -s -30d -e now --step 10800 \
+        -t "${AIRPORT} Altimeter" \
+        -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --left-axis-format %2.2lf \
+        --right-axis 1:0 \
+        --right-axis-format %2.2lf \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        LINE5:alti#00FF00:"Altimeter" \
+        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-month.png \
         -s -30d -e now --step 10800 \
         -t "${AIRPORT} Wind" \
@@ -205,7 +237,23 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
 
     # Years
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Altimeter" -w 500 -h 309 --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -u 31.00 -l 28.00 -r -a PNG -W "AirPuff® 2018" DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE LINE5:alti#00FF00:"Altimeter" GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-year.png \
+        -s -365d -e now --step 21600 \
+        -t "${AIRPORT} Altimeter" \
+        -w 500 -h 309 \
+        -Y -a PNG \
+        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --left-axis-format %2.2lf \
+        --right-axis 1:0 \
+        --right-axis-format %2.2lf \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        LINE5:alti#00FF00:"Altimeter" \
+        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-year.png \
         -s -365d -e now --step 21600 \
         -t "${AIRPORT} Wind" \
