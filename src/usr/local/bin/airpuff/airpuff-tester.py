@@ -203,12 +203,15 @@ for count in range(0, met_json_results):
             <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
-        </tr>\n" % \
+        </tr>
     """) % (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
-    <td colspan=12><font color="#444444"><center>%s</center></font>
+        <tr>
+            <td colspan=12><font color="#444444"><center>%s</center></font></td>
+        </tr>
     </table>
     </body>
     </html>
+    
     """) % (fqdn))
