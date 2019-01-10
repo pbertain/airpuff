@@ -150,6 +150,8 @@ for count in range(0, met_json_results):
     vis_m          = met_json['data'][count]['visibility']['meters']
     try:
         vis_mi_tot_float  = met_json['data'][count]['visibility']['miles_float']
+    except:
+        vis_mi_tot_error  = true
     try:
         full_vis_mi, part_vis_mi = vis_mi.split(' ', 1)
     except:
