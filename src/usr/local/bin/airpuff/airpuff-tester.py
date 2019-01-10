@@ -165,11 +165,11 @@ for count in range(0, met_json_results):
         vis_mi_tot     = vis_mi_tot_float
     except:
         vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
-    if vis_mi_tot > 5:
+    if vis_mi_tot >= 5:
         visi_class = "vfr"
-    elif 3 < vis_mi_tot <= 5:
+    elif 3 <= vis_mi_tot < 5:
         visi_class = "mvfr"
-    elif 1 < vis_mi_tot <= 3:
+    elif 1 <= vis_mi_tot < 3:
         visi_class = "ifr"
     elif vis_mi_tot <= 1:
         visi_class = "lifr"
