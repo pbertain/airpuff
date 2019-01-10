@@ -46,10 +46,12 @@ met_json_results  = met_json['results']
 print(textwrap.dedent("""\
     <html>
     <head>
-    <meta http-equiv="refresh" content="300">
-    <link rel="stylesheet" type="text/css" href="/airpuff.css">
-    <title>%s AirPuff Airport WX Info</title>
+        <meta http-equiv="refresh" content="300">
+        <link rel="stylesheet" type="text/css" href="/airpuff.css">
     </head>
+
+    <title>%s AirPuff Airport WX Info</title>
+
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
     <font color="white" face="Tahoma" size=5>
     %s AirPuff current run:
@@ -60,9 +62,18 @@ print(textwrap.dedent("""\
     <br>
     <font color="white" face="Courier" size=3>
     <table class="table">
-    <tr class="th">
-    <th>ARPT</th><th>AGE</th><th>CAT</th><th>TEMP</th><th>DEW PT</th><th>T-DP</th><th>WIND</th><th>VIS</th><th>ALT</th><th>SKY COVER</th>
-    </tr>
+        <tr class="th">
+            <th>ARPT</th>
+            <th>AGE</th>
+            <th>CAT</th>
+            <th>TEMP</th>
+            <th>DEW PT</th>
+            <th>T-DP</th>
+            <th>WIND</th>
+            <th>VIS</th>
+            <th>ALT</th>
+            <th>SKY COVER</th>
+        </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
 for count in range(0, met_json_results):
@@ -180,19 +191,20 @@ for count in range(0, met_json_results):
     except:
         win_spd_mps      = 0
 
-    print("<tr class=\"td\">\
-<td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>\
-<td>%-s</td>\
-<td class=\"%s\">%-s</td>\
-<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>\
-<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>\
-<td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>\
-<td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>\
-<td class=\"%s\">%-s %-d</td>\
-</tr>\n" % \
-    (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    print(textwrap.dedent("""\
+        <tr class=\"td\">
+            <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td>%-s</td>
+            <td class=\"%s\">%-s</td>
+            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
+            <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
+            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
+            <td class=\"%s\">%-s %-d</td>
+        </tr>\n" % \
+    """) % (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
     <td colspan=12><font color="#444444"><center>%s</center></font>
