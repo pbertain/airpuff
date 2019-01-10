@@ -150,8 +150,6 @@ for count in range(0, met_json_results):
     vis_m          = met_json['data'][count]['visibility']['meters']
     try:
         vis_mi_tot_float  = met_json['data'][count]['visibility']['miles_float']
-    except:
-        vis_mi_tot_float  = 0
     try:
         full_vis_mi, part_vis_mi = vis_mi.split(' ', 1)
     except:
@@ -161,7 +159,10 @@ for count in range(0, met_json_results):
         vis_mi_frac    = Fraction(part_vis_mi)
     except:
         vis_mi_frac    = '0.0'
-    vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
+    try:
+        vis_mi_tot     = vis_mi_tot_float
+    except:
+        vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
     if vis_mi_tot > 5:
         visi_class = "vfr"
     elif 3 < vis_mi_tot <= 5:
@@ -208,7 +209,7 @@ for count in range(0, met_json_results):
             <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot_float, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (flt_cat_class, icao_lo, icao, obs_time_age, flt_cat_class, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
