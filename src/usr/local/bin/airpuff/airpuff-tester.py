@@ -105,13 +105,13 @@ for count in range(0, met_json_results):
         ceil_m            = met_json['data'][count]['ceiling']['meters_agl']
     except:
         ceil_m            = 3,657.6
-    if ceil_ft > 3000:
+    if ceil_ft >= 3000:
         ceil_class = "vfr_std"
-    elif 1000 < ceil_ft <= 3000:
+    elif 1000 <= ceil_ft < 3000:
         ceil_class = "mvfr_std"
-    elif 500 < ceil_ft <= 1000:
+    elif 500 <= ceil_ft < 1000:
         ceil_class = "ifr_std"
-    elif ceil_ft <= 500:
+    elif ceil_ft < 500:
         ceil_class = "lifr_std"
     cld_len           = len(met_json['data'][count]['clouds'])
 #   for cld_ct in range(0, cld_len):
