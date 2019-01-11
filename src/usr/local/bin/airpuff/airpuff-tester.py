@@ -171,7 +171,7 @@ for count in range(0, met_json_results):
         visi_class = "mvfr"
     elif 1 <= vis_mi_tot < 3:
         visi_class = "ifr"
-    elif vis_mi_tot <= 1:
+    elif vis_mi_tot < 1:
         visi_class = "lifr"
     try:
         win_deg          = met_json['data'][count]["wind"]['degrees']
