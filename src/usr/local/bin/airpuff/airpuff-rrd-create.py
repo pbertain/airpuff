@@ -40,12 +40,12 @@ yearsteps        = 8760
 tenyearavg       = 10
 tenyearsteps     = 105120
 
-temperature_filename = store_path + airport_lo + "temp.rrd"
-altimeter_filename   = store_path + airport_lo + "altimeter.rrd"
-wind_filename        = store_path + airport_lo + "wind.rrd"
-visibility_filename  = store_path + airport_lo + "visibility.rrd"
-ceiling_filename     = store_path + airport_lo + "ceiling.rrd"
-category_filename    = store_path + airport_lo + "category.rrd"
+temperature_filename = store_path + airport_lo + "-temp.rrd"
+altimeter_filename   = store_path + airport_lo + "-altimeter.rrd"
+wind_filename        = store_path + airport_lo + "-wind.rrd"
+visibility_filename  = store_path + airport_lo + "-visibility.rrd"
+ceiling_filename     = store_path + airport_lo + "-ceiling.rrd"
+category_filename    = store_path + airport_lo + "-category.rrd"
 
 rrdtool.create(
     temperature_filename,
