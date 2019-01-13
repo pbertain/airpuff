@@ -49,7 +49,6 @@ category_filename    = store_path + airport_lo + "-category.rrd"
 
 rrdtool.create(
     temperature_filename,
-    '--step', step,
     '--no-overwrite',
     'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
     'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
@@ -65,8 +64,6 @@ rrdtool.create(
 
 rrdtool.create(
     altimeter_filename,
-    '--start', 'now',
-    '--step', step,
     '--no-overwrite',
     'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
     'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
@@ -77,8 +74,6 @@ rrdtool.create(
 
 rrdtool.create(
     wind_filename,
-    '--start', 'now',
-    '--step', step,
     '--no-overwrite',
     'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
     'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
@@ -90,8 +85,6 @@ rrdtool.create(
 
 rrdtool.create(
     visibility_filename,
-    '--start', 'now',
-    '--step', step,
     '--no-overwrite',
     'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
     'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
@@ -102,8 +95,6 @@ rrdtool.create(
 
 rrdtool.create(
     ceiling_filename,
-    '--start', 'now',
-    '--step', step,
     '--no-overwrite',
     'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
     'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
