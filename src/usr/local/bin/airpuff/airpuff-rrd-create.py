@@ -49,69 +49,68 @@ category_filename    = store_path + airport_lo + "category.rrd"
 
 rrdtool.create(
     temperature_filename,
-    "--start", "now",
-    "--step", step,
-    "--no-overwrite",
-    "RRA:AVERAGE:0.5:" + str(dayavg) + ":" + str(daysteps),
-    "RRA:AVERAGE:0.5:" + str(weekavg) + ":" + str(weeksteps),
-    "RRA:AVERAGE:0.5:" + str(monavg) + ":" + str(monsteps),
-    "RRA:AVERAGE:0.5:" + str(yearavg) + ":" + str(yearsteps),
-    "RRA:AVERAGE:0.5:" + str(tenyearavg) + ":" + str(tenyearsteps),
-    "DS:temp_c:GAUGE:400:-64:64",
-    "DS:temp_f:GAUGE:400:-64:150",
-    "DS:dew_pt_c:GAUGE:400:-64:64",
-    "DS:dew_pt_f:GAUGE:400:-64:150",
-    "DS:t_dp_spread_c:GAUGE:400:-4:60",
-    "DS:t_dp_spread_f:GAUGE:400:-4:130")
+    '--step', step,
+    '--no-overwrite',
+    'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (monavg, monsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (yearavg, yearsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (tenyearavg, tenyearsteps),
+    'DS:temp_c:GAUGE:400:-64:64',
+    'DS:temp_f:GAUGE:400:-64:150',
+    'DS:dew_pt_c:GAUGE:400:-64:64',
+    'DS:dew_pt_f:GAUGE:400:-64:150',
+    'DS:t_dp_spread_c:GAUGE:400:-4:60',
+    'DS:t_dp_spread_f:GAUGE:400:-4:130')
 
 rrdtool.create(
     altimeter_filename,
-    "--start", "now",
-    "--step", step,
-    "--no-overwrite",
-    "RRA:AVERAGE:0.5:" + str(dayavg) + ":" + str(daysteps),
-    "RRA:AVERAGE:0.5:" + str(weekavg) + ":" + str(weeksteps),
-    "RRA:AVERAGE:0.5:" + str(monavg) + ":" + str(monsteps),
-    "RRA:AVERAGE:0.5:" + str(yearavg) + ":" + str(yearsteps),
-    "RRA:AVERAGE:0.5:" + str(tenyearavg) + ":" + str(tenyearsteps),
-    "DS:altimeter:GAUGE:600:26:35")
+    '--start', 'now',
+    '--step', step,
+    '--no-overwrite',
+    'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (monavg, monsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (yearavg, yearsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (tenyearavg, tenyearsteps),
+    'DS:altimeter:GAUGE:600:26:35')
 
 rrdtool.create(
     wind_filename,
-    "--start", "now",
-    "--step", step,
-    "--no-overwrite",
-    "RRA:AVERAGE:0.5:" + str(dayavg) + ":" + str(daysteps),
-    "RRA:AVERAGE:0.5:" + str(weekavg) + ":" + str(weeksteps),
-    "RRA:AVERAGE:0.5:" + str(monavg) + ":" + str(monsteps),
-    "RRA:AVERAGE:0.5:" + str(yearavg) + ":" + str(yearsteps),
-    "RRA:AVERAGE:0.5:" + str(tenyearavg) + ":" + str(tenyearsteps),
-    "DS:wind_dir:GAUGE:600:0:360",
-    "DS:wind_speed:GAUGE:600:0:100")
+    '--start', 'now',
+    '--step', step,
+    '--no-overwrite',
+    'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (monavg, monsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (yearavg, yearsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (tenyearavg, tenyearsteps),
+    'DS:wind_dir:GAUGE:600:0:360',
+    'DS:wind_speed:GAUGE:600:0:100')
 
 rrdtool.create(
     visibility_filename,
-    "--start", "now",
-    "--step", step,
-    "--no-overwrite",
-    "RRA:AVERAGE:0.5:" + str(dayavg) + ":" + str(daysteps),
-    "RRA:AVERAGE:0.5:" + str(weekavg) + ":" + str(weeksteps),
-    "RRA:AVERAGE:0.5:" + str(monavg) + ":" + str(monsteps),
-    "RRA:AVERAGE:0.5:" + str(yearavg) + ":" + str(yearsteps),
-    "RRA:AVERAGE:0.5:" + str(tenyearavg) + ":" + str(tenyearsteps),
-    "DS:visibility:GAUGE:600:0:100")
+    '--start', 'now',
+    '--step', step,
+    '--no-overwrite',
+    'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (monavg, monsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (yearavg, yearsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (tenyearavg, tenyearsteps),
+    'DS:visibility:GAUGE:600:0:100')
 
 rrdtool.create(
     ceiling_filename,
-    "--start", "now",
-    "--step", step,
-    "--no-overwrite",
-    "RRA:AVERAGE:0.5:" + str(dayavg) + ":" + str(daysteps),
-    "RRA:AVERAGE:0.5:" + str(weekavg) + ":" + str(weeksteps),
-    "RRA:AVERAGE:0.5:" + str(monavg) + ":" + str(monsteps),
-    "RRA:AVERAGE:0.5:" + str(yearavg) + ":" + str(yearsteps),
-    "RRA:AVERAGE:0.5:" + str(tenyearavg) + ":" + str(tenyearsteps),
-    "DS:ceiling:GAUGE:600:0:20000")
+    '--start', 'now',
+    '--step', step,
+    '--no-overwrite',
+    'RRA:AVERAGE:0.5:%d:%d' % (dayavg, daysteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (weekavg, weeksteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (monavg, monsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (yearavg, yearsteps),
+    'RRA:AVERAGE:0.5:%d:%d' % (tenyearavg, tenyearsteps),
+    'DS:ceiling:GAUGE:600:0:20000')
 
 # feed updates to the database
 #rrdtool.update("test.rrd", "N:325")
