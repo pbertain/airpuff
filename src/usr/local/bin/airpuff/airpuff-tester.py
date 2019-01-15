@@ -63,6 +63,7 @@ print(textwrap.dedent("""\
     <font color="white" face="Courier" size=3>
     <table class="table">
         <tr class="th">
+            <th></th>
             <th>ARPT</th>
             <th>AGE</th>
             <th>CAT</th>
@@ -135,6 +136,7 @@ for count in range(0, met_json_results):
     flt_cat           = met_json['data'][count]['flight_category']
     flt_cat_link      = flt_cat.lower()
     flt_cat_text      = flt_cat_link + "_std"
+    icon_name         = "/web/icons/" + ceil_code.lower() + "-" + flt_cat_link + "-icon.png"
     hum_pct           = met_json['data'][count]['humidity_percent']
     try:
         temp_c            = met_json['data'][count]['temperature']['celsius']
@@ -163,16 +165,20 @@ for count in range(0, met_json_results):
         vis_mi_frac    = '0.0'
     try:
         vis_mi_tot     = vis_mi_tot_float
+    except TypeError:
+        vis_mi_tot     = -1
     except:
         vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
-    if vis_mi_tot >= 5:
+    if vis_mi_tot > 5:
         visi_class = "vfr"
-    elif 3 <= vis_mi_tot < 5:
+    elif 3 <= vis_mi_tot <= 5:
         visi_class = "mvfr"
     elif 1 <= vis_mi_tot < 3:
         visi_class = "ifr"
-    elif vis_mi_tot < 1:
+    elif 0 <= vis_mi_tot < 1:
         visi_class = "lifr"
+    elif vis_mi_tot < 0:
+        visi_class = "missing_std"
     try:
         win_deg          = met_json['data'][count]["wind"]['degrees']
     except:
@@ -198,20 +204,29 @@ for count in range(0, met_json_results):
     except:
         win_spd_mps      = 0
 
-    print(textwrap.dedent("""\
+    if vis_mi_tot < 0:
+        print(textwrap.dedent("""\
         <tr class=\"td\">
-            <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><img width=20 height=20 src=\"%s\"></td>
+        </tr>
+        """) % (icao_lo, icon_name))
+    else:
+        print(textwrap.dedent("""\
+        <tr class=\"td\">
+            <td><img width=20 height=20 src=\"%s\"></td>
+            <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</a></td>
             <td>%-s</td>
             <td class=\"%s\">%-s</td>
-            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
-            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
-            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
-            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"https://www.airpuff.info/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
-            <td><a class=\"%s\" href=\"https://www.airpuff.info/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
-            <td><a href=\"https://www.airpuff.info/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
+            <td><a class=\"%s\" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (flt_cat_link, icao_lo, icao, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (icon_name, flt_cat_link, icao_lo, icao, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
