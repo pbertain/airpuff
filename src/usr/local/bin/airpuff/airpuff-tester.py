@@ -2,6 +2,7 @@ import datetime
 import json
 import platform
 import pytz
+import sqlite3
 import sys
 import textwrap
 import urllib.request
@@ -18,6 +19,8 @@ ap_csv_lo         = ap_csv.lower()
 ap_csv_up         = ap_csv.upper()
 ap_list           = ap_csv.split(",")
 fqdn              = platform.node()
+
+db_name            = '/var/airpuff/data/airport_info.db'
 
 pac               = pytz.timezone('US/Pacific')
 eas               = pytz.timezone('US/Eastern')
@@ -43,6 +46,9 @@ met_data          = met_res.read()
 met_json          = json.loads(met_data)
 met_json_results  = met_json['results']
 
+conn              = sqlite3.connect(db_name)
+c                 = conn.cursor()
+
 print(textwrap.dedent("""\
     <html>
     <head>
@@ -65,6 +71,7 @@ print(textwrap.dedent("""\
         <tr class="th">
             <th></th>
             <th>ARPT</th>
+            <th></th>
             <th>AGE</th>
             <th>CAT</th>
             <th>TEMP</th>
@@ -82,6 +89,11 @@ for count in range(0, met_json_results):
     cardinal          = count + 1
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
+    try:
+        c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
+        atis_phone        = "tel://+1-" + c.fetchone()
+    except:
+        atis_phone        = "tel://+1-555-1212"
     name              = met_json['data'][count]['name']
     obs_time          = met_json['data'][count]['observed']
     obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
@@ -215,7 +227,8 @@ for count in range(0, met_json_results):
         print(textwrap.dedent("""\
         <tr class=\"td\">
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
+            <td><a href=\"%s\">☎︎</a></td>
             <td>%-s</td>
             <td class=\"%s\">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
@@ -226,7 +239,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (icon_name, flt_cat_link, icao_lo, icao, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (icon_name, flt_cat_link, icao_lo, icao, atis_phone, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
@@ -237,3 +250,5 @@ print(textwrap.dedent("""\
     </html>
     
     """) % (fqdn))
+conn.commit()
+conn.close()
