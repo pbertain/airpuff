@@ -53,7 +53,7 @@ print(textwrap.dedent("""\
     <html>
     <head>
         <meta http-equiv="refresh" content="300">
-        <link rel="stylesheet" type="text/css" href="/airpuff.css">
+        <link rel="stylesheet" type="text/css" href="/web/css/airpuff.css">
     </head>
 
     <title>%s AirPuff Airport WX Info</title>
@@ -91,7 +91,7 @@ for count in range(0, met_json_results):
     icao_lo           = icao.lower()
     try:
         c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
-        atis_phone        = "tel://+1-" + c.fetchone()
+        atis_phone        = "tel://+1-" + c.fetchone()[0]
     except:
         atis_phone        = "tel://+1-408-555-1212"
     name              = met_json['data'][count]['name']
@@ -228,7 +228,7 @@ for count in range(0, met_json_results):
         <tr class=\"td\">
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
-            <td><a href=\"%s\"><img width=30 height=30 src=\"/web/icons/telephone-icon.png\"︎></a></td>
+            <td><a href=\"%s\"><img width=20 height=20 src=\"/web/icons/telephone-icon.png\"︎></a></td>
             <td>%-s</td>
             <td class=\"%s\">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
