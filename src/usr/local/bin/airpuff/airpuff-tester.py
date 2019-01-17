@@ -93,7 +93,7 @@ for count in range(0, met_json_results):
         c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
         atis_phone        = "tel://+1-" + c.fetchone()[0]
     except:
-        atis_phone        = "tel://+1-408-555-1212"
+        atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
     name              = met_json['data'][count]['name']
     obs_time          = met_json['data'][count]['observed']
     obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
