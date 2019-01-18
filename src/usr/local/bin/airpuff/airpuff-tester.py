@@ -85,8 +85,6 @@ print(textwrap.dedent("""\
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
 for count in range(0, met_json_results):
-    met_icao          = met_json['data'][count]['icao']
-    cardinal          = count + 1
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
     if "Currently Unavailable" in (met_json['data'][count]):
