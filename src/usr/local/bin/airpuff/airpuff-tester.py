@@ -70,8 +70,8 @@ print(textwrap.dedent("""\
     <table class="table">
         <tr class="th">
             <th></th>
-            <th>ARPT</th>
             <th></th>
+            <th>ARPT</th>
             <th>AGE</th>
             <th>CAT</th>
             <th>TEMP</th>
@@ -89,6 +89,15 @@ for count in range(0, met_json_results):
     cardinal          = count + 1
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
+    if "Currently Unavailable" in (met_json['data'][count]):
+        icon_name     = "/web/icons/unknown-icon.png"
+        print(textwrap.dedent("""\
+        <tr class=\"td\">
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><img width=20 height=20 src=\"%s\"></td>
+        </tr>
+        """) % (icao_lo, icon_name))
+        break
     try:
         c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
         atis_phone        = "tel://+1-" + c.fetchone()[0]
@@ -226,9 +235,9 @@ for count in range(0, met_json_results):
     else:
         print(textwrap.dedent("""\
         <tr class=\"td\">
+            <td><a href=\"%s\"><img width=20 height=20 src=\"/web/icons/telephone-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
-            <td><a href=\"%s\"><img width=20 height=20 src=\"/web/icons/telephone-icon.png\"︎></a></td>
             <td>%-s</td>
             <td class=\"%s\">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
@@ -239,7 +248,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (icon_name, flt_cat_link, icao_lo, icao, atis_phone, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
