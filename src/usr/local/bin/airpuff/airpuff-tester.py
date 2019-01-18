@@ -90,13 +90,19 @@ for count in range(0, met_json_results):
         record_data    = met_json['data'][count]
         icao_guess     = record_data.split(" ", 1)[0]
         icao_guess_lo  = icao_guess.lower()
+        try:
+            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
+            atis_phone        = "tel://+1-" + c.fetchone()[0]
+        except:
+            atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
         <tr class=\"td\">
-            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><a href=\"%s\"><img width=20 height=20 src=\"/web/icons/telephone-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
         </tr>
-        """) % (icao_guess_lo, icao_guess, icon_name))
-        break
+        """) % (atis_phone, icon_name, icao_guess_lo, icao_guess))
+        continue
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
     try:
