@@ -85,17 +85,19 @@ print(textwrap.dedent("""\
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
 for count in range(0, met_json_results):
-    icao              = met_json['data'][count]['icao']
-    icao_lo           = icao.lower()
     if "Currently Unavailable" in (met_json['data'][count]):
-        icon_name     = "/web/icons/unknown-icon.png"
+        icon_name      = "/web/icons/unknown-icon.png"
+        record_data    = met_json['data'][count]
+        icao_guess     = record_data.split(" ", 1)[0]
         print(textwrap.dedent("""\
         <tr class=\"td\">
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
         </tr>
-        """) % (icao_lo, icon_name))
+        """) % (icao_guess, icon_name))
         break
+    icao              = met_json['data'][count]['icao']
+    icao_lo           = icao.lower()
     try:
         c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
         atis_phone        = "tel://+1-" + c.fetchone()[0]
