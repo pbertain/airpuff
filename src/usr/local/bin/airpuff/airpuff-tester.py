@@ -89,12 +89,13 @@ for count in range(0, met_json_results):
         icon_name      = "/web/icons/unknown-icon.png"
         record_data    = met_json['data'][count]
         icao_guess     = record_data.split(" ", 1)[0]
+        icao_guess_lo  = icao_guess.lower()
         print(textwrap.dedent("""\
         <tr class=\"td\">
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
         </tr>
-        """) % (icao_guess, icon_name))
+        """) % (icao_guess_lo, icao_guess, icon_name))
         break
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
