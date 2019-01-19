@@ -246,7 +246,7 @@ for count in range(0, met_json_results):
         print(textwrap.dedent("""\
         <tr class=\"td\">
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td><img width=20 height=20 src=\"%s\"></td>
+            <td><img width=40 height=20 src=\"%s\"></td>
         </tr>
         """) % (icao_lo, icon_name))
     else:
@@ -278,3 +278,4 @@ print(textwrap.dedent("""\
     """) % (fqdn))
 conn.commit()
 conn.close()
+ 
