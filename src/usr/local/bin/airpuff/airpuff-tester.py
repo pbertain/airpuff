@@ -252,7 +252,7 @@ for count in range(0, met_json_results):
     else:
         print(textwrap.dedent("""\
         <tr class=\"td\">
-            <td><a href=\"%s\"><img width=20 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
+            <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
             <td>%-s</td>
