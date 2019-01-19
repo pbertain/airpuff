@@ -5,6 +5,7 @@ import pytz
 import sqlite3
 import sys
 import textwrap
+import time
 import urllib.request
 
 from decimal import Decimal
@@ -30,7 +31,9 @@ full_fmt          = '%a %Y-%m-%d %H:%M %Z'
 time_fmt          = '%H:%M %Z'
 short_fmt         = '%H:%M'
 metar_fmt         = '%d-%m-%Y @ %H:%MZ'
+pattern           = '%d-%m-%Y @ %H:%MZ'
 
+date_time1        = datetime.datetime.now(utc).strftime(pattern)
 pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
 eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
@@ -114,9 +117,16 @@ for count in range(0, met_json_results):
     obs_time          = met_json['data'][count]['observed']
     obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
     obs_time_comp     = obs_time_obj.strftime(short_fmt)
+    date_time2        = obs_time_obj.strftime(pattern)
     utc_conv          = datetime.datetime.strptime(str(utc_cur_comp_time), short_fmt)
     obs_time_conv     = datetime.datetime.strptime(str(obs_time_comp), short_fmt)
     obs_time_age      = utc_conv - obs_time_conv
+    epoch1            = int(time.mktime(time.strptime(date_time1, pattern)))
+    epoch2            = int(time.mktime(time.strptime(date_time2, pattern)))
+    timediff          = epoch2 - epoch1
+    td_min            = timediff / 60
+    td_hr             = timediff / 3600
+    diff              = '{:02d}:{:02d}'.format(*divmod(td_min, 60))
 
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
@@ -255,7 +265,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, obs_time_age, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, diff, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
