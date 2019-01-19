@@ -126,7 +126,7 @@ for count in range(0, met_json_results):
     timediff          = epoch2 - epoch1
     td_min            = timediff / 60
     td_hr             = timediff / 3600
-    diff              = '{:02f}:{:02f}'.format(*divmod(td_min, 60))
+    diff              = '{1:2f}:{2:2f}'.format(*divmod(td_min, 60))
 
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
