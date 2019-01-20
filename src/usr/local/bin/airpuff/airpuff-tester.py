@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import json
 import platform
@@ -38,6 +39,7 @@ pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
 eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
 utc_cur_comp_time = datetime.datetime.now(utc).strftime(short_fmt)
+epoch_now         = calendar.timegm(time.strptime(date_time1, metar_fmt))
 
 met_url           = 'https://api.checkwx.com/metar/' + ap_csv_lo + '/decoded?pretty=1'
 met_hdrs          = {'X-API-Key'  : 'c5d65ffd02f05ddc608d5f0850',
@@ -103,6 +105,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td colspan=9><center>Data Unavailable</td>
         </tr>
         """) % (atis_phone, icon_name, icao_guess_lo, icao_guess))
         continue
@@ -127,6 +130,10 @@ for count in range(0, met_json_results):
     td_min            = timediff / 60
     td_hr             = timediff / 3600
     diff              = '{:2f}:{:2f}'.format(*divmod(td_min, 60))
+    epoch_report      = calendar.timegm(time.strptime(obs_time, metar_fmt))
+    epoch_secs        = epoch_now - epoch_report
+    epoch_hrs         = epoch_secs / 3600
+
 
     raw               = met_json['data'][count]['raw_text']
     bar_hg            = met_json['data'][count]['barometer']['hg']
@@ -243,19 +250,42 @@ for count in range(0, met_json_results):
         win_spd_mps      = 0
 
     if vis_mi_tot < 0:
+        icon_name      = "/web/icons/unknown-icon.png"
+        try:
+            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
+            atis_phone        = "tel://+1-" + c.fetchone()[0]
+        except:
+            atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
         <tr class=\"td\">
+            <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
+            <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td><img width=40 height=20 src=\"%s\"></td>
+            <td colspan=9><center>Missing Data</td>
         </tr>
-        """) % (icao_lo, icon_name))
+        """) % (atis_phone, icon_name, icao_lo, icao))
+    elif epoch_hrs >= 3:
+        icon_name      = "/web/icons/unknown-icon.png"
+        try:
+            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
+            atis_phone        = "tel://+1-" + c.fetchone()[0]
+        except:
+            atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
+        print(textwrap.dedent("""\
+        <tr class=\"td\">
+            <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
+            <td><img width=20 height=20 src=\"%s\"></td>
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td colspan=9><center>Stale Data (More than 3 hrs old)</td>
+        </tr>
+        """) % (atis_phone, icon_name, icao_lo, icao))
     else:
         print(textwrap.dedent("""\
         <tr class=\"td\">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
-            <td>%-s</td>
+            <td>%0.2f</td>
             <td class=\"%s\">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
@@ -265,7 +295,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class=\"%s\">%-s %-d</td>
         </tr>
-    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, diff, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, epoch_hrs, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
@@ -278,4 +308,4 @@ print(textwrap.dedent("""\
     """) % (fqdn))
 conn.commit()
 conn.close()
- 
+
