@@ -105,7 +105,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td colspan=9><center>Data Unavailable</td>
+            <td colspan=9>Data Unavailable</td>
         </tr>
         """) % (atis_phone, icon_name, icao_guess_lo, icao_guess))
         continue
@@ -151,9 +151,9 @@ for count in range(0, met_json_results):
         ceil_m            = met_json['data'][count]['ceiling']['meters_agl']
     except:
         ceil_m            = 3,657.6
-    if ceil_ft >= 3000:
+    if ceil_ft > 3000:
         ceil_class = "vfr_std"
-    elif 1000 <= ceil_ft < 3000:
+    elif 1000 <= ceil_ft <= 3000:
         ceil_class = "mvfr_std"
     elif 500 <= ceil_ft < 1000:
         ceil_class = "ifr_std"
@@ -261,7 +261,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td colspan=9><center>Missing Data</td>
+            <td colspan=9>Missing Data</td>
         </tr>
         """) % (atis_phone, icon_name, icao_lo, icao))
     elif epoch_hrs >= 3:
@@ -276,7 +276,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td colspan=9><center>Stale Data (More than 3 hrs old)</td>
+            <td colspan=9>Stale Data (More than 3 hrs old)</td>
         </tr>
         """) % (atis_phone, icon_name, icao_lo, icao))
     else:
