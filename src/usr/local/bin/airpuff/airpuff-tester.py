@@ -104,8 +104,8 @@ for count in range(0, met_json_results):
         <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td class="missing_std"><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td class="td_list" colspan=9>Data Unavailable</td>
+            <td><a class="missing_std" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td class="td_list_lg" colspan=9>Data Unavailable</td>
         </tr>
         """) % (atis_phone, icon_name, icao_guess_lo, icao_guess))
         continue
@@ -260,8 +260,8 @@ for count in range(0, met_json_results):
         <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td class="missing_std"><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td colspan=9 class="td_list"">Missing Data</td>
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td class="td_list_lg" colspan=9>Missing Data</td>
         </tr>
         """) % (atis_phone, icon_name, icao_lo, icao))
     elif epoch_hrs >= 3:
@@ -275,8 +275,8 @@ for count in range(0, met_json_results):
         <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td class="missing_std"><a href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
-            <td colspan=9 class="td_list">Stale Data (More than 3 hrs old)</td>
+            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td class="td_list_lg" colspan=9>Stale Data (More than 3 hrs old)</td>
         </tr>
         """) % (atis_phone, icon_name, icao_lo, icao))
     else:
