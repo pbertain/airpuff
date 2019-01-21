@@ -101,10 +101,10 @@ for count in range(0, met_json_results):
         except:
             atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
-        <tr class=\"td\">
+        <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
+            <td><a class="missing_std" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
             <td class="td_list_lg" colspan=9>Data Unavailable</td>
         </tr>
         """) % (atis_phone, icon_name, icao_guess_lo, icao_guess))
@@ -257,7 +257,7 @@ for count in range(0, met_json_results):
         except:
             atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
-        <tr class=\"td\">
+        <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
@@ -272,7 +272,7 @@ for count in range(0, met_json_results):
         except:
             atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
-        <tr class=\"td\">
+        <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class=\"missing_std\" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
@@ -281,19 +281,19 @@ for count in range(0, met_json_results):
         """) % (atis_phone, icon_name, icao_lo, icao))
     else:
         print(textwrap.dedent("""\
-        <tr class=\"td\">
+        <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
-            <td><a class=\"%s\" href=\"/rrdweb/%s-rrd.html\">%-s</td>
+            <td><a class="%s" href=\"/rrdweb/%s-rrd.html\">%-s</td>
             <td>%0.2f</td>
-            <td class=\"%s\">%-s</td>
+            <td class="%s">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
-            <td><a class=\"%s\" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
+            <td><a class="%s" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
-            <td class=\"%s\">%-s %-d</td>
+            <td class="%s">%-s %-d</td>
         </tr>
     """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, epoch_hrs, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
