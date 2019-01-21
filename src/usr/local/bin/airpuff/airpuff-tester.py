@@ -133,6 +133,8 @@ for count in range(0, met_json_results):
     epoch_report      = calendar.timegm(time.strptime(obs_time, metar_fmt))
     epoch_secs        = epoch_now - epoch_report
     epoch_hrs         = epoch_secs / 3600
+    hours             = epoch_hrs // 1
+    mins              = round((epoch_hrs % 1) * 60)
 
 
     raw               = met_json['data'][count]['raw_text']
@@ -285,7 +287,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td><a class="%s" href=\"/rrdweb/%s-rrd.html\">%-s</td>
-            <td>%0.2f</td>
+            <td>%d:%d</td>
             <td class="%s">%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
@@ -295,7 +297,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class="%s">%-s %-d</td>
         </tr>
-    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, epoch_hrs, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
