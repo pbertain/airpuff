@@ -301,10 +301,10 @@ for count in range(0, met_json_results):
 
 print(textwrap.dedent("""\
         <tr>
-            <td class="footer" colspan=9><a href="https://www.checkwx.com/">Powered by <img src="/web/icons/check-wx-icon.png"></a></td>
+            <td class="footer" colspan=12><a href="https://www.checkwx.com/"><img width=104.3 height=50 src="/web/icons/check-wx-icon.png"></a></td>
         </tr>
         <tr>
-            <td class="footer" colspan=9>%s</td>
+            <td class="footer" colspan=12>%s</td>
         </tr>
     </table>
     </body>
