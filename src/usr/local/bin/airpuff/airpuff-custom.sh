@@ -26,7 +26,7 @@ IFR_MIN=500
 IFR_MAX=1000
 LIFR_MAX=500
 
-/bin/logger "AirPuff run starting at `date`."
+/bin/logger "AirPuff run starting at `date` for ${REGION}."
 
 cat /dev/null > ${TEMPFILE}
 echo "<html>" > ${TEMPFILE}
@@ -171,4 +171,6 @@ echo "</body>" >> ${TEMPFILE}
 echo "</html>" >> ${TEMPFILE}
 mv ${TEMPFILE} ${PRODFILE}
 
-/bin/logger "AirPuff run complete at `date`."
+/bin/logger "AirPuff run complete at `date` for ${REGION}."
+/bin/logger "PyPuff run complete at `date` for ${REGION}."
+
