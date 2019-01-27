@@ -46,9 +46,9 @@ met_hdrs          = {'X-API-Key'  : 'c5d65ffd02f05ddc608d5f0850',
                      'User-Agent' : user_agent }
 met_req           = urllib.request.Request(met_url, headers=met_hdrs)
 met_res           = urllib.request.urlopen(met_req)
-met_data          = met_res.read()
+met_data          = met_res.read().decode('utf-8')
 #met_dump          = json.dumps(met_data)
-met_json          = json.loads(met_data.content.decode('utf-8'))
+met_json          = json.loads(met_data)
 met_json_results  = met_json['results']
 
 conn              = sqlite3.connect(db_name)
