@@ -274,7 +274,7 @@ for count in range(0, met_json_results):
     elif epoch_hrs >= 3:
         icon_name      = "/web/icons/unknown-icon.png"
         try:
-            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
+            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
             atis_phone        = "tel://+1-" + c.fetchone()[0]
         except:
             atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
