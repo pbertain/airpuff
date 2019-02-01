@@ -200,8 +200,12 @@ for count in range(0, met_json_results):
         t_dp_spread_f     = temp_f - dewpt_f
     except:
         t_dp_spread_f     = 0
-    vis_mi         = met_json['data'][count]['visibility']['miles']
-    vis_m          = met_json['data'][count]['visibility']['meters']
+    try:
+        vis_mi         = met_json['data'][count]['visibility']['miles']
+        vis_m          = met_json['data'][count]['visibility']['meters']
+    except:
+    	vis_mi         = -1
+    	vis_m          = -1
     try:
         vis_mi_tot_float  = met_json['data'][count]['visibility']['miles_float']
     except:
