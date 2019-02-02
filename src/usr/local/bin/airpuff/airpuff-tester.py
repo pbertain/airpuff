@@ -21,6 +21,7 @@ ap_csv_lo         = ap_csv.lower()
 ap_csv_up         = ap_csv.upper()
 ap_list           = ap_csv.split(",")
 fqdn              = platform.node()
+shortname         = fqdn.split('.', 1)[0]
 
 db_name            = '/var/airpuff/data/airport_info.db'
 
@@ -319,7 +320,7 @@ print(textwrap.dedent("""\
     </body>
     </html>
     
-    """) % (fqdn))
+    """) % (shortname))
 conn.commit()
 conn.close()
 
