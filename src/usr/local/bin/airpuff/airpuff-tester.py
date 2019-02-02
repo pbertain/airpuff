@@ -135,7 +135,7 @@ for count in range(0, met_json_results):
     epoch_secs        = epoch_now - epoch_report
     epoch_hrs         = epoch_secs / 3600
     hours             = epoch_hrs // 1
-    minutes           = round((epoch_hrs % 1) * 60)
+    minutes           = str(round((epoch_hrs % 1) * 60))
     mins              = minutes.zfill(2)
 
 
