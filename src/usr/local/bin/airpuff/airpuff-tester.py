@@ -267,8 +267,8 @@ for count in range(0, met_json_results):
         wind_chill           = 35.74 + (0.6215 * temp_f) - (35.75 * (int(win_spd_mph) ** 0.16)) + (0.4275 * temp_f * (win_spd_mph ** 0.16))
         wind_chill_fmt       = '{:.0f}'.format(wind_chill)
     else:
-        wind_chill           = "NA"
-        wind_chill_fmt       = "NA"
+        wind_chill           = "-"
+        wind_chill_fmt       = "-"
 
     if vis_mi_tot < 0:
         icon_name      = "/web/icons/unknown-icon.png"
