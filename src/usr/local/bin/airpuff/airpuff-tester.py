@@ -81,8 +81,9 @@ print(textwrap.dedent("""\
             <th>AGE</th>
             <th>CAT</th>
             <th>TEMP</th>
-            <th>DEW PT</th>
+            <th>DP</th>
             <th>T-DP</th>
+            <th>WC</th>
             <th>WIND</th>
             <th>VIS</th>
             <th>ALT</th>
@@ -262,6 +263,11 @@ for count in range(0, met_json_results):
     except:
         win_spd_mps      = 0
 
+    if (temp_f <= 50 and win_spd_mph > 3):
+        wind_chill           = 35.74 + (0.6215 * temp_f) - (35.75 * (int(win_spd_mph) ** 0.16)) + (0.4275 * temp_f * (win_spd_mph ** 0.16))
+    else:
+        wind_chill           = "NA"
+
     if vis_mi_tot < 0:
         icon_name      = "/web/icons/unknown-icon.png"
         try:
@@ -303,12 +309,13 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
+            <td>%-s</td>
             <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
             <td><a class="%s" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class="%s">%-s %-d</td>
         </tr>
-    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, wind_chill, icao_lo, t_dp_spread_f, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
