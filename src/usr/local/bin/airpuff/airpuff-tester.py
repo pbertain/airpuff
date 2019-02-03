@@ -265,7 +265,7 @@ for count in range(0, met_json_results):
 
     if (temp_f <= 50 and win_spd_mph > 3):
         wind_chill           = 35.74 + (0.6215 * temp_f) - (35.75 * (int(win_spd_mph) ** 0.16)) + (0.4275 * temp_f * (win_spd_mph ** 0.16))
-        wind_chill_fmt       = '{:.2f}'.format(wind_chill)
+        wind_chill_fmt       = '{:.0f}'.format(wind_chill)
     else:
         wind_chill           = "NA"
         wind_chill_fmt       = "NA"
