@@ -65,15 +65,18 @@ print(textwrap.dedent("""\
     <title>%s AirPuff Airport WX Info</title>
 
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
-    <font color="white" face="Tahoma" size=5>
-    %s AirPuff current run:
-    <font face="Courier" size=3>
-    <br><font color=cornflowerblue>%s / Zulu / Z
-    <br><font color=lightgreen>%s / %s
-    <br>
-    <br>
-    <font color="white" face="Courier" size=3>
     <table class="table">
+        <tr>
+            <td class="td_titles" rowspan="3" colspan="4"><img width="150"  height="122" src="/web/icons/airpuff-logo.png"></td>
+            <td colspan="9">%s AirPuff current run:</td>
+        </tr>
+        <tr>
+            <td class="td_cfb" colspan="9">%s / Zulu / Z</td>
+        </tr>
+        <tr>
+            <td class="td_lg" colspan="9">%s / %s</td>
+        <tr>
+
         <tr class="th">
             <th></th>
             <th></th>
