@@ -67,8 +67,10 @@ print(textwrap.dedent("""\
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
     <table class="table">
         <tr>
-            <td class="td_titles" rowspan="3" colspan="4"><img width="150"  height="122" src="/web/icons/airpuff-logo.png"></td>
-            <td colspan="9">%s AirPuff current run:</td>
+            <td class="td_titles" rowspan="4" colspan="4"><img width="150"  height="122" src="/web/icons/airpuff-logo.png"></td>
+            <td class="td_titles" colspan="9">%s AirPuff current run:</td>
+        </tr>
+        <tr>
         </tr>
         <tr>
             <td class="td_cfb" colspan="9">%s / Zulu / Z</td>
