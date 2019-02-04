@@ -71,10 +71,10 @@ print(textwrap.dedent("""\
             <td class="td_titles" colspan="9">%s AirPuff current run:</td>
         </tr>
         <tr>
-            <td class="td_cfb" colspan="9">%s / Zulu / Z</td>
+            <td class="td_cfb" colspan="9" vertical-align="bottom"">%s / Zulu / Z</td>
         </tr>
         <tr>
-            <td class="td_lg" colspan="9">%s / %s</td>
+            <td class="td_lg" colspan="9" vertical-align="top">%s / %s</td>
         <tr>
 
         <tr class="th">
