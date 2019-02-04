@@ -71,8 +71,6 @@ print(textwrap.dedent("""\
             <td class="td_titles" colspan="9">%s AirPuff current run:</td>
         </tr>
         <tr>
-        </tr>
-        <tr>
             <td class="td_cfb" colspan="9">%s / Zulu / Z</td>
         </tr>
         <tr>
