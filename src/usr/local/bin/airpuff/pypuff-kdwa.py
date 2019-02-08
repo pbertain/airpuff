@@ -88,7 +88,6 @@ print(textwrap.dedent("""\
         </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
-#print(met_json)
 temp_f            = int(met_json["temp"].split('(', 1)[0])
 dewpt_f           = int(met_json["dwpt"].split('(', 1)[0])
 t_dp_spread_f     = int(temp_f - dewpt_f)
@@ -120,7 +119,6 @@ for count in range(0, ceil_len):
             ceil_code         = "UNK"
             ceil_ft           = int('-1')
 
-#print("ceil ft = %s" % (ceil_ft))
 ceil_ft            = int(ceil_ft)
 
 if ceil_ft > 3000:
@@ -154,7 +152,7 @@ icao              = met_json['metar'].split(' ')[1]
 icao_lo           = icao.lower()
 
 epoch_report      = calendar.timegm(time.strptime(obs_time, metar_fmt))
-epoch_secs        = epoch_now - epoch_report
+epoch_secs        = epoch_report - epoch_now # It seems that KDWA AWOS is 2 mins ahead
 epoch_hrs         = epoch_secs / 3600
 hours             = epoch_hrs // 1
 minutes           = str(round((epoch_hrs % 1) * 60))
@@ -175,8 +173,6 @@ else:
 
 wind_chill_act        = met_json["windChill"].split(' ')[0]
 
-print("vis_mi_tot - %s" % (vis_mi_tot))
-
 if vis_mi_tot > 5:
     visi_class = "vfr"
 elif 3 <= vis_mi_tot <= 5:
@@ -188,23 +184,15 @@ elif 0 <= vis_mi_tot < 1:
 elif vis_mi_tot < 0:
     visi_class = "missing_std"
 
-print("visi class - %s" % (visi_class))
-print("ceil ft - %s" % (ceil_ft))
-
 if (vis_mi_tot > 5 and ceil_ft > 3000):
     flt_cat           = "VFR"
-    print("FLT CAT = %s" % (flt_cat))
 elif (3 <= vis_mi_tot <= 5 and 1000 <= ceil_ft <= 3000):
     flt_cat           = "MVFR"
-    print("FLT CAT = %s" % (flt_cat))
 elif (1 <= vis_mi_tot < 3 and 500 <= ceil_ft <= 1000):
     flt_cat           = "IFR"
-    print("FLT CAT = %s" % (flt_cat))
 elif (0 <= vis_mi_tot < 1 and ceil_ft < 500):
     flt_cat           = "LIFR"
-    print("FLT CAT = %s" % (flt_cat))
 
-print("flt cat = %s" % (flt_cat))
 
 flt_cat_link      = flt_cat.lower()
 flt_cat_text      = flt_cat_link + "_std"
@@ -275,7 +263,3 @@ print(textwrap.dedent("""\
     """) % (shortname))
 conn.commit()
 conn.close()
-
-
-
-#print("%s - VFR - %d:%s - %d - %d - %d - %s / %s - %03d@%d - %d - %2.2f - %s" % (icao, hours, mins, temp_f, dewpt_f, t_dp_spread_f, wind_chill_fmt, wind_chill_act, win_deg, win_spd_kts, vis_mi_tot, bar_hg, ceil_ft))
