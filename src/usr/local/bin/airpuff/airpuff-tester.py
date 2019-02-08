@@ -149,7 +149,7 @@ for count in range(0, met_json_results):
         bar_kpa           = met_json['data'][count]['barometer']['kpa']
         bar_mb            = met_json['data'][count]['barometer']['mb']
     except:
-        bar_hg            = '2992'
+        bar_hg            = '29.92'
         bar_kpa           = '101.32075'
         bar_mb            = '1013.2075'
     try:
