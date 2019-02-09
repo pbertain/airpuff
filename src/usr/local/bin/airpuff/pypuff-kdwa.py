@@ -197,36 +197,36 @@ if vis_mi_tot > 5:
         flt_cat           = "VFR"
     elif 1000 <= ceil_ft <= 3000:
         flt_cat           = "MVFR"
-    elif 500 <= ceil_ft < 1000
+    elif 500 <= ceil_ft < 1000:
         flt_cat           = "IFR"
-    elif ceil_ft < 500
+    elif ceil_ft < 500:
         flt_cat           = "LIFR"
 elif 3 <= vis_mi_tot <= 5
     if ceil_ft > 3000:
         flt_cat           = "MVFR"
     elif 1000 <= ceil_ft <= 3000:
         flt_cat           = "MVFR"
-    elif 500 <= ceil_ft < 1000
+    elif 500 <= ceil_ft < 1000:
         flt_cat           = "IFR"
-    elif ceil_ft < 500
+    elif ceil_ft < 500:
         flt_cat           = "LIFR"
 elif 1 <= vis_mi_tot < 3
     if ceil_ft > 3000:
         flt_cat           = "IFR"
     elif 1000 <= ceil_ft <= 3000:
         flt_cat           = "IFR"
-    elif 500 <= ceil_ft < 1000
+    elif 500 <= ceil_ft < 1000:
         flt_cat           = "IFR"
-    elif ceil_ft < 500
+    elif ceil_ft < 500:
         flt_cat           = "LIFR"
 0 <= vis_mi_tot < 1
     if ceil_ft > 3000:
         flt_cat           = "LIFR"
     elif 1000 <= ceil_ft <= 3000:
         flt_cat           = "LIFR"
-    elif 500 <= ceil_ft < 1000
+    elif 500 <= ceil_ft < 1000:
         flt_cat           = "LIFR"
-    elif ceil_ft < 500
+    elif ceil_ft < 500:
         flt_cat           = "LIFR"
 
 flt_cat_link      = flt_cat.lower()
