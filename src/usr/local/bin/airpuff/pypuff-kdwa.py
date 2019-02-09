@@ -98,7 +98,7 @@ t_dp_spread_f     = int(temp_f - dewpt_f)
 win_spd_kts       = int(met_json["wndSpd"])
 win_spd_mph       = float(win_spd_kts / 0.8689762)
 win_deg           = int(met_json["wndDir"])
-vis_mi            = int(met_json["visib"].replace("+", ""))
+vis_mi            = str(met_json["visib"].replace("+", ""))
 if vis_mi.isdigit():
     vis_mi_tot        = int(vis_mi)
 else:
