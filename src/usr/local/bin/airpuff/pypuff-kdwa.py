@@ -100,26 +100,34 @@ ceil_full         = met_json["ceiling"]
 ceil_list         = ceil_full.split()
 ceil_len          = len(ceil_list)
 ceil_cap          = ceil_len - 1
+ceil_limit        = '12000'
 
 for count in range(0, ceil_len):
     try:
-        ceil_code         = ceil_list[count][:3]
-        ceil_ht           = ceil_list[count][4:6]
-        ceil_ht           = int(ceil_ht)
+        ceil_code             = ceil_list[count][:3]
+        ceil_ht               = ceil_list[count][4:6]
+        ceil_ht               = int(ceil_ht)
         if ceil_code == ("BKN" or "OVC" or "OVX"):
             ceil_ft           = int(ceil_ht * 100)
-        else:
+            if ceil_ft < ceil_limit:
+                ceil_limit        = ceil_ft
+        elif ceil_ht is None:
             ceil_ft           = '12000'
-
+            ceil_limit        = ceil_ft
+        else:
+            ceil_ft           = int(ceil_ht * 100)
+            ceil_limit        = ceil_ft
     except:
         ceil_code         = ceil_list[count][:3]
         if ceil_code == "CLR":
             ceil_ft           = int('12000')
+            ceil_limit        = ceil_ft
         else:
             ceil_code         = "UNK"
-            ceil_ft           = int('-1')
+            ceil_ft           = '-'
+            ceil_limit        = ceil_ft
 
-ceil_ft            = int(ceil_ft)
+ceil_limit        = int(ceil_limit)
 
 if ceil_ft > 3000:
     ceil_class = "vfr_std"
@@ -184,15 +192,42 @@ elif 0 <= vis_mi_tot < 1:
 elif vis_mi_tot < 0:
     visi_class = "missing_std"
 
-if (vis_mi_tot > 5 and ceil_ft > 3000):
-    flt_cat           = "VFR"
-elif (3 <= vis_mi_tot <= 5 and 1000 <= ceil_ft <= 3000):
-    flt_cat           = "MVFR"
-elif (1 <= vis_mi_tot < 3 and 500 <= ceil_ft <= 1000):
-    flt_cat           = "IFR"
-elif (0 <= vis_mi_tot < 1 and ceil_ft < 500):
-    flt_cat           = "LIFR"
-
+if vis_mi_tot > 5:
+    if ceil_ft > 3000:
+        flt_cat           = "VFR"
+    elif 1000 <= ceil_ft <= 3000:
+        flt_cat           = "MVFR"
+    elif 500 <= ceil_ft < 1000
+        flt_cat           = "IFR"
+    elif ceil_ft < 500
+        flt_cat           = "LIFR"
+elif 3 <= vis_mi_tot <= 5
+    if ceil_ft > 3000:
+        flt_cat           = "MVFR"
+    elif 1000 <= ceil_ft <= 3000:
+        flt_cat           = "MVFR"
+    elif 500 <= ceil_ft < 1000
+        flt_cat           = "IFR"
+    elif ceil_ft < 500
+        flt_cat           = "LIFR"
+elif 1 <= vis_mi_tot < 3
+    if ceil_ft > 3000:
+        flt_cat           = "IFR"
+    elif 1000 <= ceil_ft <= 3000:
+        flt_cat           = "IFR"
+    elif 500 <= ceil_ft < 1000
+        flt_cat           = "IFR"
+    elif ceil_ft < 500
+        flt_cat           = "LIFR"
+0 <= vis_mi_tot < 1
+    if ceil_ft > 3000:
+        flt_cat           = "LIFR"
+    elif 1000 <= ceil_ft <= 3000:
+        flt_cat           = "LIFR"
+    elif 500 <= ceil_ft < 1000
+        flt_cat           = "LIFR"
+    elif ceil_ft < 500
+        flt_cat           = "LIFR"
 
 flt_cat_link      = flt_cat.lower()
 flt_cat_text      = flt_cat_link + "_std"
@@ -247,7 +282,7 @@ else:
         <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
         <td class="%s">%-s %-d</td>
     </tr>
-""") % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+""") % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_limit))
 
 print(textwrap.dedent("""\
         <tr>
