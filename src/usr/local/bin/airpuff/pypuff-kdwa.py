@@ -219,7 +219,7 @@ elif 1 <= vis_mi_tot < 3:
         flt_cat           = "IFR"
     elif ceil_ft < 500:
         flt_cat           = "LIFR"
-0 <= vis_mi_tot < 1:
+elif 0 <= vis_mi_tot < 1:
     if ceil_ft > 3000:
         flt_cat           = "LIFR"
     elif 1000 <= ceil_ft <= 3000:
