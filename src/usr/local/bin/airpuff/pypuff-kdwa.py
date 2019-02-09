@@ -220,29 +220,29 @@ if vis_mi_tot > 5:
     if ceil_limit > 3000:
         flt_cat           = "VFR"
     elif 1000 <= ceil_limit <= 3000:
-        if (ceil_code = "BKN") or (ceil_code = "OVC") or (ceil_code = "OVX"):
+        if (ceil_code == ("BKN" or "OVC" or "OVX"):
             flt_cat           = "MVFR"
         else:
             flt_cat           = "VFR"
     elif 500 <= ceil_limit < 1000:
-        if (ceil_code = "BKN") or (ceil_code = "OVC") or (ceil_code = "OVX"):
+        if (ceil_code == ("BKN" or "OVC" or "OVX"):
             flt_cat           = "IFR"
         else:
             flt_cat           = "VFR"
     elif ceil_limit < 500:
-        if (ceil_code = "BKN") or (ceil_code = "OVC") or (ceil_code = "OVX"):
+        if (ceil_code == ("BKN" or "OVC" or "OVX"):
             flt_cat           = "LIFR"
         else:
             flt_cat           = "VFR"
 # MVFR VIS
 elif 3 <= vis_mi_tot <= 5:
     if 1000 <= ceil_limit:
-        if (ceil_code = "BKN") or (ceil_code = "OVC") or (ceil_code = "OVX"):
+        if (ceil_code == ("BKN" or "OVC" or "OVX"):
             flt_cat           = "MVFR"
         else:
             flt_cat           = "MVFR"
     elif 500 <= ceil_limit < 1000:
-        if (ceil_code = "BKN") or (ceil_code = "OVC") or (ceil_code = "OVX"):
+        if (ceil_code == ("BKN" or "OVC" or "OVX"):
             flt_cat           = "IFR"
         else:
             flt_cat           = "MVFR"
