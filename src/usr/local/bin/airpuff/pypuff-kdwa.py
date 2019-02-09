@@ -152,13 +152,13 @@ for count in range(0, ceil_len):
 
 ceil_limit        = int(ceil_limit)
 
-if ceil_ft > 3000:
+if ceil_limit > 3000:
     ceil_class = "vfr_std"
-elif 1000 <= ceil_ft <= 3000:
+elif 1000 <= ceil_limit <= 3000:
     ceil_class = "mvfr_std"
-elif 500 <= ceil_ft < 1000:
+elif 500 <= ceil_limit < 1000:
     ceil_class = "ifr_std"
-elif ceil_ft < 500:
+elif ceil_limit < 500:
     ceil_class = "lifr_std"
 
 pattern           = '%d-%m-%Y @ %H:%MZ'
@@ -215,42 +215,51 @@ elif 0 <= vis_mi_tot < 1:
 elif vis_mi_tot < 0:
     visi_class = "missing_std"
 
+# VFR VIS
 if vis_mi_tot > 5:
-    if ceil_ft > 3000:
+    if ceil_limit > 3000:
         flt_cat           = "VFR"
-    elif 1000 <= ceil_ft <= 3000:
-        flt_cat           = "MVFR"
-    elif 500 <= ceil_ft < 1000:
-        flt_cat           = "IFR"
-    elif ceil_ft < 500:
-        flt_cat           = "LIFR"
+    elif 1000 <= ceil_limit <= 3000:
+        if ceil_code = ("BKN" or "OVC" or "OVX")
+            flt_cat           = "MVFR"
+        else
+            flt_cat           = "VFR"
+    elif 500 <= ceil_limit < 1000:
+        if ceil_code = ("BKN" or "OVC" or "OVX")
+            flt_cat           = "IFR"
+        else
+            flt_cat           = "VFR"
+    elif ceil_limit < 500:
+        if ceil_code = ("BKN" or "OVC" or "OVX")
+            flt_cat           = "LIFR"
+        else
+            flt_cat           = "VFR"
+# MVFR VIS
 elif 3 <= vis_mi_tot <= 5:
-    if ceil_ft > 3000:
-        flt_cat           = "MVFR"
-    elif 1000 <= ceil_ft <= 3000:
-        flt_cat           = "MVFR"
-    elif 500 <= ceil_ft < 1000:
-        flt_cat           = "IFR"
-    elif ceil_ft < 500:
+    if 1000 <= ceil_limit:
+        if ceil_code = ("BKN" or "OVC" or "OVX")
+            flt_cat           = "MVFR"
+        else
+            flt_cat           = "MVFR"
+    elif 500 <= ceil_limit < 1000:
+        if ceil_code = ("BKN" or "OVC" or "OVX")
+            flt_cat           = "IFR"
+        else
+            flt_cat           = "MVFR"
+    elif ceil_limit < 500:
         flt_cat           = "LIFR"
+# IFR VIS
 elif 1 <= vis_mi_tot < 3:
-    if ceil_ft > 3000:
+    if 500 <= ceil_limit:
         flt_cat           = "IFR"
-    elif 1000 <= ceil_ft <= 3000:
-        flt_cat           = "IFR"
-    elif 500 <= ceil_ft < 1000:
-        flt_cat           = "IFR"
-    elif ceil_ft < 500:
+    elif ceil_limit < 500:
         flt_cat           = "LIFR"
-elif x0 <= vis_mi_tot < 1:
-    if ceil_ft > 3000:
+# LIFR VIS
+elif 0 <= vis_mi_tot < 1:
+    if ceil_limit < 500:
         flt_cat           = "LIFR"
-    elif 1000 <= ceil_ft <= 3000:
-        flt_cat           = "LIFR"
-    elif 500 <= ceil_ft < 1000:
-        flt_cat           = "LIFR"
-    elif ceil_ft < 500:
-        flt_cat           = "LIFR"
+else:
+    flt_cat           = "VFR(?)"
 
 flt_cat_link      = flt_cat.lower()
 flt_cat_text      = flt_cat_link + "_std"
