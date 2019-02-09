@@ -9,6 +9,10 @@ import textwrap
 import time
 import urllib.request
 
+from decimal import Decimal
+from numbers import Number
+from fractions import Fraction
+
 user_agent        = 'AirPuff/2.0; Python/3.6.5'
 
 region            = sys.argv[1]
@@ -94,7 +98,26 @@ t_dp_spread_f     = int(temp_f - dewpt_f)
 win_spd_kts       = int(met_json["wndSpd"])
 win_spd_mph       = float(win_spd_kts / 0.8689762)
 win_deg           = int(met_json["wndDir"])
-vis_mi_tot        = int(met_json["visib"].replace("+", ""))
+vis_mi            = int(met_json["visib"].replace("+", ""))
+if vis_mi.isdigit():
+    vis_mi_tot        = int(vis_mi)
+else:
+    try:
+        full_vis_mi, part_vis_mi = vis_mi.split('-', 1)
+    except:
+        full_vis_mi        = vis_mi
+        part_vis_mi        = '0.0'
+    try:
+        vis_mi_frac    = Fraction(part_vis_mi)
+    except:
+        vis_mi_frac    = '0.0'
+    try:
+        vis_mi_tot     = vis_mi_tot_float
+    except TypeError:
+        vis_mi_tot     = -1
+    except:
+        vis_mi_tot     = Fraction(vis_mi_frac) + int(full_vis_mi)
+
 bar_hg            = float(met_json["alt"])
 ceil_full         = met_json["ceiling"]
 ceil_list         = ceil_full.split()
@@ -219,7 +242,7 @@ elif 1 <= vis_mi_tot < 3:
         flt_cat           = "IFR"
     elif ceil_ft < 500:
         flt_cat           = "LIFR"
-elif 0 <= vis_mi_tot < 1:
+elif x0 <= vis_mi_tot < 1:
     if ceil_ft > 3000:
         flt_cat           = "LIFR"
     elif 1000 <= ceil_ft <= 3000:
