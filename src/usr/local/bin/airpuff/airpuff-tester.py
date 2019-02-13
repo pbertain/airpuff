@@ -80,6 +80,7 @@ print(textwrap.dedent("""\
         <tr class="th">
             <th></th>
             <th></th>
+            <th>RAW</th>
             <th>ARPT</th>
             <th>AGE</th>
             <th>CAT</th>
@@ -144,6 +145,7 @@ for count in range(0, met_json_results):
 
 
     raw               = met_json['data'][count]['raw_text']
+    metar_ref         = icao_lo + "RawMetar"
     try:
         bar_hg            = met_json['data'][count]['barometer']['hg']
         bar_kpa           = met_json['data'][count]['barometer']['kpa']
@@ -308,6 +310,16 @@ for count in range(0, met_json_results):
         <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
+            <td>
+                <a href="#%s"><img width=20 height=20 src="/web/icons/airpuff-raw-metar-icon.png"></a>
+                <div id="%s" class="metarDialog">
+                    <div>
+                        <a href="#close" title="%s Raw METAR Data" class="close">X</a>
+                        <h3 class="header_yel">%s Raw METAR Data</h3>
+                        <p class="paragraph_metar">%s</p> 
+                    </div>
+                </div>
+            </td>
             <td><a class="%s" href=\"/rrdweb/%s-rrd.html\">%-s</td>
             <td>%d:%s</td>
             <td class="%s">%-s</td>
@@ -320,7 +332,7 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class="%s">%-s %-d</td>
         </tr>
-    """) % (atis_phone, icon_name, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+    """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 
 print(textwrap.dedent("""\
         <tr>
