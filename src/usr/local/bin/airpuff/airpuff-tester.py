@@ -110,6 +110,7 @@ for count in range(0, met_json_results):
         <tr class="td">
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
+            <td></td>
             <td><a class="missing_std" href=\"https://www.airpuff.info/rrdweb/%s-rrd.html\">%-s</a></td>
             <td class="td_list_lg" colspan=9>Data Unavailable</td>
         </tr>
