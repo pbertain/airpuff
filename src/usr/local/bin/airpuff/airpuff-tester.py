@@ -125,7 +125,6 @@ for count in range(0, met_json_results):
         atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
     name              = met_json['data'][count]['name']
     obs_time_bkn      = met_json['data'][count]['observed']
-    print("obs_time_bkn = %s" % (obs_time_bkn))
     obs_time_str      = str(obs_time_bkn)
     obs_time          = obs_time_str.replace(' <span class="tx-light tx-12">@</span>', ' @')
     obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
