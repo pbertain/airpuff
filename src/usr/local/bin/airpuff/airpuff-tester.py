@@ -187,7 +187,13 @@ for count in range(0, met_json_results):
     try:
         dewpt_c           = met_json['data'][count]['dewpoint']['celsius']
         dewpt_f           = met_json['data'][count]['dewpoint']['fahrenheit']
+    except KeyError:
+        dewpt_c           = 0
+        dewpt_f           = 0
     except TypeError:
+        dewpt_c           = 0
+        dewpt_f           = 0
+    else:
         dewpt_c           = 0
         dewpt_f           = 0
     if isinstance(dewpt_f, Number):
@@ -200,11 +206,22 @@ for count in range(0, met_json_results):
     flt_cat_link      = flt_cat.lower()
     flt_cat_text      = flt_cat_link + "_std"
     icon_name         = "/web/icons/" + ceil_code.lower() + "-" + flt_cat_link + "-icon.png"
-    hum_pct           = met_json['data'][count]['humidity']['percent']
+    try:
+        hum_pct           = met_json['data'][count]['humidity']['percent']
+    except KeyError:
+        hum_pct           = 0
+    else:
+        hum_pct           = 0
     try:
         temp_c            = met_json['data'][count]['temperature']['celsius']
         temp_f            = met_json['data'][count]['temperature']['fahrenheit']
+    except KeyError:
+        temp_c            = 0
+        temp_f            = 0
     except TypeError:
+        temp_c            = 0
+        temp_f            = 0
+    else:
         temp_c            = 0
         temp_f            = 0
     try:
