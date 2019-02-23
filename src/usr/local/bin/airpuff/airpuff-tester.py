@@ -193,13 +193,6 @@ for count in range(0, met_json_results):
     except TypeError:
         dewpt_c           = 0
         dewpt_f           = 0
-    else:
-        dewpt_c           = 0
-        dewpt_f           = 0
-    if isinstance(dewpt_f, Number):
-        empty_var         = "good"
-    else:
-        dewpt_f           = 0
     elev_ft           = met_json['data'][count]['elevation']['feet']
     elev_m            = met_json['data'][count]['elevation']['meters']
     flt_cat           = met_json['data'][count]['flight_category']
@@ -219,9 +212,6 @@ for count in range(0, met_json_results):
         temp_c            = 0
         temp_f            = 0
     except TypeError:
-        temp_c            = 0
-        temp_f            = 0
-    else:
         temp_c            = 0
         temp_f            = 0
     try:
