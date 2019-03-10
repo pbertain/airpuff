@@ -32,7 +32,8 @@ utc               = pytz.timezone("UTC")
 full_fmt          = '%a %Y-%m-%d %H:%M %Z'
 time_fmt          = '%H:%M %Z'
 short_fmt         = '%H:%M'
-metar_fmt         = '%d-%m-%Y @ %H:%MZ'
+metar_fmt         = '%Y-%m-%dT%H:%M:%S.%fZ'
+# delete this if the time formatting on the previous line works:  d-%m-%Y @ %H:%MZ'
 pattern           = '%d-%m-%Y @ %H:%MZ'
 
 date_time1        = datetime.datetime.now(utc).strftime(pattern)
