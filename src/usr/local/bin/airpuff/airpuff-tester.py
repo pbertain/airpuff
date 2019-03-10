@@ -123,7 +123,7 @@ for count in range(0, met_json_results):
         atis_phone        = "tel://+1-" + c.fetchone()[0]
     except:
         atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
-    name              = met_json['data'][count]['name']
+    name              = met_json['data'][count]['station']['name']
     obs_time_bkn      = met_json['data'][count]['observed']
     obs_time_str      = str(obs_time_bkn)
     obs_time          = obs_time_str.replace(' <span class="tx-light tx-12">@</span>', ' @')
