@@ -36,7 +36,7 @@ metar_fmt         = '%Y-%m-%dT%H:%M:%S.%fZ'
 # delete this if the time formatting on the previous line works:  d-%m-%Y @ %H:%MZ'
 pattern           = '%d-%m-%Y @ %H:%MZ'
 
-date_time1        = datetime.datetime.now(utc).strftime(pattern)
+date_time1        = datetime.datetime.now(utc).strftime(metar_fmt)
 pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
 eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
