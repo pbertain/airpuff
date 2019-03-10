@@ -130,7 +130,7 @@ for count in range(0, met_json_results):
     obs_time          = obs_time_str.replace(' <span class="tx-light tx-12">@</span>', ' @')
     obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
     obs_time_comp     = obs_time_obj.strftime(short_fmt)
-    date_time2        = obs_time_obj.strftime(pattern)
+    date_time2        = obs_time_obj.strftime(metar_fmt)
     utc_conv          = datetime.datetime.strptime(str(utc_cur_comp_time), short_fmt)
     obs_time_conv     = datetime.datetime.strptime(str(obs_time_comp), short_fmt)
     obs_time_age      = utc_conv - obs_time_conv
