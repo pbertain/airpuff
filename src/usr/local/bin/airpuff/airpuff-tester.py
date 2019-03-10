@@ -134,8 +134,8 @@ for count in range(0, met_json_results):
     utc_conv          = datetime.datetime.strptime(str(utc_cur_comp_time), short_fmt)
     obs_time_conv     = datetime.datetime.strptime(str(obs_time_comp), short_fmt)
     obs_time_age      = utc_conv - obs_time_conv
-    epoch1            = int(time.mktime(time.strptime(date_time1, pattern)))
-    epoch2            = int(time.mktime(time.strptime(date_time2, pattern)))
+    epoch1            = int(time.mktime(time.strptime(date_time1, metar_fmt)))
+    epoch2            = int(time.mktime(time.strptime(date_time2, metar_fmt)))
     timediff          = epoch2 - epoch1
     td_min            = timediff / 60
     td_hr             = timediff / 3600
