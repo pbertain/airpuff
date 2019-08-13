@@ -1,4 +1,4 @@
-import calendar
+`import calendar
 import datetime
 import json
 import platform
@@ -178,7 +178,11 @@ for count in range(0, met_json_results):
         ceil_class = "ifr_std"
     elif ceil_ft < 500:
         ceil_class = "lifr_std"
+    clouds            = met_json['data'][count]['clouds']
     cld_len           = len(met_json['data'][count]['clouds'])
+    for layer in clouds:
+        for attribute, value in layer.items():
+            print("%s - %s", attribute, value)
 #   for cld_ct in range(0, cld_len):
 #        cld_code          = met_json['data'][cld_ct]['clouds']['code']
 #        cld_text          = met_json['data'][cld_ct]['clouds']['text']
