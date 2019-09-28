@@ -2,6 +2,7 @@ import calendar
 import datetime
 import json
 import platform
+import pytz
 import sqlite3
 import sys
 import textwrap
@@ -10,7 +11,6 @@ import urllib.request
 from fractions import Fraction
 from numbers import Number
 
-import pytz
 
 user_agent = 'AirPuff/2.0; Python/3.6.5'
 
