@@ -180,6 +180,10 @@ for count in range(0, met_json_results):
         ceil_class = "lifr_std"
     clouds            = met_json['data'][count]['clouds']
     cld_len           = len(met_json['data'][count]['clouds'])
+    cloud_layer       = ""
+    for layer in clouds:
+        for value in layer.items():
+            cloud_layer = 
 #    for layer in clouds:
 #        for attribute, value in layer.items():
 #            print("%s - %s", attribute, value)
@@ -348,8 +352,11 @@ for count in range(0, met_json_results):
             <td><a class="%s" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
             <td class="%s">%-s %-d</td>
-        </tr>
-    """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+                print(textwrap.dedent("""\
+            <td class="%s">%s - %s</td>, )
+            """) % (ceil_class, attribute, value))
+        print('</tr>')
 
 print(textwrap.dedent("""\
         <tr>
@@ -361,8 +368,8 @@ print(textwrap.dedent("""\
     </table>
     </body>
     </html>
-    
     """) % (shortname))
+
 conn.commit()
 conn.close()
 
