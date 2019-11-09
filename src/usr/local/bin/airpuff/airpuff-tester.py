@@ -182,7 +182,7 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         for value in layer.items():
-            cloud_layer = cloud_layer + " " + value
+            cloud_layer = str(cloud_layer + " " + value)
 #    for layer in clouds:
 #        for attribute, value in layer.items():
 #            print("%s - %s", attribute, value)
