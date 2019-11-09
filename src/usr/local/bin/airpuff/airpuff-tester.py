@@ -14,7 +14,6 @@ from numbers import Number
 from fractions import Fraction
 
 user_agent        = 'AirPuff/2.0; Python/3.6.5'
-
 region            = sys.argv[1]
 ap_csv            = sys.argv[2]
 ap_csv_lo         = ap_csv.lower()
@@ -183,7 +182,7 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         for value in layer.items():
-            cloud_layer = 
+            cloud_layer = cloud_layer + " " + value
 #    for layer in clouds:
 #        for attribute, value in layer.items():
 #            print("%s - %s", attribute, value)
@@ -354,8 +353,8 @@ for count in range(0, met_json_results):
             <td class="%s">%-s %-d</td>
         """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
                 print(textwrap.dedent("""\
-            <td class="%s">%s - %s</td>, )
-            """) % (ceil_class, attribute, value))
+            <td class="%s">%s</td>, )
+            """) % (ceil_class, cloud_layer))
         print('</tr>')
 
 print(textwrap.dedent("""\
