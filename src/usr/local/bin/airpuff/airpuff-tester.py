@@ -182,7 +182,9 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         for value in layer.items():
-            cloud_layer = str(cloud_layer) + str(" ") + str(value)
+            code = value['code']
+            layer_ft = value['base_Feet_agl']
+            cloud_layer = str(cloud_layer) + str(" ") + str(code) + str(" ") + str(layer_ft)
 #    for layer in clouds:
 #        for attribute, value in layer.items():
 #            print("%s - %s", attribute, value)
@@ -353,7 +355,7 @@ for count in range(0, met_json_results):
             <td class="%s">%-s %-d</td>
         """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
         print(textwrap.dedent("""\
-            <td class="%s">%s</td>, )
+            <td class="%s">%s</td>
             """) % (ceil_class, cloud_layer))
         print('</tr>')
 
