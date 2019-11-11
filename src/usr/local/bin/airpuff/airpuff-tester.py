@@ -183,9 +183,7 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         code = layer['code']
-        if code == ["CLR"]:
-            layer_class = "vfr_std"
-        elif code == ["SKC"]:
+        if code == ['CLR', 'SKC']:
             layer_class = "vfr_std"
         try:
             layer_ft = layer['base_feet_agl']
@@ -193,13 +191,25 @@ for count in range(0, met_json_results):
             layer_ft = 12001
         if layer_ft > 3000:
             layer_class = "vfr_std"
-        elif 1000 <= layer_ft <= 3000 and code != ['SKC', 'CLR']:
-            layer_class = "mvfr_std"
-        elif 500 <= layer_ft < 1000 and code != ['SKC', 'CLR']:
-            layer_class = "ifr_std"
-        elif layer_ft < 500 and code != ['SKC', 'CLR']:
-            layer_class = "lifr_std"
-        cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + " </td>"
+        elif 1000 <= layer_ft <= 3000:
+            if code == ['FEW', 'SCT']:
+                layer_class = "vfr_std"
+            elif code == ['BKN', 'OVC']:
+                layer_class = "mvfr_std"
+        elif 500 <= layer_ft < 1000:
+            if code == ['FEW', 'SCT']:
+                layer_class = "vfr_std"
+            elif code == ['BKN', 'OVC']:
+                layer_class = "ifr_std"
+        elif layer_ft < 500:
+            if code == ['FEW', 'SCT']:
+                layer_class = "vfr_std"
+            elif code == ['BKN', 'OVC']:
+                layer_class = "lifr_std"
+        if code == ['CLR', 'SKC']:
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + "</td>"
+        elif:
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
 #        <td class="%s">%s</td>
 #        for value in layer.items():
 #            code = value[1]
