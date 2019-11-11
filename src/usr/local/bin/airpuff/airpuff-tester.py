@@ -187,7 +187,6 @@ for count in range(0, met_json_results):
             layer_class = "vfr_std"
         elif code == ["SKC"]:
             layer_class = "vfr_std"
-        continue
         try:
             layer_ft = layer['base_feet_agl']
         except:
