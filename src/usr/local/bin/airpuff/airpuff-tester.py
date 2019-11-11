@@ -183,9 +183,10 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         code = layer['code']
-        layer_ft = 12000
         try:
             layer_ft = layer['base_feet_agl']
+        except:
+            layer_ft = 12000
         cloud_layer = str(code) + str(" ") + str(layer_ft)
 #        for value in layer.items():
 #            code = value[1]
