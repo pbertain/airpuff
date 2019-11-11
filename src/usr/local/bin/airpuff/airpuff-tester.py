@@ -91,10 +91,10 @@ print(textwrap.dedent("""\
             <th>WIND</th>
             <th>VIS</th>
             <th>ALT</th>
-            <th>SKY COVER</th>
             <th>LAYERS</th>
         </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
+#            <th>SKY COVER</th>
 
 for count in range(0, met_json_results):
     if "Currently Unavailable" in (met_json['data'][count]):
@@ -359,12 +359,13 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
             <td><a class="%s" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
-            <td class="%s">%-s %-d</td>
-        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg))
         print(textwrap.dedent("""\
             <td class="%s">%s</td>
             """) % (ceil_class, cloud_layer))
         print('</tr>')
+#        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
+#            <td class="%s">%-s %-d</td>
 
 print(textwrap.dedent("""\
         <tr>
