@@ -187,7 +187,7 @@ for count in range(0, met_json_results):
             layer_ft = layer['base_feet_agl']
         except:
             layer_ft = 12001
-        cloud_layer = cloud_layer + "<td class=\"" + str(code).lower + "_std\">" + str(code) + str(" ") + str(layer_ft) + " </td>"
+        cloud_layer = cloud_layer + "<td class=\"" + str(code.lower) + "_std\">" + str(code) + str(" ") + str(layer_ft) + " </td>"
 #        <td class="%s">%s</td>
 #        for value in layer.items():
 #            code = value[1]
