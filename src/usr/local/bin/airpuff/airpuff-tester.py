@@ -208,7 +208,7 @@ for count in range(0, met_json_results):
                 layer_class = "lifr_std"
         if code == ['CLR', 'SKC']:
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + "</td>"
-        elif:
+        elif code != ['CLR', 'SKC']:
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
 #        <td class="%s">%s</td>
 #        for value in layer.items():
