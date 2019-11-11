@@ -67,7 +67,7 @@ print(textwrap.dedent("""\
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
     <table class="table">
         <tr>
-            <td class="td_titles" rowspan="3" colspan="4" vertical-align="center"><img width="100"  height="81" src="/web/icons/airpuff-logo.png"></td>
+            <td class="td_titles" rowspan="3" colspan="4" vertical-align="center"><a href="https://www.airpuff.info/"><img width="100"  height="81" src="/web/icons/airpuff-logo.png"></a></td>
             <td class="td_titles" colspan="9" vertical-align="center">%s AirPuff current run:</td>
         </tr>
         <tr>
@@ -92,6 +92,7 @@ print(textwrap.dedent("""\
             <th>VIS</th>
             <th>ALT</th>
             <th>SKY COVER</th>
+            <th>LAYERS</th>
         </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
 
@@ -181,10 +182,15 @@ for count in range(0, met_json_results):
     cld_len           = len(met_json['data'][count]['clouds'])
     cloud_layer       = ""
     for layer in clouds:
-        for value in layer.items():
-            code = value[1]
-            layer_ft = value[3]
-            cloud_layer = str(cloud_layer) + str(" ") + str(code) + str(" ") + str(layer_ft)
+        code = layer['code']
+        layer_ft = 12000
+        try:
+            layer_ft = layer['base_feet_agl']
+        cloud_layer = str(code) + str(" ") + str(layer_ft)
+#        for value in layer.items():
+#            code = value[1]
+#            layer_ft = value[3]
+#            cloud_layer = str(cloud_layer) + str(" ") + str(code) + str(" ") + str(layer_ft)
 #    for layer in clouds:
 #        for attribute, value in layer.items():
 #            print("%s - %s", attribute, value)
@@ -192,7 +198,7 @@ for count in range(0, met_json_results):
 #        cld_code          = met_json['data'][cld_ct]['clouds']['code']
 #        cld_text          = met_json['data'][cld_ct]['clouds']['text']
 #        cld_base_ft       = met_json['data'][cld_ct]['clouds']['base_feet_agl']
-#        cld_base_m        = met_json['data'][cld_ct]['clouds']['base_meters_agl']
+#        cld_base_m        = met_json['déata'][cld_ct]['clouds']['base_meters_agl']
 #        cld_levels.append  = [cld_code, cld_base_ft, cld_base_m]
     try:
         dewpt_c           = met_json['data'][count]['dewpoint']['celsius']
