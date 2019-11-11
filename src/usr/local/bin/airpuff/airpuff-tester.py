@@ -207,9 +207,10 @@ for count in range(0, met_json_results):
             elif code == ['BKN', 'OVC']:
                 layer_class = "lifr_std"
         if code == ['CLR', 'SKC']:
-            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + "</td>"
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">cs" + str(code)
         elif code != ['CLR', 'SKC']:
-            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">!cs" + str(code) + str(" ") + str(layer_ft)
+        cloud_layer = cloud_layer + "</td>"
 #        <td class="%s">%s</td>
 #        for value in layer.items():
 #            code = value[1]
