@@ -214,7 +214,7 @@ for count in range(0, met_json_results):
             print("MATCHES - SKC")
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         else:
-        	print("MATCHES - %s & %s", str(code), str(layer_ft))
+            print("MATCHES - %s & %s", str(code), str(layer_ft))
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
 
 # END: Cloud layer
