@@ -207,26 +207,11 @@ for count in range(0, met_json_results):
             elif code == ['BKN', 'OVC']:
                 layer_class = "lifr_std"
         if str(code) == 'CLR':
-            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code)
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         elif str(code) == 'SKC':
-            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code)
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         elif str(code) != ['CLR', 'SKC']:
-            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft)
-        cloud_layer = cloud_layer + "</td>"
-#        <td class="%s">%s</td>
-#        for value in layer.items():
-#            code = value[1]
-#            layer_ft = value[3]
-#            cloud_layer = str(cloud_layer) + str(" ") + str(code) + str(" ") + str(layer_ft)
-#    for layer in clouds:
-#        for attribute, value in layer.items():
-#            print("%s - %s", attribute, value)
-#   for cld_ct in range(0, cld_len):
-#        cld_code          = met_json['data'][cld_ct]['clouds']['code']
-#        cld_text          = met_json['data'][cld_ct]['clouds']['text']
-#        cld_base_ft       = met_json['data'][cld_ct]['clouds']['base_feet_agl']
-#        cld_base_m        = met_json['déata'][cld_ct]['clouds']['base_meters_agl']
-#        cld_levels.append  = [cld_code, cld_base_ft, cld_base_m]
+            cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
     try:
         dewpt_c           = met_json['data'][count]['dewpoint']['celsius']
         dewpt_f           = met_json['data'][count]['dewpoint']['fahrenheit']
