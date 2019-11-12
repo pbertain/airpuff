@@ -184,7 +184,7 @@ for count in range(0, met_json_results):
     cloud_layer       = ""
     for layer in clouds:
         code = layer['code']
-        if code == ['CLR', 'SKC']:
+        if code == ('BKN' or 'OVC'):
             layer_class = "vfr_std"
         try:
             layer_ft = layer['base_feet_agl']
@@ -193,19 +193,19 @@ for count in range(0, met_json_results):
         if layer_ft > 3000:
             layer_class = "vfr_std"
         elif 1000 <= layer_ft <= 3000:
-            if code == ['FEW', 'SCT']:
+            if code == ('FEW' or 'SCT'):
                 layer_class = "vfr_std"
-            elif code == ['BKN', 'OVC']:
+            elif code == ('FEW' or 'SCT'):
                 layer_class = "mvfr_std"
         elif 500 <= layer_ft < 1000:
-            if code == ['FEW', 'SCT']:
+            if code == ('FEW' or 'SCT'):
                 layer_class = "vfr_std"
-            elif code == ['BKN', 'OVC']:
+            elif code == ('BKN' or 'OVC'):
                 layer_class = "ifr_std"
         elif layer_ft < 500:
-            if code == ['FEW', 'SCT']:
+            if code == ('FEW' or 'SCT'):
                 layer_class = "vfr_std"
-            elif code == ['BKN', 'OVC']:
+            elif code == ('BKN' or 'OVC'):
                 layer_class = "lifr_std"
         if str(code) == 'CLR':
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
