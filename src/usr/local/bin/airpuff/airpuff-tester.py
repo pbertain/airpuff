@@ -183,13 +183,14 @@ for count in range(0, met_json_results):
     cld_len           = len(met_json['data'][count]['clouds'])
     cloud_layer       = ""
     for layer in clouds:
-        code = layer['code']
+        code = str(layer['code'])
         if code == ('BKN' or 'OVC'):
             layer_class = "vfr_std"
         try:
             layer_ft = layer['base_feet_agl']
         except:
             layer_ft = 12001
+        print(code, " ", layer_ft, "\n")
         if layer_ft > 3000:
             layer_class = "vfr_std"
         elif 1000 <= layer_ft <= 3000:
