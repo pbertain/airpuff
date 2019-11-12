@@ -178,6 +178,7 @@ for count in range(0, met_json_results):
         ceil_class = "ifr_std"
     elif ceil_ft < 500:
         ceil_class = "lifr_std"
+# START: Cloud layer
     clouds            = met_json['data'][count]['clouds']
     cld_len           = len(met_json['data'][count]['clouds'])
     cloud_layer       = ""
@@ -207,11 +208,17 @@ for count in range(0, met_json_results):
             elif code == ['BKN', 'OVC']:
                 layer_class = "lifr_std"
         if str(code) == 'CLR':
+        	print("MATCHES - CLR")
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         elif str(code) == 'SKC':
+        	print("MATCHES - SKC")
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
-        elif str(code) != ['CLR', 'SKC']:
+        else:
+        	print("MATCHES - %s & %s", str(code), str(layer_ft))
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + str(" ") + str(layer_ft) + "</td>"
+
+# END: Cloud layer
+
     try:
         dewpt_c           = met_json['data'][count]['dewpoint']['celsius']
         dewpt_f           = met_json['data'][count]['dewpoint']['fahrenheit']
