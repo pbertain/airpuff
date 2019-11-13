@@ -194,20 +194,35 @@ for count in range(0, met_json_results):
         if layer_ft > 3000:
             layer_class = "vfr_std"
         elif 1000 <= layer_ft <= 3000:
-            if code == ('FEW' or 'SCT'):
+            if code == 'FEW':
                 layer_class = "vfr_std"
-            elif code == ('FEW' or 'SCT'):
+            elif code == 'SCT':
+                layer_class = "vfr_std"
+            elif code == 'BKN':
                 layer_class = "mvfr_std"
+            elif code == 'OVC':
+                layer_class = "mvfr_std"
+            else layer_class = "mvfr_std"
         elif 500 <= layer_ft < 1000:
-            if code == ('FEW' or 'SCT'):
+            if code == 'FEW':
                 layer_class = "vfr_std"
-            elif code == ('BKN' or 'OVC'):
+            elif code == 'SCT':
+                layer_class = "vfr_std"
+            elif code == 'BKN':
                 layer_class = "ifr_std"
+            elif code == 'OVC':
+                layer_class = "ifr_std"
+            elese layer_class = "ifr_std"
         elif layer_ft < 500:
-            if code == ('FEW' or 'SCT'):
+            if code == 'FEW':
                 layer_class = "vfr_std"
-            elif code == ('BKN' or 'OVC'):
+            elif code == 'SCT':
+                layer_class = "vfr_std"
+            elif code == 'BKN':
                 layer_class = "lifr_std"
+            elif code == 'OVC':
+                layer_class = "lifr_std"
+            else layer_class = "lifr_std"
         if str(code) == 'CLR':
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         elif str(code) == 'SKC':
