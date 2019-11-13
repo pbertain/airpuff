@@ -1,4 +1,4 @@
-import calendar
+elseimport calendar
 import datetime
 import json
 import platform
@@ -190,7 +190,7 @@ for count in range(0, met_json_results):
             layer_ft = layer['base_feet_agl']
         except:
             layer_ft = 12001
-        print(code, " ", layer_ft, "\n")
+#        print(code, " ", layer_ft, "\n")
         if layer_ft > 3000:
             layer_class = "vfr_std"
         elif 1000 <= layer_ft <= 3000:
@@ -202,7 +202,8 @@ for count in range(0, met_json_results):
                 layer_class = "mvfr_std"
             elif code == 'OVC':
                 layer_class = "mvfr_std"
-            else layer_class = "mvfr_std"
+            else:
+                layer_class = "mvfr_std"
         elif 500 <= layer_ft < 1000:
             if code == 'FEW':
                 layer_class = "vfr_std"
@@ -212,7 +213,8 @@ for count in range(0, met_json_results):
                 layer_class = "ifr_std"
             elif code == 'OVC':
                 layer_class = "ifr_std"
-            elese layer_class = "ifr_std"
+            else:
+                layer_class = "ifr_std"
         elif layer_ft < 500:
             if code == 'FEW':
                 layer_class = "vfr_std"
@@ -222,7 +224,8 @@ for count in range(0, met_json_results):
                 layer_class = "lifr_std"
             elif code == 'OVC':
                 layer_class = "lifr_std"
-            else layer_class = "lifr_std"
+            else:
+                layer_class = "lifr_std"
         if str(code) == 'CLR':
             cloud_layer = cloud_layer + "<td class=\"" + str(layer_class) + "\">" + str(code) + "</td>"
         elif str(code) == 'SKC':
