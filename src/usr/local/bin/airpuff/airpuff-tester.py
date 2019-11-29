@@ -249,7 +249,10 @@ for count in range(0, met_json_results):
     flt_cat           = met_json['data'][count]['flight_category']
     flt_cat_link      = flt_cat.lower()
     flt_cat_text      = flt_cat_link + "_std"
-    icon_name         = "/web/icons/" + ceil_code.lower() + "-" + flt_cat_link + "-icon.png"
+    if flt_cat == 'UNK':
+        icon_name         = "/web/icons/unknown-icon.png"
+    else:
+        icon_name         = "/web/icons/" + ceil_code.lower() + "-" + flt_cat_link + "-icon.png"
     try:
         hum_pct           = met_json['data'][count]['humidity']['percent']
     except KeyError:
