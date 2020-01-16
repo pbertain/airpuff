@@ -16,6 +16,7 @@ RRDPATH="/var/airpuff/rrd-data"
 RRDBINPATH="/opt/rrdtool/bin/"
 RRDIMGPATH="/var/www/html/htdocs/airpuff.info/html/images/rrd/"
 TEMPFILE="${PRODFILE}.temp"
+AIRPUFF_TM="AirPuff® 2019"
 
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
 E_COAST_TIME=`TZ='America/New_York' date +'%T %Z'`
@@ -31,7 +32,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
         --upper-limit 31.00 -l 28.00 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -49,7 +50,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "360" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -70,7 +71,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind Dir" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "370" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -84,7 +85,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind Speed" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "40" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -94,14 +95,14 @@ for AIRPORT in ${AIRPORTS} ; do
         LINE5:scaled_windspd#00FF00:"Wind Speed" \
         GPRINT:windspd:LAST:" Current\:%3.1lf\n" ;
 
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0.0" --upper-limit "20000.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0.0" --upper-limit "20000.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-day.png \
         -s -24h -e now --step 500 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -122,7 +123,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -139,7 +140,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "370" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -154,14 +155,14 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:windspd:LAST:"%8.1lf\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
         GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-week.png \
         -s -7d -e now --step 3600 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -182,7 +183,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -199,7 +200,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "370" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -214,14 +215,14 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:windspd:LAST:"%8.1lf\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
         GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-month.png \
         -s -30d -e now --step 10800 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -242,7 +243,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018 ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -259,7 +260,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Wind" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "360" \
         --color CANVAS#111111 \
         --color BACK#333333 \
@@ -274,14 +275,14 @@ for AIRPORT in ${AIRPORTS} ; do
         GPRINT:windspd:LAST:"%8.1lf\n" \
         LINE5:winddir#0000FF:"Wind Dir" \
         GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "AirPuff® 2018" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
     $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-year.png \
         -s -365d -e now --step 21600 --slope-mode \
         -t "${AIRPORT} Temp" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "AirPuff® 2018" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit "120" \
         --color CANVAS#111111 \
         --color BACK#333333 \
