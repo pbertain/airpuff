@@ -279,7 +279,7 @@ for count in range(0, met_json_results):
     	vis_mi         = -1
     	vis_m          = -1
     try:
-        vis_mi_tot_float  = met_json['data'][count]['visibility']['miles_float']
+        vis_mi_tot_float  = met_json['data'][count]['visibility']['meters_float'] * 0.000621371
     except:
         vis_mi_tot_error  = true
     try:
