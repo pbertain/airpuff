@@ -53,45 +53,6 @@ met_json          = json.loads(met_data)
 conn              = sqlite3.connect(db_name)
 c                 = conn.cursor()
 
-print(textwrap.dedent("""\
-    <html>
-    <head>
-        <meta http-equiv="refresh" content="300">
-        <link rel="stylesheet" type="text/css" href="/web/css/airpuff.css">
-    </head>
-
-    <title>%s AirPuff Airport WX Info</title>
-
-    <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
-    <table class="table">
-        <tr>
-            <td class="td_titles" rowspan="3" colspan="4" vertical-align="center"><img width="100"  height="81" src="/web/icons/airpuff-logo.png"></td>
-            <td class="td_titles" colspan="9" vertical-align="center">%s AirPuff current run:</td>
-        </tr>
-        <tr>
-            <td class="td_cfb" colspan="9" vertical-align="center">%s / Zulu / Z</td>
-        </tr>
-        <tr>
-            <td class="td_lg" colspan="9" vertical-align="center">%s / %s</td>
-        <tr>
-
-        <tr class="th">
-            <th></th>
-            <th></th>
-            <th>ARPT</th>
-            <th>AGE</th>
-            <th>CAT</th>
-            <th>TEMP</th>
-            <th>DP</th>
-            <th>T-DP</th>
-            <th>WC</th>
-            <th>WIND</th>
-            <th>VIS</th>
-            <th>ALT</th>
-            <th>SKY COVER</th>
-        </tr>
-    """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
-
 temp_f            = int(met_json["temp"].split('(', 1)[0])
 dewpt_f           = int(met_json["dwpt"].split('(', 1)[0])
 t_dp_spread_f     = int(temp_f - dewpt_f)
