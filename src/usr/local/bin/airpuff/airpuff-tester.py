@@ -244,8 +244,12 @@ for count in range(0, met_json_results):
     except TypeError:
         dewpt_c           = 0
         dewpt_f           = 0
-    elev_ft           = met_json['data'][count]['elevation']['feet']
-    elev_m            = met_json['data'][count]['elevation']['meters']
+    try:
+        elev_ft           = met_json['data'][count]['elevation']['feet']
+        elev_m            = met_json['data'][count]['elevation']['meters']
+    except:
+        elev_ft           = 0
+        elev_m            = 0
     flt_cat           = met_json['data'][count]['flight_category']
     flt_cat_link      = flt_cat.lower()
     flt_cat_text      = flt_cat_link + "_std"
