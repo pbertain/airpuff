@@ -1,24 +1,53 @@
 #*/5 * * * * root /usr/local/bin/airpuff/airpuff.sh
 #0 00,12,13,14,15,16,23 * * 1-5 root /usr/local/bin/airpuff/airpuff-cron.sh
 
+# Update the Airpuff /usr/local/bin code
+*/15 * * * * root GIT_DIR=/var/airpuff/code/airpuff/.git GIT_WORK_TREE=/var/airpuff/code/airpuff /bin/git pull
+*/15 * * * * root GIT_DIR=/var/airpuff/web/airpuff-web/.git GIT_WORK_TREE=/var/airpuff/web/airpuff-web /bin/git pull
+
+# Python version - manual version for KDWA for now
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-kdwa-run.sh "Woodland" kdwa
+
+# Python version
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Work Commute" kedu,kdwa,kvcb,o88,ksuu,kapc,kccr,klvk,khwd,koak,krhv,ksjc,ksql,knuq,kpao
+#*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Work Commute" kedu,kvcb,o88,ksuu,kapc,kccr,klvk,khwd,koak,krhv,ksjc,ksql,kpao
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Sac Valley" ksac,kacv,kcec,kmhr,kmcc,kwlw,kcic,kove,krbl,krdd,kbab,kgoo
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Humboldt County" o60,kuki,o28,0q5,o16,kfot,keka,kacv
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "National Airports" ksmf,ksfo,klax,ksea,kpdx,kden,kiah,kord,kmsp,kjfk,klga,kiad,kclt,katl,kmsy,kbos
+*/5 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "International" feff,vobl,lfpg,egll,eddf,vhhh,omdb 
+
 # Quick commute Visi chart:
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-commute-vis.sh
 # Get the wx
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Work Commute" "KEDU KVCB KSUU KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Sac Valley" "KEDU KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-kdwa.sh "Woodland" "KDWA"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Work Commute" "KEDU KDWA KSAC KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Misc Airports of Interest" "KSAC KDWA KACV KMMC KMHR KLHM"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Sac Valley" "KEDU KDWA KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Humboldt County" "O60 KUKI O28 0Q5 O16 KFOT KEKA KACV"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "National Airports" "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 # Store the data
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KEDU KVCB KSUU KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KEDU KSAC KACV KMMC KMHR KLHM KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "O60 KUKI O28 0Q5 O16 KFOT KEKA KACV"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 # Make the charts
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KEDU KVCB KSUU KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KEDU KDWA KSAC KACV KMMC KMHR KLHM KVCB KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "O60 KUKI O28 0Q5 O16 KFOT KEKA KACV"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 # Make the web pages
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KEDU KVCB KSUU KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KEDU KSAC KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KSAC KACV KMMC KMHR KLHM"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KDWA"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "O60 KUKI O28 0Q5 O16 KFOT KEKA KACV"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KEDU KSAC KACV KMMC KMHR KLHM KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KDWA"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "O60 KUKI O28 0Q5 O16 KFOT KEKA KACV"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 # Cleanup
 6,11,16,21,26,31,36,41,46,51,56 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-cleanup.sh
+7,12,17,22,27,32,37,42,47,52,57 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link-cleanup.sh
 
