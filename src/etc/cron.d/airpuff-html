@@ -2,7 +2,7 @@
 #0 00,12,13,14,15,16,23 * * 1-5 root /usr/local/bin/airpuff/airpuff-cron.sh
 
 # Quick commute Visi chart:
-*/5 * * * * root /usr/local/bin/airpuff/airpuff/airpuff-rrd-commute-vis.sh
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-commute-vis.sh
 # Get the wx
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Work Commute" "KEDU KVCB KSUU KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Sac Valley" "KEDU KSAC KWLW KCIC KOVE KRBL KRDD KBAB KGOO"
