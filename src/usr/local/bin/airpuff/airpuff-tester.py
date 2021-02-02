@@ -285,7 +285,7 @@ for count in range(0, met_json_results):
     try:
         vis_mi_tot_float  = met_json['data'][count]['visibility']['meters_float'] * 0.000621371
     except:
-        vis_mi_tot_error  = true
+        vis_mi_tot_error  = 1
     try:
         full_vis_mi, part_vis_mi = vis_mi.split(' ', 1)
     except:
