@@ -50,4 +50,3 @@
 # Cleanup
 6,11,16,21,26,31,36,41,46,51,56 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-cleanup.sh
 7,12,17,22,27,32,37,42,47,52,57 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link-cleanup.sh
-
