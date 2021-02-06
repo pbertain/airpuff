@@ -9,8 +9,8 @@
 
 # Notes: This is the first pass as a shell script.  Next will be a perl script and then hopefully a python script.
 
-DATAFILE="/var/www/html/htdocs/airpuff.info/html/airpuff.html.temp"
-PRODFILE="/var/www/html/htdocs/airpuff.info/html/airpuff.html"
+DATAFILE="/var/www/vhosts/airpuff/html/airpuff.html.temp"
+PRODFILE="/var/www/vhosts/airpuff/html/airpuff.html"
 AIRPORTS="KEDU KVCB KSUU KCCR KLVK KHWD KOAK KSQL KRHV KSJC KNUQ KPAO"
 LOCALTIMEZONE=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
 ZULU_TIMEZONE=`date -u +'%a %F %T %Z/Zulu/Z'`

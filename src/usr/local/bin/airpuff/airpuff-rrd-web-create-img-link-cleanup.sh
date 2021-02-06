@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /var/www/html/htdocs/airpuff.info/html/rrdweb/img-link
+cd /var/www/vhosts/airpuff/html/rrdweb/img-link
 for FILE in `ls -1 | grep .temp$` ; do
     NAME=`echo ${FILE} | sed -e 's/.temp$//'` ;
     mv -f ${FILE} ${NAME}

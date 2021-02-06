@@ -9,7 +9,7 @@ AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
 AIRPORTS_LOWER_NOSPACE=$(echo -e "${AIRPORTS_LOWER}" | tr -d "[:space:]")
-FILEPATH="/var/www/html/htdocs/airpuff.info/html/rrdweb/img-link"
+FILEPATH="/var/www/vhosts/airpuff/html/rrdweb/img-link"
 W_COAST_TIME=`TZ="America/Los_Angeles" date +"%a %F %T %Z"`
 E_COAST_TIME=`TZ="America/New_York" date +"%T %Z"`
 ZULU_TIMEZONE=`date -u +"%a %F %T %Z/Zulu/Z"`
