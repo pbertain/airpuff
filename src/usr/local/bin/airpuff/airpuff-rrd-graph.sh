@@ -10,11 +10,11 @@ AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
 AIRPORT_LOWER_NOSPACE=$(echo -e "${AIRPORT_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 RRDPATH="/var/airpuff/rrd-data"
 RRDBINPATH="/usr/bin/"
-RRDIMGPATH="/var/www/html/htdocs/airpuff.info/html/images/rrd/"
+RRDIMGPATH="/var/www/vhosts/airpuff/html/images/rrd/"
 TEMPFILE="${PRODFILE}.temp"
 AIRPUFF_TM="AirPuff® 2021"
 
