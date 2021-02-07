@@ -10,9 +10,9 @@ AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
 AIRPORT_LOWER_NOSPACE=$(echo -e "${AIRPORT_LOWER}" | tr -d '[:space:]')
-RRDIMGPATH="/var/www/html/htdocs/airpuff.info/html/images/rrd/"
+RRDIMGPATH="/var/www/vhosts/airpuff/html/images/rrd/"
 RRDPATH="/var/airpuff/rrd-data"
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 TEMPFILE="${PRODFILE}.temp"
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
