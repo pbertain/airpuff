@@ -9,7 +9,7 @@
 #*/5 * * * * root /usr/local/bin/airpuff/pypuff-kdwa-run.sh "Woodland" kdwa
 
 # Python version
-*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Work Commute" kvcb,o88,ksuu,kapc,kccr,klvk,khwd,koak,krhv,ksjc,ksql,knuq,kpao
+*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Work Commute" kedu,kvcb,kvcb,o88,ksuu,kapc,kccr,klvk,khwd,koak,krhv,ksjc,ksql,knuq,kpao
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Sac Valley" ksac,kacv,kcec,kmhr,kmcc,kwlw,kcic,kove,krbl,krdd,kbab,kgoo
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Humboldt County" o60,kuki,o28,0q5,o16,kfot,keka,kacv
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "National Airports" ksmf,ksfo,klax,ksea,kpdx,kden,kiah,kord,kmsp,kjfk,klga,kiad,kclt,katl,kmsy,kbos
