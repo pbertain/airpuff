@@ -3,7 +3,8 @@
 # airpuff.sh
 # Looks up wx for airports on the commute and presents it as a webpage
 # Paul Bertain paul@bertain.net
-# Wed 29 Feb 2012
+# Created: Wed 29 Feb 2012
+# Modified: Fri 05 Feb 2021
 # $HeadURL: svn+ssh://pbertain@pan.lipadesogesk.name/opt/svn/pbertain/pacman/airpuff/bin/data/pacman/airpuff/bin/airpuff.sh $
 
 ##### CUSTOMIZE HERE #####
@@ -13,7 +14,7 @@ AIRPORTS="$2"
 
 REGION_LOWER=$(echo -e "${REGION}" | tr '[:upper:]' '[:lower:]')
 REGION_LOWER_NOSPACE=$(echo -e "${REGION_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 TEMPFILE="${PRODFILE}.temp"
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`

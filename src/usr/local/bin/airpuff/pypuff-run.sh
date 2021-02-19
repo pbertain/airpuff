@@ -15,7 +15,7 @@ AIRPORTS="$2"
 REGION_LOWER=$(echo -e "${REGION}" | tr '[:upper:]' '[:lower:]')
 REGION_LOWER_NOSPACE=$(echo -e ${REGION_LOWER} | tr -d '[:space:]')
 
-FILEPATH="/var/www/html/htdocs/airpuff.info/html/pypuff"
+FILEPATH="/var/www/vhosts/airpuff/html/pypuff"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 PYPUFF="/usr/local/bin/airpuff/airpuff-tester.py"
 PYTHON="/bin/python3"

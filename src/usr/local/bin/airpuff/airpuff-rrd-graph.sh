@@ -10,13 +10,13 @@ AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
 AIRPORT_LOWER_NOSPACE=$(echo -e "${AIRPORT_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 RRDPATH="/var/airpuff/rrd-data"
-RRDBINPATH="/opt/rrdtool/bin/"
-RRDIMGPATH="/var/www/html/htdocs/airpuff.info/html/images/rrd/"
+RRDBINPATH="/usr/bin/"
+RRDIMGPATH="/var/www/vhosts/airpuff/html/images/rrd/"
 TEMPFILE="${PRODFILE}.temp"
-AIRPUFF_TM="AirPuff® 2019"
+AIRPUFF_TM="AirPuff® 2021"
 
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
 E_COAST_TIME=`TZ='America/New_York' date +'%T %Z'`
