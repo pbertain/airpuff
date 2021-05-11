@@ -31,7 +31,8 @@ utc               = pytz.timezone("UTC")
 full_fmt          = '%a %Y-%m-%d %H:%M %Z'
 time_fmt          = '%H:%M %Z'
 short_fmt         = '%H:%M'
-metar_fmt         = '%Y-%m-%dT%H:%M:%S.%fZ'
+metar_fmt_mod     = '%Y-%m-%dT%H:%M:%S.%fZ'
+metar_fmt         = '%Y-%m-%dT%H:%M%fZ'
 # delete this if the time formatting on the previous line works:  d-%m-%Y @ %H:%MZ'
 pattern           = '%d-%m-%Y @ %H:%MZ'
 
@@ -128,7 +129,7 @@ for count in range(0, met_json_results):
     obs_time_bkn      = met_json['data'][count]['observed']
     obs_time_str      = str(obs_time_bkn)
     obs_time          = obs_time_str.replace(' <span class="tx-light tx-12">@</span>', ' @')
-    obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt)
+    obs_time_obj      = datetime.datetime.strptime(obs_time, metar_fmt_mod)
     obs_time_comp     = obs_time_obj.strftime(short_fmt)
     date_time2        = obs_time_obj.strftime(metar_fmt)
     utc_conv          = datetime.datetime.strptime(str(utc_cur_comp_time), short_fmt)
