@@ -14,7 +14,8 @@
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Humboldt County" o60,kuki,o28,0q5,o16,kfot,keka,kacv
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "National Airports" ksmf,ksfo,klax,ksea,kpdx,kden,kiah,kord,kmsp,kjfk,klga,kiad,kclt,katl,kmsy,kbos
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "International" feff,vobl,lfpg,egll,eddf,vhhh,omdb 
-*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Great Northwest" klmt,krdm,krbg,keug,kolm,ktcm,ktiw
+*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Great Northwest" kmhs,ksiy,klmt,s03,kmfr,3s8,krbg,krdm,s39,keug,kcvo,kuao,kolm,ktcm,ktiw
+KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW
 
 # Quick commute Visi chart:
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-commute-vis.sh
