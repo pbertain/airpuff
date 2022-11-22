@@ -43,6 +43,7 @@ utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
 utc_cur_comp_time = datetime.datetime.now(utc).strftime(short_fmt)
 epoch_now         = calendar.timegm(time.strptime(date_time1, metar_fmt))
 
+# Get data
 met_url           = 'https://api.checkwx.com/metar/' + ap_csv_lo + '/decoded?pretty=1'
 met_hdrs          = {'X-API-Key'  : 'c5d65ffd02f05ddc608d5f0850',
                      'User-Agent' : user_agent }
@@ -54,7 +55,7 @@ met_json          = json.loads(met_data)
 met_json_results  = met_json['results']
 
 conn              = sqlite3.connect(db_name)
-c                 = conn.cursor()
+db_conn           = conn.cursor()
 
 print(textwrap.dedent("""\
     <html>
@@ -104,8 +105,8 @@ for count in range(0, met_json_results):
         icao_guess     = record_data.split(" ", 1)[0]
         icao_guess_lo  = icao_guess.lower()
         try:
-            c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
-            atis_phone        = "tel://+1-" + c.fetchone()[0]
+            db_conn.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
+            atis_phone        = "tel://+1-" + db_conn.fetchone()[0]
         except:
             atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
         print(textwrap.dedent("""\
@@ -121,8 +122,8 @@ for count in range(0, met_json_results):
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
     try:
-        c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
-        atis_phone        = "tel://+1-" + c.fetchone()[0]
+        db_conn.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
+        atis_phone        = "tel://+1-" + db_conn.fetchone()[0]
     except:
         atis_phone        = "https://www.airpuff.info/web/airpuff-airror.html"
     name              = met_json['data'][count]['station']['name']
