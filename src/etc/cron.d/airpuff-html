@@ -15,6 +15,7 @@
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "National Airports" ksmf,ksfo,klax,ksea,kpdx,kden,kiah,kord,kmsp,kjfk,klga,kiad,kclt,katl,kmsy,kbos
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "International" feff,vobl,lfpg,egll,eddf,vhhh,omdb 
 */15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Great Northwest" kmhs,ksiy,klmt,s03,kmfr,3s8,krbg,krdm,s39,keug,kcvo,kuao,kolm,ktcm,ktiw
+*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "SoCal Run" kfat,kbfl,kful,klgb,ksbd
 
 # Quick commute Visi chart:
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-commute-vis.sh
@@ -30,6 +31,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "National Airports" "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "International Airports" "FEFF VOBL LFPG EGLL EDDF VHHH OMDH"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Great Northwest" "KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "SoCal Run" "KFAT KBFL KFUL KLGB KSBD"
 
 # Store the data
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KEDU KSAC KACV KMMC KMHR KLHM KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
@@ -38,6 +40,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "FEFF VOBL LFPG EGLL EDDF VHHH OMDH"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW" 
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KFAT KBFL KFUL KLGB KSBD"
 
 # Make the charts
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KEDU KDWA KSAC KACV KMMC KMHR KLHM KVCB KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
@@ -46,6 +49,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "FEFF VOBL LFPG EGLL EDDF VHHH OMDH"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KFAT KBFL KFUL KLGB KSBD"
 
 # Make the web pages
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KEDU KSAC KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
@@ -56,6 +60,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "FEFF VOBL LFPG EGLL EDDF VHHH OMDH"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KFAT KBFL KFUL KLGB KSBD"
 
 # Fix the links
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KEDU KSAC KACV KMMC KMHR KLHM KDWA KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"
@@ -65,6 +70,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KSMF KSFO KLAX KSEA KPDX KDEN KIAH KORD KMSP KJFK KLGA KIAD KCLT KATL KMSY KBOS"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "FEFF VOBL LFPG EGLL EDDF VHHH OMDH"
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KMHS KSIY KLMT S03 KMFR 3S8 KRBG KRDM S39 KEUG KCVO KUAO KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KFAT KBFL KFUL KLGB KSBD"
 
 # Cleanup
 6,11,16,21,26,31,36,41,46,51,56 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-cleanup.sh
