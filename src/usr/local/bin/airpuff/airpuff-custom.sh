@@ -159,14 +159,14 @@ for AIRPORT in ${AIRPORTS} ; do
         SKY_COVER_COLOR="#00FF00"
     else
         SKY_COVER_COLOR="#999999"
-    fi 
+    fi
 
     echo "<tr>" >> ${TEMPFILE} ;
     echo "<td><a href=\"https://www.airpuff.info/rrdweb/${AIRPORT_LOWER}-rrd.html\">${AIRPORT}</a></td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td style=\"color:${SKY_COVER_COLOR}; \">${SKY_COVERAGE}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;
     echo >> ${TEMPFILE} ;
 done
-echo "<td colspan=12><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${TEMPFILE}
+echo "<td colspan=14><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${TEMPFILE}
 echo "</table>" >> ${TEMPFILE}
 echo "</body>" >> ${TEMPFILE}
 echo "</html>" >> ${TEMPFILE}
