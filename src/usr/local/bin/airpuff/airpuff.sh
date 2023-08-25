@@ -64,7 +64,7 @@ for AIRPORT in $AIRPORTS ; do
     echo "</tr>" >> ${DATAFILE} ;
     echo >> ${DATAFILE} ;
 done
-echo "<td colspan=12><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${DATAFILE}
+echo "<td colspan=14><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${DATAFILE}
 echo "</table>" >> ${DATAFILE}
 echo "</body>" >> ${DATAFILE}
 echo "</html>" >> ${DATAFILE}

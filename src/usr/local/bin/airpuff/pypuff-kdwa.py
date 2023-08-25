@@ -318,15 +318,15 @@ else:
 
 print(textwrap.dedent("""\
         <tr>
-            <td class="footer" colspan=12><a href="https://www.checkwx.com/"><img width=134.7 height=50 src="/web/icons/check-wx-icon.png"></a></td>
+            <td class="footer" colspan=14><a href="https://www.checkwx.com/"><img width=134.7 height=50 src="/web/icons/check-wx-icon.png"></a></td>
         </tr>
         <tr>
-            <td class="footer" colspan=12>%s</td>
+            <td class="footer" colspan=14>%s</td>
         </tr>
     </table>
     </body>
     </html>
-    
+
     """) % (shortname))
 conn.commit()
 conn.close()

@@ -386,7 +386,7 @@ for count in range(0, met_json_results):
                     <div>
                         <a href="#close" title="%s Raw METAR Data" class="close">X</a>
                         <h3 class="header_yel">%s Raw METAR Data</h3>
-                        <p class="paragraph_metar">%s</p> 
+                        <p class="paragraph_metar">%s</p>
                     </div>
                 </div>
             </td>
@@ -408,10 +408,10 @@ for count in range(0, met_json_results):
 
 print(textwrap.dedent("""\
         <tr>
-            <td class="footer" colspan=12><a href="https://www.checkwx.com/"><img width=134.7 height=50 src="/web/icons/check-wx-icon.png"></a></td>
+            <td class="footer" colspan=14><a href="https://www.checkwx.com/"><img width=134.7 height=50 src="/web/icons/check-wx-icon.png"></a></td>
         </tr>
         <tr>
-            <td class="footer" colspan=12>%s</td>
+            <td class="footer" colspan=14>%s</td>
         </tr>
     </table>
     </body>
