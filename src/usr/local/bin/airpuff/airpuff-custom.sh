@@ -5,6 +5,7 @@
 # Paul Bertain paul@bertain.net
 # Created: Wed 29 Feb 2012
 # Modified: Fri 05 Feb 2021
+# Modified: Fri 25 Aug 2023
 # $HeadURL: svn+ssh://pbertain@pan.lipadesogesk.name/opt/svn/pbertain/pacman/airpuff/bin/data/pacman/airpuff/bin/airpuff.sh $
 
 ##### CUSTOMIZE HERE #####
@@ -166,7 +167,7 @@ for AIRPORT in ${AIRPORTS} ; do
     echo "</tr>" >> ${TEMPFILE} ;
     echo >> ${TEMPFILE} ;
 done
-echo "<td colspan=14><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${TEMPFILE}
+echo "<td colspan=12><font color=\"#444444\"><center>${HOSTNAME}</center></font>" >> ${TEMPFILE}
 echo "</table>" >> ${TEMPFILE}
 echo "</body>" >> ${TEMPFILE}
 echo "</html>" >> ${TEMPFILE}
