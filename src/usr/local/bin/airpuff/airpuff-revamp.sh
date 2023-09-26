@@ -16,7 +16,7 @@ AIRPORTS="$2"
 
 REGION_LOWER=$(echo -e "${REGION}" | tr '[:upper:]' '[:lower:]')
 REGION_LOWER_NOSPACE=$(echo -e "${REGION_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/gencon/airpuff-rv/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 TEMPFILE="${PRODFILE}.temp"
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
@@ -51,18 +51,20 @@ echo '</tr>' >> ${TEMPFILE}
 echo '<tr>' >> ${TEMPFILE}
 
 for AIRPORT in ${AIRPORTS} ; do
-    OBS_TIME=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep observation_time | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | awk -FT '{ print $2 }'` ;
+    OBS_TIME=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep observation_time | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | awk -FT '{ print $2 }'` ;
+    echo "${OBS_TIME} <-- OBS_TIME"
     if [ -z ${OBS_TIME} ]; then
        echo "<td style=\"color:#999999; \">${AIRPORT}</td></tr>"  >> ${TEMPFILE} ;
        continue
     fi
-    FLIGHT_CATEGORY=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep flight_category | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    #RAW_TEXT=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep raw_text | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | sed -e 's/AUTO//' -e 's/RMK.*//'` ;
-    TEMP_C=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep temp_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    FLIGHT_CATEGORY=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep flight_category | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    echo "${FLIGHT_CATEGORY} <-- FLT_CAT"
+    #RAW_TEXT=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep raw_text | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | sed -e 's/AUTO//' -e 's/RMK.*//'` ;
+    TEMP_C=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep temp_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     TEMP_C_FORMATTED=`printf "%000.1fF" "${TEMP_C}"` ;
     TEMP_F=`echo "9 * ${TEMP_C} / 5 + 32" | bc -l` ;
     TEMP_F_FORMATTED=`printf "%000.1fF" "${TEMP_F}"` ;
-    DP_C=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep dewpoint_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    DP_C=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep dewpoint_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     DP_C_FORMATTED=`printf "%.1fF" "${DP_C}" ` ;
     DP_F=`echo "9 * ${DP_C} / 5 + 32" | bc -l` ;
     DP_F_FORMATTED=`printf "%.1fF" "${DP_F}" ` ;
@@ -70,25 +72,17 @@ for AIRPORT in ${AIRPORTS} ; do
     T_DP_SPREAD_C_FORMATTED=`printf "%02.0f" "${T_DP_SPREAD_C}" ` ;
     T_DP_SPREAD_F=`echo "${TEMP_F} - ${DP_F}" | bc -l` ;
     T_DP_SPREAD_F_FORMATTED=`printf "%02.0f" "${T_DP_SPREAD_F}" ` ;
-    WIND_DIR=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_dir_degrees | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    WIND_DIR=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_dir_degrees | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     WIND_DIR_FORMATTED=`printf "%003d" "${WIND_DIR}"` ;
-    WIND_SPEED=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_speed_kt | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    VIS=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep visibility_statute_mi | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    ALTIMETER=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep altim_in_hg | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    WIND_SPEED=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_speed_kt | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    VIS=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep visibility_statute_mi | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    ALTIMETER=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep altim_in_hg | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     ALTIMETER_FORMATTED=`printf "%.2f" "${ALTIMETER}" ` ;
-    METAR_TYPE=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep metar_type | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    SKY_COVERAGE=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
-    ELEVATION_M=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep elevation_m | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    METAR_TYPE=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep metar_type | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    SKY_COVERAGE=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
+    ELEVATION_M=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep elevation_m | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
     ELEVATION_FT=`echo "${ELEVATION_M} * 100 / 2.54 / 12" | bc -l` ;
     ELEVATION_FORMATTED=`printf "%0004.0f" "${ELEVATION_FT}" ` ;
-
-    #echo "Starting ${AIRPORT}: FC=${FLIGHT_CATEGORY}...";
-    #if [ !-z ${FLIGHT_CATEGORY} ]; then
-    #   continue
-    #fi
-    #if [ ${AIRPORT} == 'KSJC' ]; then
-    #    echo "${RAW_TEXT}"
-    #fi
 
     case "${FLIGHT_CATEGORY}" in
         VFR)
@@ -107,16 +101,8 @@ for AIRPORT in ${AIRPORTS} ; do
             WX_COLOR="#AAAA00"
     esac
 
-    #VIS_INTEGER=`echo "${VIS}" | bc`
-    #VIS_INTEGER=`echo "${VIS%%.*}"`
     VIS_INTEGER=${VIS/.*}
-    # or maybe
-    #VIS_INTEGER=${VIS/\.*}
-    #echo "VIS = ${VIS} - VIS_INTEGER = ${VIS_INTEGER}"
 
-#if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" -a -z "$MYSQL_RANDOM_ROOT_PASSWORD" ]; then
-    #...
-#fi
     if [ ${VIS_INTEGER} -ge 1 ] && [ "${VIS_INTEGER}" -lt 3 ]; then
             VIS_COLOR="#FF0000"
     elif [ ${VIS_INTEGER} -lt 1 ]; then
@@ -129,56 +115,11 @@ for AIRPORT in ${AIRPORTS} ; do
             VIS_COLOR="333333"
     fi
 
-    #sky_cover="BKN" cloud_base_ft_agl="600" />
-    #SKY_COVER_ARRAY=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
+    SKY_COVER=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` 
+    #SKY_COVER_ARRAY=(${SKY_COVER})
+    #SKY_COVER_ARRAY=(${SKY_COVER// / })
     #SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
-    #echo "## - ${SKY_COVER_ARRAY}"
-    #echo ${SKY_COVER_ARRAY_LEN}
-    #if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
-        #echo "${AIRPORT} - FONT = GREEN"
-    #elif [ ${SKY_COVER_ARRAY_LEN} -gt 1 ]; then
-        #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
-            #echo "${AIRPORT} - FONT = BLUE"
-        #fi
-    #else
-        #echo "${AIRPORT} - FONT = RED / MAGENTA"
-    #fi
-    #for (( i=0; i<${SKY_COVER_ARRAY_LEN}; i++ ));
-    #do
-        #echo ${SKY_COVER_ARRAY[$i]}
-    #done
-
-    #echo "SKY COVER = ${SKY_COVERAGE} - SKY COVER ARRAY = ${SKY_COVER_ARRAY[0]} & ${SKY_COVER_ARRAY[1]}"
-    #if [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 1000 || "${SKY_COVER_ARRAY[1]}" > 500 ]]; then
-        #SKY_COVER_COLOR="#FF0000"
-    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" -le 500 ]]; then
-        #SKY_COVER_COLOR="#FF00FF"
-    #elif [[ "${SKY_COVER_ARRAY[0]}" == 'BKN' || "${SKY_COVER_ARRAY[0]}" == 'OVC' ]] && [[ "${SKY_COVER_ARRAY[1]}" < 3000 || "${SKY_COVER_ARRAY[1]}" -ge 1000 ]]; then
-        #SKY_COVER_COLOR="#3333FF"
-    #else
-        #SKY_COVER_COLOR="#00FF00"
-    #fi
-    #SKY_COVER_COLOR="#CCAACC"
-
-    #my_error_flag=1
-    #my_error_flag_o=1
-    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ] || ([ $my_error_flag -eq 1 ] && [ $my_error_flag_o -eq 2 ]); then
-      #echo "$my_error_flag"
-    #else
-        #echo "no flag"
-    #fi
-    #Although in your case you can discard the last two expressions and just stick with one or operation like this:
-    #my_error_flag=1
-    #my_error_flag_o=1
-    #if [ $my_error_flag -eq 1 ] ||  [ $my_error_flag_o -eq 2 ]; then
-        #echo "$my_error_flag"
-    #else
-        #echo "no flag"
-    #fi
-
-    SKY_COVER=`curl -s "https//www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
-    SKY_COVER_ARRAY=(${SKY_COVER// / })
-    SKY_COVER_ARRAY_LEN=${#SKY_COVER_ARRAY[@]}
+    SKY_COVER_ARRAY_LEN=${#SKY_COVER[@]}
     # VFR
     if [ ${SKY_COVER_ARRAY_LEN} -eq 1 ]; then
         SKY_COVER_COLOR="#00FF00"
@@ -200,11 +141,6 @@ for AIRPORT in ${AIRPORTS} ; do
     else
         SKY_COVER_COLOR="#999999"
     fi 
-    #echo "## ${AIRPORT}"
-    #echo "# Just print the array like a variable: ${SKY_COVER_ARRAY}"
-    #echo "# Properly print the array: ${SKY_COVER_ARRAY[@]}"
-    #echo "# Array length: ${SKY_COVER_ARRAY_LEN}"
-    #echo "# Array [1]: ${SKY_COVER_ARRAY[1]}"
 
     echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td style=\"color:${WX_COLOR}; \">${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_F_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td style=\"color:${VIS_COLOR}; \">${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td style=\"color:${SKY_COVER_COLOR}; \">${SKY_COVERAGE}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${TEMPFILE} ;
     echo "</tr>" >> ${TEMPFILE} ;

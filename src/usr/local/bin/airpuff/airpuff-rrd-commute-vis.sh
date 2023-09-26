@@ -1,7 +1,7 @@
 #!/bin/sh
 
 /bin/rrdtool graph \
-	/var/www/html/htdocs/airpuff.info/html/images/rrd/commute-visi-day.png \
+        /var/www/vhosts/airpuff/gencon/airpuff-v1/html/images/rrd/commute-visi-day.png \
 	-s -24h -e now --step 500 \
 	-t "Commute Visibility" \
 	-w 500 -h 309 \
@@ -25,7 +25,7 @@
 	GPRINT:kpao-visi:LAST:" cur\:%3.1lf\n"
 
 /bin/rrdtool graph \
-	/var/www/html/htdocs/airpuff.info/html/images/rrd/commute-ceil-day.png \
+        /var/www/vhosts/airpuff/gencon/airpuff-v1/html/images/rrd/commute-ceil-day.png \
 	-s -24h -e now --step 500 \
 	-t "Commute Ceiling" \
 	-w 500 -h 309 \
