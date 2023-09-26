@@ -21,7 +21,7 @@
 */5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-commute-vis.sh
 
 # Get the wx
-*/5 * * * * root /usr/local/bin/airpuff/airpuff-kdwa.sh "Woodland" "KDWA"
+#*/5 * * * * root /usr/local/bin/airpuff/airpuff-kdwa.sh "Woodland" "KDWA"
 
 # Create the classic page
 */5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Work Commute" "KEDU KDWA KSAC KVCB O88 KSUU KAPC KCCR KLVK KHWD KOAK KRHV KSJC KSQL KNUQ KPAO"

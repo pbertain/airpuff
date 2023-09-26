@@ -14,7 +14,7 @@ AIRPORTS="$2"
 
 REGION_LOWER=$(echo -e "${REGION}" | tr '[:upper:]' '[:lower:]')
 REGION_LOWER_NOSPACE=$(echo -e "${REGION_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/html/htdocs/airpuff.info/html"
+FILEPATH="/var/www/vhosts/airpuff/gencon/airpuff-v1.1/html"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
 TEMPFILE="${PRODFILE}.temp"
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
