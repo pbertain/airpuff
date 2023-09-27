@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # airpuff.sh
 # Looks up wx for airports on the commute and presents it as a webpage

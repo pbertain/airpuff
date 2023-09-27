@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Which airport is this data for?
 AIRPORT=$1

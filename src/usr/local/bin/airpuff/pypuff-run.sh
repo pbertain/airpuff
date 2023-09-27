@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # airpuff-pypuff.sh
 # Invokes the Python version of AirPuff to generate the web pages
@@ -12,8 +12,8 @@ AIRPORTS="$2"
 
 /bin/logger "PyPuff run starting at `date` for ${REGION}."
 
-REGION_LOWER=$(echo -e "${REGION}" | tr '[:upper:]' '[:lower:]')
-REGION_LOWER_NOSPACE=$(echo -e ${REGION_LOWER} | tr -d '[:space:]')
+REGION_LOWER=$(echo "${REGION}" | tr '[:upper:]' '[:lower:]')
+REGION_LOWER_NOSPACE=$(echo ${REGION_LOWER} | tr -d '[:space:]')
 
 FILEPATH="/var/www/vhosts/airpuff/html/pypuff"
 PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"

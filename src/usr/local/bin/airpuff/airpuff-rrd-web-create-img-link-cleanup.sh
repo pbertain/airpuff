@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cd /var/www/vhosts/airpuff/html/rrdweb/img-link
 for FILE in `ls -1 | grep .temp$` ; do

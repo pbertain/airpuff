@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # airpuff-custom.sh
 # Looks up wx for KDWA 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # pypuff-kdwa-run.sh
 # Invokes the Python version of AirPuff to generate a web page for KDWA in Woodland, CA
