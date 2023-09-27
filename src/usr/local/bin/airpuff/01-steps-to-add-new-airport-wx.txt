@@ -1,0 +1,22 @@
+# Started Fri 2021-11-12
+
+1. cd /usr/local/bin/airpuff/
+2. python3 ./airport-info-insert-phones.py <4-letter lower case ICAO> <ATIS Phone #> <Tower or FBO phone>
+3. ./airpuff-rrd-create.sh <4-letter ICAO code in CAPS>
+4. Create a page for it: ./pypuff-run.sh "<group title - spaces allowed>" "<comma separated list of lower case airports>"
+5. ./airpuff-custom.sh "<group title - spaces allowed>" "<space separated list of upper case airports>"
+6. ./airpuff-rrd.sh "<space separated list of upper case airports>"
+7. ./airpuff-rrd-graph.sh "<space separated list of upper case airports>"
+8. ./airpuff-rrd-web-create.sh "<space separated list of upper case airports>"
+9. ./airpuff-rrd-web-create-img-link.sh "<space separated list of upper case airports>"
+10. Add steps 4-9 to /etc/cron.d/airpuff
+
+
+# Cronjob example entries
+*/15 * * * * root /usr/local/bin/airpuff/pypuff-run.sh "Great Northwest" klmt,krdm,krbg,keug,kolm,ktcm,ktiw
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-custom.sh "Great Northwest" "KLMT KRDM KRBG KEUG KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd.sh "KLMT KRDM KRBG KEUG KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-graph.sh "KLMT KRDM KRBG KEUG KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create.sh "KLMT KRDM KRBG KEUG KOLM KTCM KTIW"
+*/5 * * * * root /usr/local/bin/airpuff/airpuff-rrd-web-create-img-link.sh "KLMT KRDM KRBG KEUG KOLM KTCM KTIW"
+
