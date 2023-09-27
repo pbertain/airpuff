@@ -16,7 +16,7 @@ RRDPATH="/var/airpuff/rrd-data"
 RRDBINPATH="/usr/bin/"
 RRDIMGPATH="/var/www/vhosts/airpuff/html/images/rrd/"
 TEMPFILE="${PRODFILE}.temp"
-AIRPUFF_TM="AirPuff® 2021"
+AIRPUFF_TM="AirPuff® `date '+%Y'` ~ `date '+%a %d %b %y - %H:%M'`"
 
 W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
 E_COAST_TIME=`TZ='America/New_York' date +'%T %Z'`
@@ -32,7 +32,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit 31.00 -l 28.00 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -123,7 +123,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -183,7 +183,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
@@ -243,7 +243,7 @@ for AIRPORT in ${AIRPORTS} ; do
         -t "${AIRPORT} Altimeter" \
         -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM} ~ `date '+%a %d %b %y - %H:%M'`" \
+        -W "${AIRPUFF_TM}" \
         --upper-limit 31.00 --lower-limit 28.00 --rigid \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
