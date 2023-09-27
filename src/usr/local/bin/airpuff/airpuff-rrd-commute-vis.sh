@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 /bin/rrdtool graph \
         /var/www/vhosts/airpuff/gencon/airpuff-v1/html/images/rrd/commute-visi-day.png \

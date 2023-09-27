@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cd /var/www/vhosts/airpuff/html/rrdweb
 for FILE in `ls -1 | grep temp` ; do

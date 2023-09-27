@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # airpuff-rrd-web-create.sh
 # Paul Bertain paul@bertain.net
