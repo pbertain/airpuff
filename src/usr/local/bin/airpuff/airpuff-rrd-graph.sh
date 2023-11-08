@@ -33,11 +33,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -w 500 -h 309 \
         -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit 31.00 -l 28.00 -r \
+        --upper-limit 30.50 -l 29.50 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
         --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
+	--y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
@@ -58,6 +59,7 @@ for AIRPORT in ${AIRPORTS} ; do
         --right-axis-label 'Wind Speed' \
         --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
+	--y-grid 5:2 \
         DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
         DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
         CDEF:scaled_windspd=windspd,10,* \
@@ -124,10 +126,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -w 500 -h 309 \
         -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --upper-limit 30.50 -l 29.50 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
+        --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
+	--y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
@@ -184,10 +188,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -w 500 -h 309 \
         -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --upper-limit 30.50 -l 29.50 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
+        --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
+	--y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
@@ -244,10 +250,12 @@ for AIRPORT in ${AIRPORTS} ; do
         -w 500 -h 309 \
         -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit 31.00 --lower-limit 28.00 --rigid \
+        --upper-limit 30.50 -l 29.50 -r \
         --left-axis-format %2.2lf \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
+        --x-grid MONTH:13:WEEK:4:MINUTE:120:0:%R \
+	--y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
