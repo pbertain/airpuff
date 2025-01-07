@@ -36,28 +36,29 @@ echo "<th>ARPT</th><th>TIME</th><th>TYPE</th><th>CAT</th><th>TEMP</th><th>DEW PT
 echo '</tr>' >> ${DATAFILE}
 
 for AIRPORT in $AIRPORTS ; do
-    FLIGHT_CATEGORY=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep flight_category | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    #RAW_TEXT=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep raw_text | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | sed -e 's/AUTO//' -e 's/RMK.*//'` ;
-    TEMP_C=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep temp_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    FLIGHT_CATEGORY=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $31 }'`
+    RAW_TEXT=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $1 }'`
+    TEMP_C=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $6 }'`
     TEMP_F=`echo "9 * ${TEMP_C} / 5 + 32" | bc -l` ;
     TEMP_F_FORMATTED=`printf "%000.1fF" "${TEMP_F}"` ;
-    DP_C=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep dewpoint_c | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    DP_C=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $7 }'`
     DP_F=`echo "9 * ${DP_C} / 5 + 32" | bc -l` ;
     DP_F_FORMATTED=`printf "%.1fF" "${DP_F}" ` ;
     T_DP_SPREAD=`echo "${TEMP_F} - ${DP_F}" | bc -l` ;
     T_DP_SPREAD_FORMATTED=`printf "%02.0f" "${T_DP_SPREAD}" ` ;
-    WIND_DIR=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_dir_degrees | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    WIND_DIR=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $8 }'`
     WIND_DIR_FORMATTED=`printf "%003d" "${WIND_DIR}"` ;
-    WIND_SPEED=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep wind_speed_kt | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    VIS=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep visibility_statute_mi | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    ALTIMETER=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep altim_in_hg | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    WIND_SPEED=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $9 }'`
+    VIS=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $11 }' | sed -e 's/+//g'`
+    ALTIMETER=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $12 }'`
     ALTIMETER_FORMATTED=`printf "%.2f" "${ALTIMETER}" ` ;
-    METAR_TYPE=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep metar_type | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
-    SKY_COVER=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep sky_cover | awk -F\" '{ print $2,$4 }'` ;
-    ELEVATION_M=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep elevation_m | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }'` ;
+    METAR_TYPE=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $43 }'`
+    SKY_COVER=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $23,$24,$25,$26,$27,$28,$29,$30 }'`k
+    ELEVATION_M=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $44 }'`
     ELEVATION_FT=`echo "${ELEVATION_M} * 100 / 2.54 / 12" | bc -l` ;
     ELEVATION_FORMATTED=`printf "%0004.0f" "${ELEVATION_FT}" ` ;
-    OBS_TIME=`curl -s "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=${AIRPORT}" | grep observation_time | awk -F\> '{ print $2 }' | awk -F\< '{ print $1 }' | awk -FT '{ print $2 }'` ;
+    OBS_TIME=`grep -i ${AIRPORT} /var/fli-rite/data/metars_current.csv | awk -F, '{ print $3 }' | awk -FT '{ print $2 }' | awk -F: '{ print $1":"$2 }'`
+
 
     echo "<tr>" >> ${DATAFILE} ;
     echo "<td>${AIRPORT}</td><td>${OBS_TIME}</td><td>${METAR_TYPE}</td><td>${FLIGHT_CATEGORY}</td><td>${TEMP_F_FORMATTED}</td><td>${DP_F_FORMATTED}</td><td>${T_DP_SPREAD_FORMATTED}</td><td>${WIND_DIR_FORMATTED}@${WIND_SPEED}</td><td>${VIS}</td><td>${ALTIMETER_FORMATTED}</td><td>${SKY_COVER}</td><td>${ELEVATION_FORMATTED}</td>"  >> ${DATAFILE} ;
