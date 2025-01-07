@@ -9,300 +9,576 @@
 AIRPORTS="$1"
 ##### END CUSTOMIZATION SECTION #####
 
-AIRPORT_LOWER_NOSPACE=$(echo -e "${AIRPORT_LOWER}" | tr -d '[:space:]')
-FILEPATH="/var/www/vhosts/airpuff/html"
-PRODFILE="${FILEPATH}/${REGION_LOWER_NOSPACE}.html"
-RRDPATH="/var/airpuff/rrd-data"
+##### GLOBAL VARS #####
+AIRPUFF_TM="AirPuff® `date '+%Y'` ~ `date '+%a %d %b %y - %H:%M'`"
 RRDBINPATH="/usr/bin/"
 RRDIMGPATH="/var/www/vhosts/airpuff/html/images/rrd/"
-TEMPFILE="${PRODFILE}.temp"
-AIRPUFF_TM="AirPuff® `date '+%Y'` ~ `date '+%a %d %b %y - %H:%M'`"
-
-W_COAST_TIME=`TZ='America/Los_Angeles' date +'%a %F %T %Z'`
-E_COAST_TIME=`TZ='America/New_York' date +'%T %Z'`
-ZULU_TIMEZONE=`date -u +'%a %F %T %Z/Zulu/Z'`
-AP_TIMESTAMP=`date '+%a %d %b %y - %H:%M'`
+RRDPATH="/var/airpuff/rrd-data"
+##### GLOBAL VARS #####
 
 for AIRPORT in ${AIRPORTS} ; do
-    AIRPORT_LOWER=$(echo -e "${AIRPORT}" | tr '[:upper:]' '[:lower:]')
+    GET_SITE_NAME="/usr/local/bin/airpuff/get-icao-site-name.py"
+    PYTHON3="/usr/bin/python3"
+    AIRPORT_LOWER=$(echo -e "${AIRPORT}" | tr "[:upper:]" "[:lower:]")
+    AIRPORT_LOWER_NOSPACE=$(echo -e "${AIRPORT_LOWER}" | tr -d "[:space:]")
+    SITE_NAME=`${PYTHON3} ${GET_SITE_NAME} ${AIRPORT_LOWER}`
 
-  ## Days
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-day.png \
+    # Altimeter
+    ## Day
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-day.png \
+        -r \
         -s -24h -e now --step 500 --slope-mode \
-        -t "${AIRPORT} Altimeter" \
+        -t "${SITE_NAME} [${AIRPORT}] Altimeter" \
         -w 500 -h 309 \
-        -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit 30.50 -l 29.50 -r \
+        -Y -a PNG \
+        --upper-limit 31.00 -l 28.90 \
+        --vertical-label Altimeter \
         --left-axis-format %2.2lf \
+        --right-axis-label Altimeter \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
         --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
-	--y-grid 0.05:2 \
+        --y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
-        LINE5:alti_avg#00FF00:"Alti - Avg" \
-        GPRINT:alti_avg:LAST:"Current\:%8.2lf %s\n";
+        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
+        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
+        LINE3:alti_avg#00FF00:"Altimeter [avg]" \
+        GPRINT:alti_avg:LAST:"Avg \:%8.2lf %s\n" \
+        LINE1:alti_min#0000FF:"          [min]" \
+        GPRINT:alti_min:MIN:"Min \:%8.2lf %s\n" \
+        LINE1:alti_max#FF0000:"          [max]" \
+        GPRINT:alti_max:MAX:"Max \:%8.2lf %s\n";
 
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-day.png \
-        -s -24h -e now --step 500 --slope-mode \
-        -t "${AIRPORT} Wind" \
+    ## Week
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-week.png \
+        -r \
+        -s -7d -e now --step 3600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Altimeter" \
         -w 500 -h 309 \
-        -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit "360" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        --right-axis-label 'Wind Speed' \
-        --right-axis 0.1:0 \
-        --right-axis-format %1.1lf \
-	--y-grid 5:2 \
-        DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
-        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,10,* \
-        LINE5:scaled_windspd#00FF00:"Wind Speed" \
-        GPRINT:windspd:LAST:"%8.1lf\n" \
-        LINE5:winddir#0000FF:"Wind Dir" \
-        GPRINT:winddir:LAST:"%10.1lf\n" ;
-
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-winddir-day.png \
-        -s -24h -e now --step 500 --slope-mode \
-        -t "${AIRPORT} Wind Dir" \
-        -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "370" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        LINE5:winddir#0000FF:"Wind Dir" \
-        GPRINT:winddir:LAST:" Current\:%3.1lf\n" ;
-
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-windspd-day.png \
-        -s -24h -e now --step 500 --slope-mode \
-        -t "${AIRPORT} Wind Speed" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "40" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
-        CDEF:scaled_windspd=windspd,10,* \
-        LINE5:scaled_windspd#00FF00:"Wind Speed" \
-        GPRINT:windspd:LAST:" Current\:%3.1lf\n" ;
-
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-day.png -s -24h -e now --step 500 --slope-mode -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0.0" --upper-limit "20000.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-day.png \
-        -s -24h -e now --step 500 --slope-mode \
-        -t "${AIRPORT} Temp" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "120" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
-        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
-        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
-        LINE5:temp_f#00FF00:"Temp °F" \
-        GPRINT:temp_f:LAST:"%16.1lf\n" \
-        LINE5:dew_pt_f#0000FF:"Dew Pt °F" \
-        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
-        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread" \
-        GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
-
-  ## Weeks
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-week.png \
-        -s -7d -e now --step 3600 \
-        -t "${AIRPORT} Altimeter" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit 30.50 -l 29.50 -r \
+        --upper-limit 31.00 -l 28.90 \
+        --vertical-label Altimeter \
         --left-axis-format %2.2lf \
+        --right-axis-label Altimeter \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
-        --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
-	--y-grid 0.05:2 \
+        --x-grid HOUR:12:DAY:1:DAY:1:0:"%a %m/%d" \
+        --y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
-        LINE5:alti#00FF00:"Altimeter" \
-        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+        DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
+        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
+        LINE3:alti_avg#00FF00:"Altimeter [avg]" \
+        GPRINT:alti_avg:LAST:"Avg \:%8.2lf %s\n" \
+        LINE1:alti_min#0000FF:"          [min]" \
+        GPRINT:alti_min:MIN:"Min \:%8.2lf %s\n" \
+        LINE1:alti_max#FF0000:"          [max]" \
+        GPRINT:alti_max:MAX:"Max \:%8.2lf %s\n";
 
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-week.png \
-        -s -7d -e now --step 3600 --slope-mode \
-        -t "${AIRPORT} Wind" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "370" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        --right-axis-label 'Wind Speed' \
-        --right-axis 0.1:0 \
-        --right-axis-format %1.1lf \
-        DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
-        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,10,* \
-        LINE5:scaled_windspd#00FF00:"Wind Speed" \
-        GPRINT:windspd:LAST:"%8.1lf\n" \
-        LINE5:winddir#0000FF:"Wind Dir" \
-        GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-week.png -s -7d -e now --step 3600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-week.png \
-        -s -7d -e now --step 3600 --slope-mode \
-        -t "${AIRPORT} Temp" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "120" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
-        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
-        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
-        LINE5:temp_f#00FF00:"Temp °F" \
-        GPRINT:temp_f:LAST:"%16.1lf\n" \
-        LINE5:dew_pt_f#0000FF:"Dew Pt °F" \
-        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
-        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread" \
-        GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
-
-    #Months
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-month.png \
-        -s -30d -e now --step 10800 \
-        -t "${AIRPORT} Altimeter" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit 30.50 -l 29.50 -r \
-        --left-axis-format %2.2lf \
-        --right-axis 1:0 \
-        --right-axis-format %2.2lf \
-        --x-grid MINUTE:30:HOUR:1:MINUTE:120:0:%R \
-	--y-grid 0.05:2 \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
-        LINE5:alti#00FF00:"Altimeter" \
-        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
-
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-month.png \
-        -s -30d -e now --step 10800 \
-        -t "${AIRPORT} Wind" \
-        -w 500 -h 309 \
-        -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit "370" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        --right-axis-label 'Wind Speed' \
-        --right-axis 0.1:0 \
-        --right-axis-format %1.1lf \
-        DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
-        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,10,* \
-        LINE5:scaled_windspd#00FF00:"Wind Speed" \
-        GPRINT:windspd:LAST:"%8.1lf\n" \
-        LINE5:winddir#0000FF:"Wind Dir" \
-        GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-month.png -s -30d -e now --step 10800 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-month.png \
+    ## Month
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-month.png \
+        -r \
         -s -30d -e now --step 10800 --slope-mode \
-        -t "${AIRPORT} Temp" \
+        -t "${SITE_NAME} [${AIRPORT}] Altimeter" \
         -w 500 -h 309 \
-        -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit "120" \
-        --color CANVAS#111111 \
-        --color BACK#333333 \
-        --color FONT#CCCCCC \
-        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
-        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
-        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
-        LINE5:temp_f#00FF00:"Temp °F" \
-        GPRINT:temp_f:LAST:"%16.1lf\n" \
-        LINE5:dew_pt_f#0000FF:"Dew Pt °F" \
-        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
-        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread" \
-        GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
-
-    # Years
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-year.png \
-        -s -365d -e now --step 21600 \
-        -t "${AIRPORT} Altimeter" \
-        -w 500 -h 309 \
         -Y -a PNG \
-        -W "${AIRPUFF_TM}" \
-        --upper-limit 30.50 -l 29.50 -r \
+        --upper-limit 31.00 -l 28.90 \
+        --vertical-label Altimeter \
         --left-axis-format %2.2lf \
+        --right-axis-label Altimeter \
         --right-axis 1:0 \
         --right-axis-format %2.2lf \
-        --x-grid MONTH:13:WEEK:4:MINUTE:120:0:%R \
-	--y-grid 0.05:2 \
+        --x-grid DAY:1:DAY:7:DAY:7:0:"Week %U" \
+        --y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
-        DEF:alti=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
-        LINE5:alti#00FF00:"Altimeter" \
-        GPRINT:alti:LAST:" Current\:%3.1lf\n" ;
+        DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
+        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
+        LINE3:alti_avg#00FF00:"Altimeter [avg]" \
+        GPRINT:alti_avg:LAST:"Avg \:%8.2lf %s\n" \
+        LINE1:alti_min#0000FF:"          [min]" \
+        GPRINT:alti_min:MIN:"Min \:%8.2lf %s\n" \
+        LINE1:alti_max#FF0000:"          [max]" \
+        GPRINT:alti_max:MAX:"Max \:%8.2lf %s\n";
 
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-year.png \
-        -s -365d -e now --step 21600 \
-        -t "${AIRPORT} Wind" \
+    ## Year
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-alti-year.png \
+        -r \
+        -s -365d -e now --step 21600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Altimeter" \
         -w 500 -h 309 \
-        -Y -a PNG \
         -W "${AIRPUFF_TM}" \
-        --upper-limit "360" \
+        -Y -a PNG \
+        --upper-limit 31.00 -l 28.90 \
+        --vertical-label Altimeter \
+        --left-axis-format %2.2lf \
+        --right-axis-label Altimeter \
+        --right-axis 1:0 \
+        --right-axis-format %2.2lf \
+        --x-grid WEEK:1:MONTH:1:MONTH:2:0:"%b %Y" \
+        --y-grid 0.05:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
+        DEF:alti_avg=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:AVERAGE \
+        DEF:alti_min=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MIN \
+        DEF:alti_max=${RRDPATH}/${AIRPORT_LOWER}-altimeter.rrd:altimeter:MAX \
+        LINE3:alti_avg#00FF00:"Altimeter [avg]" \
+        GPRINT:alti_avg:LAST:"Avg \:%8.2lf %s\n" \
+        LINE1:alti_min#0000FF:"          [min]" \
+        GPRINT:alti_min:MIN:"Min \:%8.2lf %s\n" \
+        LINE1:alti_max#FF0000:"          [max]" \
+        GPRINT:alti_max:MAX:"Max \:%8.2lf %s\n";
+
+  # Wind Speed and Direction
+   ## Days
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-day.png \
+        -r \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Wind" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.0lf" \
         --right-axis-label 'Wind Speed' \
         --right-axis 0.1:0 \
         --right-axis-format %1.1lf \
-        DEF:windspd=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
-        DEF:winddir=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
-        CDEF:scaled_windspd=windspd,10,* \
-        LINE5:scaled_windspd#00FF00:"Wind Speed" \
-        GPRINT:windspd:LAST:"%8.1lf\n" \
-        LINE5:winddir#0000FF:"Wind Dir" \
-        GPRINT:winddir:LAST:"%10.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Visibility" -w 500 -h 309 --lower-limit "0.0" --upper-limit "11.0" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE LINE5:visibility#00FF00:"Visibility" GPRINT:visibility:LAST:" Current\:%3.1lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-year.png -s -365d -e now --step 21600 -t "${AIRPORT} Ceiling" -w 500 -h 309 --lower-limit "0" --upper-limit "20000" -r --color CANVAS#111111 --color BACK#333333 --color FONT#CCCCCC -Y -a PNG -W "${AIRPUFF_TM}" DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE LINE5:ceiling#00FF00:"Ceiling" GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
-    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-year.png \
-        -s -365d -e now --step 21600 --slope-mode \
-        -t "${AIRPORT} Temp" \
+        --upper-limit "360" -l 0 -r \
+        --vertical-label 'Wind Dir' \
+        --x-grid MINUTE:30:HOUR:1:HOUR:2:0:%R \
+        --y-grid 10:3 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+	DEF:windspd_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
+        DEF:windgust_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_gust:AVERAGE \
+        DEF:winddir_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
+        CDEF:scaled_windspd_avg=windspd_avg,10,* \
+        CDEF:scaled_windgust_avg=windgust_avg,10,* \
+        LINE5:winddir_avg#0000FF:"Wind Dir   [avg]" \
+        GPRINT:winddir_avg:LAST:"Current\:%6.0lf\n" \
+        LINE3:scaled_windspd_avg#00FF00:"Wind Speed [avg]" \
+        GPRINT:windspd_avg:LAST:"Current\:%8.1lf\n" \
+        LINE1:scaled_windgust_avg#FF0000:"Wind Gust  [avg]" \
+        GPRINT:windgust_avg:LAST:"Current\:%8.1lf\n" ;
+
+   ## Weeks
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-week.png \
+        -r \
+        -s -7d -e now --step 3600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Wind" \
         -w 500 -h 309 \
-        -Y -a PNG \
         -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.0lf" \
+        --right-axis-label 'Wind Speed' \
+        --right-axis 0.1:0 \
+        --right-axis-format %1.1lf \
+        --upper-limit "360" -l 0 -r \
+        --vertical-label 'Wind Dir' \
+        --x-grid HOUR:12:DAY:1:DAY:1:0:"%a %m/%d" \
+        --y-grid 10:3 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:windspd_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
+        DEF:windgust_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_gust:AVERAGE \
+        DEF:winddir_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
+        CDEF:scaled_windspd_avg=windspd_avg,10,* \
+        CDEF:scaled_windgust_avg=windgust_avg,10,* \
+        LINE5:winddir_avg#0000FF:"Wind Dir   [avg]" \
+        GPRINT:winddir_avg:LAST:"Current\:%6.0lf\n" \
+        LINE3:scaled_windspd_avg#00FF00:"Wind Speed [avg]" \
+        GPRINT:windspd_avg:LAST:"Current\:%8.1lf\n" \
+        LINE1:scaled_windgust_avg#FF0000:"Wind Gust  [avg]" \
+        GPRINT:windgust_avg:LAST:"Current\:%8.1lf\n" ;
+	
+   ## Months
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-month.png \
+        -r \
+        -s -30d -e now --step 10800 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Wind" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.0lf" \
+        --right-axis-label 'Wind Speed' \
+        --right-axis 0.1:0 \
+        --right-axis-format %1.1lf \
+        --upper-limit "360" -l 0 -r \
+        --vertical-label 'Wind Dir' \
+        --x-grid DAY:1:DAY:7:DAY:7:0:"Week %U" \
+        --y-grid 10:3 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:windspd_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
+        DEF:windgust_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_gust:AVERAGE \
+        DEF:winddir_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
+        CDEF:scaled_windspd_avg=windspd_avg,10,* \
+        CDEF:scaled_windgust_avg=windgust_avg,10,* \
+        LINE5:winddir_avg#0000FF:"Wind Dir   [avg]" \
+        GPRINT:winddir_avg:LAST:"Current\:%6.0lf\n" \
+        LINE3:scaled_windspd_avg#00FF00:"Wind Speed [avg]" \
+        GPRINT:windspd_avg:LAST:"Current\:%8.1lf\n" \
+        LINE1:scaled_windgust_avg#FF0000:"Wind Gust  [avg]" \
+        GPRINT:windgust_avg:LAST:"Current\:%8.1lf\n" ;
+	
+   ## Years
+    $RRDBINPATH/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-wind-year.png \
+        -r \
+        -s -365d -e now --step 21600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Wind" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.0lf" \
+        --right-axis-label 'Wind Speed' \
+        --right-axis 0.1:0 \
+        --right-axis-format %1.1lf \
+        --upper-limit "360" -l 0 -r \
+        --vertical-label 'Wind Dir' \
+        --x-grid WEEK:1:MONTH:1:MONTH:2:0:"%b %Y" \
+        --y-grid 10:3 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:windspd_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_speed:AVERAGE \
+        DEF:windgust_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_gust:AVERAGE \
+        DEF:winddir_avg=${RRDPATH}/${AIRPORT_LOWER}-wind.rrd:wind_dir:AVERAGE \
+        CDEF:scaled_windspd_avg=windspd_avg,10,* \
+        CDEF:scaled_windgust_avg=windgust_avg,10,* \
+        LINE5:winddir_avg#0000FF:"Wind Dir   [avg]" \
+        GPRINT:winddir_avg:LAST:"Current\:%6.0lf\n" \
+        LINE3:scaled_windspd_avg#00FF00:"Wind Speed [avg]" \
+        GPRINT:windspd_avg:LAST:"Current\:%8.1lf\n" \
+        LINE1:scaled_windgust_avg#FF0000:"Wind Gust  [avg]" \
+        GPRINT:windgust_avg:LAST:"Current\:%8.1lf\n" ;
+	
+  # Visibility
+   ## Day
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-day.png \
+        -r \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Visibility" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Visibility' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "20.0" \
+        --vertical-label 'Visibility' \
+        --x-grid MINUTE:30:HOUR:1:HOUR:2:0:%R \
+        --y-grid 0.5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE \
+        LINE5:visibility#00FF00:"Visibility [avg]" \
+        GPRINT:visibility:LAST:"Current\:%8.1lf\n" ;
+  
+   ## Week
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-week.png \
+        -r \
+        -s -7d -e now --step 3600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Visibility" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Visibility' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "20.0" \
+        --vertical-label 'Visibility' \
+        --x-grid HOUR:12:DAY:1:DAY:1:0:"%a %m/%d" \
+        --y-grid 0.5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE \
+        LINE5:visibility#00FF00:"Visibility [avg]" \
+        GPRINT:visibility:LAST:"Current\:%8.1lf\n" ;
+      
+   ## Month
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-month.png \
+        -r \
+        -s -30d -e now --step 10800 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Visibility" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Visibility' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "20.0" \
+        --vertical-label 'Visibility' \
+        --x-grid DAY:1:DAY:7:DAY:7:0:"Week %U" \
+        --y-grid 0.5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE \
+        LINE5:visibility#00FF00:"Visibility [avg]" \
+        GPRINT:visibility:LAST:"Current\:%8.1lf\n" ;
+          
+   ## Year
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-visi-year.png \
+        -r \
+        -s -365d -e now --step 21600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Visibility" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Visibility' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "20.0" \
+        --vertical-label 'Visibility' \
+        --x-grid WEEK:1:MONTH:1:MONTH:2:0:"%b %Y" \
+        --y-grid 0.5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:visibility=${RRDPATH}/${AIRPORT_LOWER}-visibility.rrd:visibility:AVERAGE \
+        LINE5:visibility#00FF00:"Visibility [avg]" \
+        GPRINT:visibility:LAST:"Current\:%8.1lf\n" ;
+
+  # Ceiling
+   ## Day
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-day.png \
+        -r \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Ceiling" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%6.0lf000" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Ceiling' \
+        --right-axis 1:0 \
+        --right-axis-format "%0.0lf" \
+        --upper-limit "20000.0" \
+        --vertical-label 'Ceiling' \
+        --x-grid MINUTE:30:HOUR:1:HOUR:2:0:%R \
+        --y-grid 500:4 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE \
+        LINE5:ceiling#00FF00:"Ceiling [avg]" \
+        GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+  
+   ## Week
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-week.png \
+        -r \
+        -s -7d -e now --step 3600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Ceiling" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%6.0lf000" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Ceiling' \
+        --right-axis 1:0 \
+        --right-axis-format "%0.0lf" \
+        --upper-limit "20000.0" \
+        --vertical-label 'Ceiling' \
+        --x-grid HOUR:12:DAY:1:DAY:1:0:"%a %m/%d" \
+        --y-grid 500:4 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE \
+        LINE5:ceiling#00FF00:"Ceiling [avg]" \
+        GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+      
+   ## Month
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-month.png \
+        -r \
+        -s -30d -e now --step 10800 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Ceiling" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%6.0lf000" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Ceiling' \
+        --right-axis 1:0 \
+        --right-axis-format "%0.0lf" \
+        --upper-limit "20000.0" \
+        --vertical-label 'Ceiling' \
+        --x-grid DAY:1:DAY:7:DAY:7:0:"Week %U" \
+        --y-grid 500:4 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE \
+        LINE5:ceiling#00FF00:"Ceiling [avg]" \
+        GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+          
+   ## Year
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-ceil-year.png \
+        -r \
+        -s -365d -e now --step 21600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Ceiling" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%6.0lf000" \
+        --lower-limit "0.0" \
+        --right-axis-label 'Ceiling' \
+        --right-axis 1:0 \
+        --right-axis-format "%0.0lf" \
+        --upper-limit "20000.0" \
+        --vertical-label 'Ceiling' \
+        --x-grid WEEK:1:MONTH:1:MONTH:2:0:"%b %Y" \
+        --y-grid 500:4 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:ceiling=${RRDPATH}/${AIRPORT_LOWER}-ceiling.rrd:ceiling:AVERAGE \
+        LINE5:ceiling#00FF00:"Ceiling [avg]" \
+        GPRINT:ceiling:LAST:" Current\:%5.0lf\n" ;
+        
+  # Temperature
+   ## Days
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-day.png \
+        -r \
+        -s -24h -e now --step 500 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Temperature" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0" \
+        --right-axis-label 'Temperature / Dew Pt / Temp Spread' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
         --upper-limit "120" \
+        --vertical-label 'Temperature / Dew Pt / Temp Spread' \
+        --x-grid MINUTE:30:HOUR:1:HOUR:2:0:%R \
+        --y-grid 5:2 \
         --color CANVAS#111111 \
         --color BACK#333333 \
         --color FONT#CCCCCC \
         DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
         DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
         DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
-        LINE5:temp_f#00FF00:"Temp °F" \
+        LINE5:temp_f#00FF00:"Temp °F [avg]" \
         GPRINT:temp_f:LAST:"%16.1lf\n" \
-        LINE5:dew_pt_f#0000FF:"Dew Pt °F" \
+        LINE5:dew_pt_f#0000FF:"Dew Pt °F [avg]" \
         GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
-        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread" \
-        GPRINT:t_dp_spread_f:LAST:"% 5.1lf\n" ;
+        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread [avg]" \
+        GPRINT:t_dp_spread_f:LAST:"%5.1lf\n" ;
+
+   ## Weeks
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-week.png \
+        -r \
+        -s -7d -e now --step 3600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Temperature" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0" \
+        --right-axis-label 'Temperature / Dew Pt / Temp Spread' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "120" \
+        --vertical-label 'Temperature / Dew Pt / Temp Spread' \
+        --x-grid HOUR:12:DAY:1:DAY:1:0:"%a %m/%d" \
+        --y-grid 5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
+        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
+        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
+        LINE5:temp_f#00FF00:"Temp °F [avg]" \
+        GPRINT:temp_f:LAST:"%16.1lf\n" \
+        LINE5:dew_pt_f#0000FF:"Dew Pt °F [avg]" \
+        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
+        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread [avg]" \
+        GPRINT:t_dp_spread_f:LAST:"%5.1lf\n" ;
+
+   ## Months
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-month.png \
+        -r \
+        -s -30d -e now --step 10800 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Temperature" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0" \
+        --right-axis-label 'Temperature / Dew Pt / Temp Spread' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "120" \
+        --vertical-label 'Temperature / Dew Pt / Temp Spread' \
+        --x-grid DAY:1:DAY:7:DAY:7:0:"Week %U" \
+        --y-grid 5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
+        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
+        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
+        LINE5:temp_f#00FF00:"Temp °F [avg]" \
+        GPRINT:temp_f:LAST:"%16.1lf\n" \
+        LINE5:dew_pt_f#0000FF:"Dew Pt °F [avg]" \
+        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
+        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread [avg]" \
+        GPRINT:t_dp_spread_f:LAST:"%5.1lf\n" ;
+
+   ## Years
+    ${RRDBINPATH}/rrdtool graph ${RRDIMGPATH}/${AIRPORT_LOWER}-temp-year.png \
+        -r \
+        -s -365d -e now --step 21600 --slope-mode \
+        -t "${SITE_NAME} [${AIRPORT}] Temperature" \
+        -w 500 -h 309 \
+        -W "${AIRPUFF_TM}" \
+        -Y -a PNG \
+        --left-axis-format "%3.1lf" \
+        --lower-limit "0" \
+        --right-axis-label 'Temperature / Dew Pt / Temp Spread' \
+        --right-axis 1:0 \
+        --right-axis-format "%3.1lf" \
+        --upper-limit "120" \
+        --vertical-label 'Temperature / Dew Pt / Temp Spread' \
+        --x-grid WEEK:1:MONTH:1:MONTH:2:0:"%b %Y" \
+        --y-grid 5:2 \
+        --color CANVAS#111111 \
+        --color BACK#333333 \
+        --color FONT#CCCCCC \
+        DEF:temp_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:temp_f:AVERAGE \
+        DEF:dew_pt_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:dew_pt_f:AVERAGE \
+        DEF:t_dp_spread_f=${RRDPATH}/${AIRPORT_LOWER}-temp.rrd:t_dp_spread_f:AVERAGE \
+        LINE5:temp_f#00FF00:"Temp °F [avg]" \
+        GPRINT:temp_f:LAST:"%16.1lf\n" \
+        LINE5:dew_pt_f#0000FF:"Dew Pt °F [avg]" \
+        GPRINT:dew_pt_f:LAST:"%14.1lf\n" \
+        LINE3:t_dp_spread_f#FF0000:"Temp-Dew Pt Spread [avg]" \
+        GPRINT:t_dp_spread_f:LAST:"%5.1lf\n" ;
 
 done
+

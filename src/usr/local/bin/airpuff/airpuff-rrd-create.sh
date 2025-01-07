@@ -59,6 +59,7 @@ rrdcreate $STOREPATH/${AIRPORT_LOWER}-wind.rrd \
   --no-overwrite --start now --step $STEP \
   DS:wind_dir:GAUGE:600:0:360 \
   DS:wind_speed:GAUGE:600:0:100 \
+  DS:wind_gust:GAUGE:600:0:100 \
   RRA:AVERAGE:0.5:$DAYAVG:$DAYSTEPS \
   RRA:AVERAGE:0.5:$WEEKAVG:$WEEKSTEPS \
   RRA:AVERAGE:0.5:$MONAVG:$MONSTEPS \

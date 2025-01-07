@@ -12,6 +12,7 @@ import urllib.request
 from decimal import Decimal
 from numbers import Number
 from fractions import Fraction
+from icao_lookup import get_icao_site
 
 user_agent        = 'AirPuff/2.0; Python/3.6.5'
 region            = sys.argv[1]
@@ -28,7 +29,7 @@ pac               = pytz.timezone('US/Pacific')
 eas               = pytz.timezone('US/Eastern')
 utc               = pytz.timezone("UTC")
 
-full_fmt          = '%a %Y-%m-%d %H:%M %Z'
+full_fmt          = '%a %b %e %H:%M %Z'
 time_fmt          = '%H:%M %Z'
 short_fmt         = '%H:%M'
 metar_fmt_mod     = '%Y-%m-%dT%H:%M:%S.%f'
@@ -39,7 +40,7 @@ pattern           = '%d-%m-%Y @ %H:%MZ'
 
 date_time1        = datetime.datetime.now(utc).strftime(metar_fmt)
 pac_cur_time      = datetime.datetime.now(pac).strftime(full_fmt)
-eas_cur_time      = datetime.datetime.now(eas).strftime(time_fmt)
+eas_cur_time      = datetime.datetime.now(eas).strftime(full_fmt)
 utc_cur_time      = datetime.datetime.now(utc).strftime(full_fmt)
 utc_cur_comp_time = datetime.datetime.now(utc).strftime(short_fmt)
 epoch_now         = calendar.timegm(time.strptime(date_time1, metar_fmt))
@@ -62,23 +63,28 @@ print(textwrap.dedent("""\
     <head>
         <meta http-equiv="refresh" content="300">
         <link rel="stylesheet" type="text/css" href="/web/css/airpuff.css">
+        <title>%s AirPuff Airport WX Info</title>
     </head>
-
-    <title>%s AirPuff Airport WX Info</title>
 
     <body bgcolor="#333333" link="#FFA500" alink="#FFA500" vlink="#FFA500">
     <table class="table">
         <tr>
             <td class="td_titles" rowspan="3" colspan="4" vertical-align="center"><a href="https://www.airpuff.info/"><img width="100"  height="81" src="/web/icons/airpuff-logo.png"></a></td>
-            <td class="td_titles" colspan="9" vertical-align="center">%s AirPuff current run:</td>
         </tr>
         <tr>
-            <td class="td_cfb" colspan="9" vertical-align="center">%s / Zulu / Z</td>
+            <td class="td_titles" colspan="11" vertical-align="center"><font size=+3 color="white">%s <font size=+2 color="#ff0">AirPuff current run:</td>
         </tr>
         <tr>
-            <td class="td_lg" colspan="9" vertical-align="center">%s / %s</td>
-        <tr>
-
+            <td class="td_cfb" colspan="11" vertical-align="center">
+                <font face="Courier" size=3>
+                <font color="cornflowerblue">%s
+                <font color="lightgreen">%s
+                <font color="pink">%s
+            </td>
+        </tr>
+    </table>
+    <font color="white" face="Courier" size=3>
+    <table style="color: #FFFFFF; border: 1; border-spacing: 3px; bordercolor: black ; text-align: left; ">
         <tr class="th">
             <th></th>
             <th></th>
@@ -93,6 +99,7 @@ print(textwrap.dedent("""\
             <th>WIND</th>
             <th>VIS</th>
             <th>ALT</th>
+            <th>SITE_NAME</th>
             <th>LAYERS</th>
         </tr>
     """) % (region, region, utc_cur_time, pac_cur_time, eas_cur_time))
@@ -104,6 +111,8 @@ for count in range(0, met_json_results):
         record_data    = met_json['data'][count]
         icao_guess     = record_data.split(" ", 1)[0]
         icao_guess_lo  = icao_guess.lower()
+        site_name      = get_icao_site(icao_guess_lo)
+
         try:
             c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_guess_lo,))
             atis_phone        = "tel://+1-" + c.fetchone()[0]
@@ -121,6 +130,7 @@ for count in range(0, met_json_results):
         continue
     icao              = met_json['data'][count]['icao']
     icao_lo           = icao.lower()
+    site_name         = get_icao_site(icao_lo)
     try:
         c.execute("SELECT wx_phone FROM airports WHERE airport=?", (icao_lo,))
         atis_phone        = "tel://+1-" + c.fetchone()[0]
@@ -252,7 +262,10 @@ for count in range(0, met_json_results):
     except:
         elev_ft           = 0
         elev_m            = 0
-    flt_cat           = met_json['data'][count]['flight_category']
+    try:
+        flt_cat           = met_json['data'][count]['flight_category']
+    except:
+        flt_cat           = 'UKN'
     flt_cat_link      = flt_cat.lower()
     flt_cat_text      = flt_cat_link + "_std"
     if flt_cat == 'UNK':
@@ -322,6 +335,10 @@ for count in range(0, met_json_results):
     else:
         win_deg           = 0
     try:
+        win_spd_kph      = met_json['data'][count]["wind"]['speed_kph']
+    except:
+        win_spd_kph      = 0
+    try:
         win_spd_kts      = met_json['data'][count]["wind"]['speed_kts']
     except:
         win_spd_kts      = 0
@@ -337,6 +354,26 @@ for count in range(0, met_json_results):
         win_spd_mps      = met_json['data'][count]["wind"]['speed_mps']
     except:
         win_spd_mps      = 0
+    try:
+        win_gst_kph  = met_json['data'][count]["wind"]['gust_kph']
+    except:
+        win_gst_kph  = win_spd_kph
+    try:
+        win_gst_kts  = met_json['data'][count]["wind"]['gust_kts']
+        if win_gst_kts < 1:
+            win_gst_kts_web = ''
+        else:
+            win_gst_kts_web = f"G{win_gst_kts:02d}" 
+    except:
+        win_gst_kts  = ''
+    try:
+        win_gst_mph  = met_json['data'][count]["wind"]['gust_mph']
+    except:
+        win_gst_mph  = win_spd_mph
+    try:
+        win_gst_mps  = met_json['data'][count]["wind"]['gust_mps']
+    except:
+        win_gst_mps  = win_spd_mps
 
     if (temp_f <= 50 and win_spd_mph > 3):
         wind_chill           = 35.74 + (0.6215 * temp_f) - (35.75 * (int(win_spd_mph) ** 0.16)) + (0.4275 * temp_f * (win_spd_mph ** 0.16))
@@ -383,7 +420,7 @@ for count in range(0, met_json_results):
             <td><a href=\"%s\"><img width=40 height=20 src=\"/web/icons/telephone-wide-icon.png\"︎></a></td>
             <td><img width=20 height=20 src=\"%s\"></td>
             <td>
-                <a href="#%s"><img width=20 height=20 src="/web/icons/airpuff-raw-metar-icon.png"></a>
+                <a href="%s"><img width=20 height=20 src="/web/icons/airpuff-raw-metar-icon.png"></a>
                 <div id="%s" class="metarDialog">
                     <div>
                         <a href="#close" title="%s Raw METAR Data" class="close">X</a>
@@ -399,12 +436,14 @@ for count in range(0, met_json_results):
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td><a href=\"/rrdweb/img-link/%s-temp-day-rrd.html\">%-d</a></td>
             <td>%-s</td>
-            <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d</a></td>
+            <td><a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%03d</a>@<a href=\"/rrdweb/img-link/%s-wind-day-rrd.html\">%02d%s</a></td>
             <td><a class="%s" href=\"/rrdweb/img-link/%s-visi-day-rrd.html\">%0.2f</a></td>
             <td><a href=\"/rrdweb/img-link/%s-alti-day-rrd.html\">%0.2f</a></td>
+            <td style="font-size: 8px; text-align: left; link='yellow'; alink='yellow'; vlink='yellow'"><a href=\"/rrdweb/%s-rrd.html\">%-35s</a></td>
             %s
-        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, cloud_layer))
+        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, win_gst_kts_web, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, icao_lo, site_name, cloud_layer))
         print('</tr>')
+    win_gst_kts_web = ''
 #        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 #            <td class="%s">%-s %-d</td>
 
