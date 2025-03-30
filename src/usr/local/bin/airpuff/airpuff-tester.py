@@ -191,11 +191,19 @@ for count in range(0, met_json_results):
     elif ceil_ft < 500:
         ceil_class = "lifr_std"
 # START: Cloud layer
-    clouds            = met_json['data'][count]['clouds']
-    cld_len           = len(met_json['data'][count]['clouds'])
+    try:
+        clouds        = met_json['data'][count]['clouds']
+    except:
+        continue
+    try:
+        cld_len       = len(met_json['data'][count]['clouds'])
+    except:
+        cld_len       = 1
     cloud_layer       = ""
     for layer in clouds:
         code = str(layer['code'])
+        if code == ('UKN'):
+            layer_class = "missing_std"
         if code == ('BKN' or 'OVC'):
             layer_class = "vfr_std"
         try:
@@ -359,6 +367,7 @@ for count in range(0, met_json_results):
     except:
         win_gst_kph  = win_spd_kph
     try:
+        win_gst_kts_web = ''
         win_gst_kts  = met_json['data'][count]["wind"]['gust_kts']
         if win_gst_kts < 1:
             win_gst_kts_web = ''
@@ -443,7 +452,7 @@ for count in range(0, met_json_results):
             %s
         """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, win_gst_kts_web, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, icao_lo, site_name, cloud_layer))
         print('</tr>')
-    win_gst_kts_web = ''
+    #win_gst_kts_web = ''
 #        """) % (atis_phone, icon_name, metar_ref, metar_ref, icao, icao, raw, flt_cat_link, icao_lo, icao, hours, mins, flt_cat_text, flt_cat, icao_lo, temp_f, icao_lo, dewpt_f, icao_lo, t_dp_spread_f, wind_chill_fmt, icao_lo, win_deg, icao_lo, win_spd_kts, visi_class, icao_lo, vis_mi_tot, icao_lo, bar_hg, ceil_class, ceil_code, ceil_ft))
 #            <td class="%s">%-s %-d</td>
 
