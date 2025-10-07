@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from .config import settings
 from .database import init_timescaledb
 from .api.v1 import airports, weather, routes, auth
+from .api.curl.v1 import airports as curl_airports, weather as curl_weather, routes as curl_routes
 from .services.websocket_manager import WebSocketManager
 
 
@@ -57,6 +58,11 @@ app.include_router(airports.router, prefix="/api/v1/airports", tags=["airports"]
 app.include_router(weather.router, prefix="/api/v1/weather", tags=["weather"])
 app.include_router(routes.router, prefix="/api/v1/routes", tags=["routes"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+
+# Include cURL-friendly routers
+app.include_router(curl_airports.router, prefix="/curl/v1/airports", tags=["curl-airports"])
+app.include_router(curl_weather.router, prefix="/curl/v1/weather", tags=["curl-weather"])
+app.include_router(curl_routes.router, prefix="/curl/v1/routes", tags=["curl-routes"])
 
 
 @app.get("/")

@@ -87,29 +87,38 @@ uvicorn app.main:app --reload
 
 ## API Endpoints
 
-### Airports
+### JSON API (REST)
 - `GET /api/v1/airports` - List airports
 - `GET /api/v1/airports/{icao}` - Get airport details
 - `POST /api/v1/airports` - Create airport
 - `PUT /api/v1/airports/{icao}` - Update airport
 - `DELETE /api/v1/airports/{icao}` - Delete airport
-
-### Weather
 - `GET /api/v1/weather/{icao}` - Current weather
 - `GET /api/v1/weather/{icao}/history` - Weather history
 - `GET /api/v1/weather?icaos=KSFO,KLAX` - Multiple airports
-
-### Routes
 - `GET /api/v1/routes` - List routes
 - `GET /api/v1/routes/{id}` - Get route details
 - `POST /api/v1/routes` - Create route
 - `PUT /api/v1/routes/{id}` - Update route
 - `DELETE /api/v1/routes/{id}` - Delete route
-
-### Authentication
 - `POST /api/v1/auth/google` - Google OAuth
 - `POST /api/v1/auth/apple` - Apple OAuth
 - `GET /api/v1/auth/me` - Current user
+
+### cURL API (Plain Text)
+- `GET /curl/v1/airports` - List airports (text format)
+- `GET /curl/v1/airports/{icao}` - Get airport details (text format)
+- `POST /curl/v1/airports` - Create airport (text format)
+- `PUT /curl/v1/airports/{icao}` - Update airport (text format)
+- `DELETE /curl/v1/airports/{icao}` - Delete airport (text format)
+- `GET /curl/v1/weather/{icao}` - Current weather (text format)
+- `GET /curl/v1/weather/{icao}/history` - Weather history (text format)
+- `GET /curl/v1/weather?icaos=KSFO,KLAX` - Multiple airports (text format)
+- `GET /curl/v1/routes` - List routes (text format)
+- `GET /curl/v1/routes/{id}` - Get route details (text format)
+- `POST /curl/v1/routes` - Create route (text format)
+- `PUT /curl/v1/routes/{id}` - Update route (text format)
+- `DELETE /curl/v1/routes/{id}` - Delete route (text format)
 
 ## Configuration
 
