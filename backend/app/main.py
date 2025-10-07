@@ -1,0 +1,103 @@
+"""Main FastAPI application for AirPuff."""
+
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+
+from .config import settings
+from .database import init_timescaledb
+from .api.v1 import airports, weather, routes, auth
+from .services.websocket_manager import WebSocketManager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events."""
+    # Startup
+    print("Starting AirPuff application...")
+    init_timescaledb()
+    print("TimescaleDB initialized")
+    
+    yield
+    
+    # Shutdown
+    print("Shutting down AirPuff application...")
+
+
+# Create FastAPI application
+app = FastAPI(
+    title="AirPuff API",
+    description="Modern weather information system for aviation",
+    version="2.0.0",
+    lifespan=lifespan
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"] if settings.debug else ["https://airpuff.info"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Templates
+templates = Jinja2Templates(directory="app/templates")
+
+# WebSocket manager
+ws_manager = WebSocketManager()
+
+# Include API routers
+app.include_router(airports.router, prefix="/api/v1/airports", tags=["airports"])
+app.include_router(weather.router, prefix="/api/v1/weather", tags=["weather"])
+app.include_router(routes.router, prefix="/api/v1/routes", tags=["routes"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+
+
+@app.get("/")
+async def root(request: Request):
+    """Root endpoint - redirect to main page."""
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy", "version": "2.0.0"}
+
+
+@app.get("/api/v1/health")
+async def api_health_check():
+    """API health check endpoint."""
+    return {"status": "healthy", "api_version": "v1"}
+
+
+# WebSocket endpoint
+@app.websocket("/ws")
+async def websocket_endpoint(websocket):
+    """WebSocket endpoint for real-time updates."""
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Echo back for now - will implement proper message handling later
+            await websocket.send_text(f"Echo: {data}")
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+    finally:
+        ws_manager.disconnect(websocket)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=settings.debug
+    )

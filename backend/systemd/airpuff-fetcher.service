@@ -1,0 +1,30 @@
+[Unit]
+Description=AirPuff Weather Data Fetcher
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=exec
+User=airpuff
+Group=airpuff
+WorkingDirectory=/opt/airpuff/backend
+Environment=PATH=/opt/airpuff/venv/bin
+Environment=PYTHONPATH=/opt/airpuff/backend
+ExecStart=/opt/airpuff/venv/bin/python -m app.services.weather_fetcher
+Restart=on-failure
+RestartSec=30
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/airpuff
+ReadWritePaths=/var/log/airpuff
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

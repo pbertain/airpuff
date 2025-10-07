@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: airpuff-timescaledb
+    environment:
+      POSTGRES_DB: airpuff
+      POSTGRES_USER: airpuff
+      POSTGRES_PASSWORD: airpuff
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./backend/alembic/versions:/docker-entrypoint-initdb.d
+    networks:
+      - airpuff-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: airpuff-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - airpuff-network
+    depends_on:
+      - timescaledb
+
+  airpuff-backend:
+    build: ./backend
+    container_name: airpuff-backend
+    environment:
+      DATABASE_URL: postgresql://airpuff:airpuff@timescaledb:5432/airpuff
+      TIMESCALEDB_URL: postgresql://airpuff:airpuff@timescaledb:5432/airpuff
+      ENVIRONMENT: development
+      DEBUG: "true"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - airpuff-network
+    depends_on:
+      - timescaledb
+    restart: unless-stopped
+
+volumes:
+  timescaledb_data:
+  grafana_data:
+
+networks:
+  airpuff-network:
+    driver: bridge
