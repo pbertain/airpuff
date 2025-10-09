@@ -129,7 +129,7 @@ jobs:
               hosts:
                 host74.nird.club:
                   ansible_host: host74.nird.club
-                  ansible_user: deploy
+                  ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/dev_key
         EOF
         

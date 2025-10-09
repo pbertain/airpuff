@@ -1,0 +1,17 @@
+# Development and testing dependencies
+-r requirements.txt
+
+# Additional development tools
+mypy==1.7.1
+bandit==1.7.5
+safety==2.3.5
+pre-commit==3.5.0
+
+# Testing utilities
+pytest-mock==3.12.0
+pytest-xdist==3.5.0
+httpx==0.25.2
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8
