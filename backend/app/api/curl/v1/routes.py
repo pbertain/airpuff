@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from ...database import get_db
-from ...models.route import Route, RouteAirport, ScheduledMessage
-from ...models.airport import Airport
-from ...models.user import User
+from ....database import get_db
+from ....models.route import Route, RouteAirport, ScheduledMessage
+from ....models.airport import Airport
+from ....models.user import User
 
 router = APIRouter()
 

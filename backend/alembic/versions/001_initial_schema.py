@@ -147,8 +147,9 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_scheduled_messages_id'), 'scheduled_messages', ['id'], unique=False)
 
-    # Create TimescaleDB hypertable
-    op.execute("SELECT create_hypertable('weather_observations', 'time', if_not_exists => TRUE);")
+    # Create TimescaleDB hypertable (only for PostgreSQL with TimescaleDB extension)
+    # For SQLite, we'll skip this step
+    # op.execute("SELECT create_hypertable('weather_observations', 'time', if_not_exists => TRUE);")
 
 
 def downgrade() -> None:

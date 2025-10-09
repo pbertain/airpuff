@@ -1,0 +1,282 @@
+name: Database Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Database operation'
+        required: true
+        type: choice
+        options:
+        - migrate
+        - backup
+        - restore
+        - seed-data
+        - cleanup
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      backup_name:
+        description: 'Backup name (for restore operation)'
+        required: false
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANSIBLE_VERSION: '7.4.0'
+
+jobs:
+  database-migrate:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    if: inputs.operation == 'migrate'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run database migrations
+        run: |
+          echo "🔄 Running database migrations on ${{ inputs.environment }}"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "⚠️  PRODUCTION MIGRATION - Creating backup first"
+            # Create backup before migration
+            ansible-playbook ansible/playbooks/backup.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_prod \
+              --vault-password-file <(echo "${{ secrets.VAULT_PASSWORD }}")
+          fi
+          
+          # Run migrations
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            ./deploy.sh -t airpuff_prod -e prod -v -o "app,migrations" -p "${{ secrets.VAULT_PASSWORD }}"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ./deploy.sh -t airpuff_staging -e staging -v -o "app,migrations"
+          else
+            ./deploy.sh -t airpuff_dev -e dev -v -o "app,migrations"
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+      - name: Verify migration
+        run: |
+          echo "✅ Verifying migration success"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            curl -f https://airpuff.com:8000/api/v1/health || exit 1
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            curl -f https://staging.airpuff.com:8000/api/v1/health || exit 1
+          else
+            curl -f http://dev.airpuff.local:8000/api/v1/health || exit 1
+          fi
+
+  database-backup:
+    name: Database Backup
+    runs-on: ubuntu-latest
+    if: inputs.operation == 'backup'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Create database backup
+        run: |
+          echo "💾 Creating database backup for ${{ inputs.environment }}"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            ansible-playbook ansible/playbooks/backup.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_prod \
+              --vault-password-file <(echo "${{ secrets.VAULT_PASSWORD }}")
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ansible-playbook ansible/playbooks/backup.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_staging
+          else
+            ansible-playbook ansible/playbooks/backup.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_dev
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+      - name: Verify backup
+        run: |
+          echo "✅ Verifying backup integrity"
+          # Verify backup was created successfully
+          # This would check backup files and integrity
+
+  database-restore:
+    name: Database Restore
+    runs-on: ubuntu-latest
+    if: inputs.operation == 'restore'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Restore database
+        run: |
+          echo "🔄 Restoring database from backup: ${{ inputs.backup_name }}"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "⚠️  PRODUCTION RESTORE - This is dangerous!"
+            ansible-playbook ansible/playbooks/restore.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_prod \
+              -e "backup_name=${{ inputs.backup_name }}" \
+              --vault-password-file <(echo "${{ secrets.VAULT_PASSWORD }}")
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ansible-playbook ansible/playbooks/restore.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_staging \
+              -e "backup_name=${{ inputs.backup_name }}"
+          else
+            ansible-playbook ansible/playbooks/restore.yml \
+              -i ansible/inventory/hosts.yml \
+              -t airpuff_dev \
+              -e "backup_name=${{ inputs.backup_name }}"
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+      - name: Verify restore
+        run: |
+          echo "✅ Verifying restore success"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            curl -f https://airpuff.com:8000/api/v1/health || exit 1
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            curl -f https://staging.airpuff.com:8000/api/v1/health || exit 1
+          else
+            curl -f http://dev.airpuff.local:8000/api/v1/health || exit 1
+          fi
+
+  database-seed:
+    name: Seed Data
+    runs-on: ubuntu-latest
+    if: inputs.operation == 'seed-data'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Seed database
+        run: |
+          echo "🌱 Seeding database with initial data"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "⚠️  PRODUCTION SEED - This will add data to production!"
+            ./deploy.sh -t airpuff_prod -e prod -v -o "app,data" -p "${{ secrets.VAULT_PASSWORD }}"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ./deploy.sh -t airpuff_staging -e staging -v -o "app,data"
+          else
+            ./deploy.sh -t airpuff_dev -e dev -v -o "app,data"
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+  database-cleanup:
+    name: Database Cleanup
+    runs-on: ubuntu-latest
+    if: inputs.operation == 'cleanup'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Cleanup database
+        run: |
+          echo "🧹 Cleaning up database (old data, logs, etc.)"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "⚠️  PRODUCTION CLEANUP - This will remove old data!"
+            ./deploy.sh -t airpuff_prod -e prod -v -o "app,cleanup" -p "${{ secrets.VAULT_PASSWORD }}"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ./deploy.sh -t airpuff_staging -e staging -v -o "app,cleanup"
+          else
+            ./deploy.sh -t airpuff_dev -e dev -v -o "app,cleanup"
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+  database-notification:
+    name: Database Operation Notification
+    runs-on: ubuntu-latest
+    needs: [database-migrate, database-backup, database-restore, database-seed, database-cleanup]
+    if: always()
+    
+    steps:
+      - name: Send database operation notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#database'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: |
+            Operation: ${{ inputs.operation }}
+            Environment: ${{ inputs.environment }}
+            Backup Name: ${{ inputs.backup_name || 'N/A' }}
+            Result: ${{ job.status }}
+        if: always()

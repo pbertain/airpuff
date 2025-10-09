@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block title %}Route Planner - AirPuff{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Route Planning Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">Route Planner</h4>
+                            <p class="text-muted mb-0">Plan your flight routes and check weather conditions</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary me-2" onclick="saveRoute()">
+                                <i class="fas fa-save"></i> Save Route
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="clearRoute()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Route Builder -->
+        <div class="col-lg-8">
+            <div class="card bg-dark border-light mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Route Builder</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Route Name -->
+                    <div class="mb-3">
+                        <label for="route-name" class="form-label">Route Name</label>
+                        <input type="text" class="form-control" id="route-name" 
+                               placeholder="Enter route name (e.g., West Coast Commute)">
+                    </div>
+                    
+                    <!-- Route Description -->
+                    <div class="mb-3">
+                        <label for="route-description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="route-description" rows="2" 
+                                  placeholder="Describe your route..."></textarea>
+                    </div>
+                    
+                    <!-- Airport Search -->
+                    <div class="mb-3">
+                        <label for="airport-search" class="form-label">Add Airport</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="airport-search" 
+                                   placeholder="Search by ICAO code (e.g., KSFO, KLAX)">
+                            <button class="btn btn-outline-primary" onclick="searchAirport()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div id="airport-search-results" class="mt-2"></div>
+                    </div>
+                    
+                    <!-- Route Airports List -->
+                    <div class="mb-3">
+                        <label class="form-label">Route Airports</label>
+                        <div id="route-airports" class="border rounded p-3 bg-secondary" style="min-height: 100px;">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-plane fa-2x mb-2"></i>
+                                <p>No airports added yet. Search and add airports to build your route.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Route Options -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="route-public">
+                                <label class="form-check-label" for="route-public">
+                                    Make this route public
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="route-favorite">
+                                <label class="form-check-label" for="route-favorite">
+                                    Mark as favorite
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weather Panel -->
+        <div class="col-lg-4">
+            <div class="card bg-dark border-light">
+                <div class="card-header">
+                    <h5 class="mb-0">Weather Conditions</h5>
+                </div>
+                <div class="card-body">
+                    <div id="weather-panel">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-cloud fa-2x mb-2"></i>
+                            <p>Add airports to see weather conditions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Airport Search Modal -->
+<div class="modal fade" id="airportSearchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark border-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Search Airports</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="modal-search-input" 
+                           placeholder="Search by ICAO code or name...">
+                    <button class="btn btn-outline-primary" onclick="searchAirportsModal()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div id="modal-search-results"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let routeAirports = [];
+let allAirports = [];
+
+// Load airports on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllAirports();
+    
+    // Setup search functionality
+    document.getElementById('airport-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchAirport();
+        }
+    });
+});
+
+// Load all airports for search
+async function loadAllAirports() {
+    try {
+        const response = await fetch('/api/v1/airports/');
+        if (response.ok) {
+            allAirports = await response.json();
+        }
+    } catch (error) {
+        console.error('Error loading airports:', error);
+    }
+}
+
+// Search for airport
+function searchAirport() {
+    const searchTerm = document.getElementById('airport-search').value.trim().toUpperCase();
+    const resultsContainer = document.getElementById('airport-search-results');
+    
+    if (!searchTerm) {
+        resultsContainer.innerHTML = '';
+        return;
+    }
+    
+    // Filter airports
+    const matches = allAirports.filter(airport => 
+        airport.icao.includes(searchTerm) || 
+        airport.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ).slice(0, 5); // Limit to 5 results
+    
+    if (matches.length === 0) {
+        resultsContainer.innerHTML = '<div class="alert alert-warning">No airports found</div>';
+        return;
+    }
+    
+    resultsContainer.innerHTML = matches.map(airport => `
+        <div class="card bg-secondary border-light mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${airport.icao}</strong> - ${airport.name}
+                        <br><small class="text-muted">${airport.city}, ${airport.state || airport.country}</small>
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="addAirportToRoute('${airport.icao}')">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Add airport to route
+function addAirportToRoute(icao) {
+    const airport = allAirports.find(a => a.icao === icao);
+    if (!airport) return;
+    
+    // Check if already added
+    if (routeAirports.some(a => a.icao === icao)) {
+        alert('Airport already added to route');
+        return;
+    }
+    
+    // Add to route
+    routeAirports.push({
+        ...airport,
+        order: routeAirports.length
+    });
+    
+    updateRouteDisplay();
+    updateWeatherPanel();
+    
+    // Clear search
+    document.getElementById('airport-search').value = '';
+    document.getElementById('airport-search-results').innerHTML = '';
+}
+
+// Remove airport from route
+function removeAirportFromRoute(icao) {
+    routeAirports = routeAirports.filter(a => a.icao !== icao);
+    // Reorder
+    routeAirports.forEach((airport, index) => {
+        airport.order = index;
+    });
+    updateRouteDisplay();
+    updateWeatherPanel();
+}
+
+// Update route display
+function updateRouteDisplay() {
+    const container = document.getElementById('route-airports');
+    
+    if (routeAirports.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-plane fa-2x mb-2"></i>
+                <p>No airports added yet. Search and add airports to build your route.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = routeAirports.map((airport, index) => `
+        <div class="card bg-dark border-light mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-2">${index + 1}</span>
+                        <div>
+                            <strong>${airport.icao}</strong> - ${airport.name}
+                            <br><small class="text-muted">${airport.city}, ${airport.state || airport.country}</small>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeAirportFromRoute('${airport.icao}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Update weather panel
+async function updateWeatherPanel() {
+    const container = document.getElementById('weather-panel');
+    
+    if (routeAirports.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-cloud fa-2x mb-2"></i>
+                <p>Add airports to see weather conditions</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+    
+    // Load weather for each airport
+    const weatherPromises = routeAirports.map(async (airport) => {
+        try {
+            const response = await fetch(`/curl/v1/weather/${airport.icao}`);
+            if (response.ok) {
+                const weatherText = await response.text();
+                return { icao: airport.icao, weather: weatherText };
+            } else {
+                return { icao: airport.icao, weather: 'No weather data available' };
+            }
+        } catch (error) {
+            return { icao: airport.icao, weather: 'Error loading weather' };
+        }
+    });
+    
+    const weatherResults = await Promise.all(weatherPromises);
+    
+    container.innerHTML = weatherResults.map(({ icao, weather }) => `
+        <div class="card bg-secondary border-light mb-2">
+            <div class="card-header py-1">
+                <h6 class="mb-0">${icao}</h6>
+            </div>
+            <div class="card-body py-2">
+                <pre class="text-light small mb-0" style="font-size: 0.75rem;">${weather}</pre>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Save route
+async function saveRoute() {
+    const name = document.getElementById('route-name').value.trim();
+    const description = document.getElementById('route-description').value.trim();
+    const isPublic = document.getElementById('route-public').checked;
+    const isFavorite = document.getElementById('route-favorite').checked;
+    
+    if (!name) {
+        alert('Please enter a route name');
+        return;
+    }
+    
+    if (routeAirports.length < 2) {
+        alert('Please add at least 2 airports to create a route');
+        return;
+    }
+    
+    const token = localStorage.getItem('airpuff_token');
+    if (!token) {
+        alert('Please log in to save routes');
+        window.location.href = '/login';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/v1/routes/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                airport_icaos: routeAirports.map(a => a.icao),
+                is_public: isPublic,
+                is_favorite: isFavorite
+            })
+        });
+        
+        if (response.ok) {
+            alert('Route saved successfully!');
+            window.location.href = '/dashboard';
+        } else {
+            alert('Error saving route');
+        }
+    } catch (error) {
+        console.error('Error saving route:', error);
+        alert('Error saving route');
+    }
+}
+
+// Clear route
+function clearRoute() {
+    if (confirm('Are you sure you want to clear the current route?')) {
+        routeAirports = [];
+        document.getElementById('route-name').value = '';
+        document.getElementById('route-description').value = '';
+        document.getElementById('route-public').checked = false;
+        document.getElementById('route-favorite').checked = false;
+        updateRouteDisplay();
+        updateWeatherPanel();
+    }
+}
+</script>
+{% endblock %}

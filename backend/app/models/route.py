@@ -1,6 +1,6 @@
 """Route models for user-defined flight routes."""
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Table, Boolean
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import relationship
 from ..database import Base
@@ -35,7 +35,8 @@ class Route(Base):
     
     # Relationships
     user = relationship("User", back_populates="routes")
-    airports = relationship("Airport", secondary=route_airports, back_populates="route_airports")
+    airports = relationship("Airport", secondary=route_airports)
+    route_airport_details = relationship("RouteAirport", back_populates="route")
     scheduled_messages = relationship("ScheduledMessage", back_populates="route")
     
     def __repr__(self):
@@ -56,7 +57,7 @@ class RouteAirport(Base):
     is_waypoint = Column(Boolean, default=False)  # True for waypoints, False for destinations
     
     # Relationships
-    route = relationship("Route")
+    route = relationship("Route", back_populates="route_airport_details")
     airport = relationship("Airport", back_populates="route_airports")
     
     def __repr__(self):

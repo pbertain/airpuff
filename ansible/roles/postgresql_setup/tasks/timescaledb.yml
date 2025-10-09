@@ -1,0 +1,59 @@
+---
+# TimescaleDB Configuration
+
+- name: Enable TimescaleDB extension
+  postgresql_db:
+    name: "{{ postgresql_db_name }}"
+    extensions:
+      - "timescaledb"
+  become_user: postgres
+  tags: [timescaledb, configure]
+
+- name: Create TimescaleDB hypertables
+  postgresql_query:
+    db: "{{ postgresql_db_name }}"
+    query: |
+      SELECT create_hypertable('weather_observations', 'time', if_not_exists => TRUE);
+  become_user: postgres
+  tags: [timescaledb, configure]
+
+- name: Set data retention policy
+  postgresql_query:
+    db: "{{ postgresql_db_name }}"
+    query: |
+      SELECT add_retention_policy('weather_observations', INTERVAL '1 year', if_not_exists => TRUE);
+  become_user: postgres
+  tags: [timescaledb, configure]
+
+- name: Create TimescaleDB views
+  postgresql_query:
+    db: "{{ postgresql_db_name }}"
+    query: |
+      CREATE OR REPLACE VIEW weather_summary AS
+      SELECT 
+          wo.time,
+          a.icao as icao_code,
+          a.name as airport_name,
+          a.city,
+          a.state,
+          a.country,
+          wo.flight_category,
+          wo.temperature_c,
+          wo.dewpoint_c,
+          wo.wind_dir_deg,
+          wo.wind_speed_kts,
+          wo.visibility_mi,
+          wo.altimeter_hg,
+          wo.ceiling_code,
+          CASE 
+              WHEN wo.flight_category = 'VFR' THEN 1
+              WHEN wo.flight_category = 'MVFR' THEN 2
+              WHEN wo.flight_category = 'IFR' THEN 3
+              WHEN wo.flight_category = 'LIFR' THEN 4
+              ELSE 0
+          END as flight_category_numeric
+      FROM weather_observations wo
+      JOIN airports a ON wo.airport_id = a.id
+      ORDER BY wo.time DESC;
+  become_user: postgres
+  tags: [timescaledb, configure]

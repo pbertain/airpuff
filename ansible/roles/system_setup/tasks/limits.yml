@@ -1,0 +1,21 @@
+---
+# System Limits Configuration
+
+- name: Configure system limits for AirPuff user
+  template:
+    src: limits.conf.j2
+    dest: /etc/security/limits.d/airpuff.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags: [limits]
+
+- name: Configure systemd limits
+  template:
+    src: systemd-limits.conf.j2
+    dest: /etc/systemd/system.conf.d/airpuff-limits.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [limits]

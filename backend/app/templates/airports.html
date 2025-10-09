@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Airports - AirPuff{% endblock %}
+
+{% block extra_head %}
+<script src="/static/js/websocket.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Search and Filter Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-light">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-secondary border-secondary">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       id="search-input" placeholder="Search airports by ICAO code or name...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select bg-dark text-light border-secondary" id="country-filter">
+                                <option value="">All Countries</option>
+                                <option value="USA">United States</option>
+                                <option value="CAN">Canada</option>
+                                <option value="MEX">Mexico</option>
+                                <option value="GBR">United Kingdom</option>
+                                <option value="DEU">Germany</option>
+                                <option value="FRA">France</option>
+                                <option value="JPN">Japan</option>
+                                <option value="AUS">Australia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="loadAirports()">
+                                <i class="fas fa-refresh"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Airports Grid -->
+    <div class="row" id="airports-container">
+        <div class="col-12">
+            <div class="text-center text-muted">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading airports...</span>
+                </div>
+                <p class="mt-2">Loading airports...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Airport Detail Modal -->
+<div class="modal fade" id="airportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark border-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="airportModalTitle">Airport Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="airportModalBody">
+                <!-- Airport details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addToRoute()">Add to Route</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allAirports = [];
+let filteredAirports = [];
+
+// Load airports on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAirports();
+    
+    // Setup search functionality
+    document.getElementById('search-input').addEventListener('input', filterAirports);
+    document.getElementById('country-filter').addEventListener('change', filterAirports);
+});
+
+// Load airports from API
+async function loadAirports() {
+    try {
+        const response = await fetch('/api/v1/airports/');
+        if (response.ok) {
+            allAirports = await response.json();
+            filteredAirports = [...allAirports];
+            displayAirports();
+        } else {
+            showError('Failed to load airports');
+        }
+    } catch (error) {
+        console.error('Error loading airports:', error);
+        showError('Error loading airports');
+    }
+}
+
+// Display airports in grid
+function displayAirports() {
+    const container = document.getElementById('airports-container');
+    
+    if (filteredAirports.length === 0) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="text-center text-muted">
+                    <i class="fas fa-plane fa-3x mb-3"></i>
+                    <p>No airports found matching your criteria.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filteredAirports.map(airport => `
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card bg-secondary border-light h-100 airport-card" 
+                 data-airport="${airport.icao}" 
+                 data-icao="${airport.icao}" 
+                 data-name="${airport.name}"
+                 data-country="${airport.country}">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title text-primary mb-0">${airport.icao}</h6>
+                        <div>
+                            <span class="flight-category badge bg-secondary me-1">N/A</span>
+                            <span class="badge bg-info">${airport.country}</span>
+                        </div>
+                    </div>
+                    <h6 class="card-subtitle text-light mb-2">${airport.name}</h6>
+                    <p class="card-text text-muted small flex-grow-1">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        ${airport.city}, ${airport.state || airport.country}
+                    </p>
+                    
+                    <!-- Weather Information -->
+                    <div class="weather-info mb-3 p-2 bg-dark rounded">
+                        <div class="row text-center small">
+                            <div class="col-3">
+                                <div class="text-muted">Temp</div>
+                                <div class="temperature text-light">--°C</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-muted">Wind</div>
+                                <div class="wind text-light">--@--kt</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-muted">Vis</div>
+                                <div class="visibility text-light">--SM</div>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-muted">Alt</div>
+                                <div class="altimeter text-light">--</div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-1">
+                            <small class="update-time text-muted">Loading...</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center small">
+                        <div class="col-4">
+                            <div class="text-muted">Elevation</div>
+                            <div class="text-light">${airport.elevation_ft || 'N/A'} ft</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-muted">Lat</div>
+                            <div class="text-light">${airport.latitude?.toFixed(4) || 'N/A'}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-muted">Lon</div>
+                            <div class="text-light">${airport.longitude?.toFixed(4) || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-primary btn-sm w-100" 
+                                onclick="showAirportDetails('${airport.icao}')">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filter airports based on search and country
+function filterAirports() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const countryFilter = document.getElementById('country-filter').value;
+    
+    filteredAirports = allAirports.filter(airport => {
+        const matchesSearch = !searchTerm || 
+            airport.icao.toLowerCase().includes(searchTerm) ||
+            airport.name.toLowerCase().includes(searchTerm) ||
+            airport.city?.toLowerCase().includes(searchTerm);
+        
+        const matchesCountry = !countryFilter || airport.country === countryFilter;
+        
+        return matchesSearch && matchesCountry;
+    });
+    
+    displayAirports();
+}
+
+// Show airport details modal
+async function showAirportDetails(icao) {
+    const airport = allAirports.find(a => a.icao === icao);
+    if (!airport) return;
+    
+    // Update modal title
+    document.getElementById('airportModalTitle').textContent = `${airport.icao} - ${airport.name}`;
+    
+    // Load weather data
+    const weatherData = await loadWeatherData(icao);
+    
+    // Build modal content
+    const modalBody = document.getElementById('airportModalBody');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Airport Information</h6>
+                <table class="table table-dark table-sm">
+                    <tr><td><strong>ICAO Code:</strong></td><td>${airport.icao}</td></tr>
+                    <tr><td><strong>Name:</strong></td><td>${airport.name}</td></tr>
+                    <tr><td><strong>Location:</strong></td><td>${airport.city}, ${airport.state || ''} ${airport.country}</td></tr>
+                    <tr><td><strong>Elevation:</strong></td><td>${airport.elevation_ft || 'N/A'} ft</td></tr>
+                    <tr><td><strong>Coordinates:</strong></td><td>${airport.latitude?.toFixed(6)}, ${airport.longitude?.toFixed(6)}</td></tr>
+                    <tr><td><strong>ATIS Phone:</strong></td><td>${airport.atis_phone || 'N/A'}</td></tr>
+                    <tr><td><strong>Tower Phone:</strong></td><td>${airport.tower_phone || 'N/A'}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Current Weather</h6>
+                <div id="weather-display">
+                    ${weatherData}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Show modal
+    new bootstrap.Modal(document.getElementById('airportModal')).show();
+}
+
+// Load weather data for airport
+async function loadWeatherData(icao) {
+    try {
+        const response = await fetch(`/curl/v1/weather/${icao}`);
+        if (response.ok) {
+            const weatherText = await response.text();
+            return `<pre class="text-light small">${weatherText}</pre>`;
+        } else {
+            return '<p class="text-muted">No weather data available</p>';
+        }
+    } catch (error) {
+        console.error('Error loading weather:', error);
+        return '<p class="text-danger">Error loading weather data</p>';
+    }
+}
+
+// Add airport to route (placeholder)
+function addToRoute() {
+    const icao = document.querySelector('#airportModal .airport-card')?.dataset.icao;
+    if (icao) {
+        // In a real implementation, this would open a route creation modal
+        alert(`Adding ${icao} to route (feature coming soon!)`);
+    }
+}
+
+// Show error message
+function showError(message) {
+    const container = document.getElementById('airports-container');
+    container.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> ${message}
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

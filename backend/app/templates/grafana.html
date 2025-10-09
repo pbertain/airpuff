@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Grafana Dashboards - AirPuff{% endblock %}
+
+{% block extra_head %}
+<script src="/static/js/websocket.js"></script>
+<style>
+    .dashboard-iframe {
+        width: 100%;
+        height: 600px;
+        border: none;
+        border-radius: 8px;
+    }
+    .dashboard-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-light">
+                <div class="card-body text-center">
+                    <h2 class="text-light mb-3">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Grafana Dashboards
+                    </h2>
+                    <p class="text-muted mb-0">Real-time weather data visualization and analytics</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafana Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-secondary border-light">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="text-light mb-2">
+                                <i class="fas fa-server me-2"></i>
+                                Grafana Service Status
+                            </h5>
+                            <p class="text-muted mb-0">Monitor the status of your Grafana instance</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button id="check-grafana-status" class="btn btn-outline-primary">
+                                <i class="fas fa-sync-alt me-1"></i>
+                                Check Status
+                            </button>
+                        </div>
+                    </div>
+                    <div id="grafana-status" class="mt-3" style="display: none;">
+                        <!-- Status will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="row">
+        <!-- Weather Overview Dashboard -->
+        <div class="col-lg-6 mb-4">
+            <div class="card bg-secondary border-light h-100 dashboard-card">
+                <div class="card-header bg-dark border-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="text-light mb-0">
+                            <i class="fas fa-cloud-sun me-2"></i>
+                            Weather Overview
+                        </h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="refreshWeatherDashboard()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <a id="weather-dashboard-link" href="#" target="_blank" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <iframe id="weather-dashboard" class="dashboard-iframe" src="about:blank"></iframe>
+                </div>
+                <div class="card-footer bg-dark border-light">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Real-time weather trends across all airports
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Airport-Specific Dashboard -->
+        <div class="col-lg-6 mb-4">
+            <div class="card bg-secondary border-light h-100 dashboard-card">
+                <div class="card-header bg-dark border-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="text-light mb-0">
+                            <i class="fas fa-plane me-2"></i>
+                            Airport Weather
+                        </h5>
+                        <div>
+                            <select id="airport-selector" class="form-select form-select-sm me-2" style="width: auto; display: inline-block;">
+                                <option value="KSFO">KSFO - San Francisco</option>
+                                <option value="KLAX">KLAX - Los Angeles</option>
+                                <option value="KJFK">KJFK - New York</option>
+                                <option value="KORD">KORD - Chicago</option>
+                                <option value="KDFW">KDFW - Dallas</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="refreshAirportDashboard()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <a id="airport-dashboard-link" href="#" target="_blank" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <iframe id="airport-dashboard" class="dashboard-iframe" src="about:blank"></iframe>
+                </div>
+                <div class="card-footer bg-dark border-light">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Detailed weather analysis for selected airport
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-dark border-light">
+                <div class="card-header">
+                    <h5 class="text-light mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-primary w-100" onclick="openGrafanaAdmin()">
+                                <i class="fas fa-cog me-2"></i>
+                                Grafana Admin
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-success w-100" onclick="createWeatherAlert()">
+                                <i class="fas fa-bell me-2"></i>
+                                Create Alert
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-info w-100" onclick="exportDashboardData()">
+                                <i class="fas fa-download me-2"></i>
+                                Export Data
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-warning w-100" onclick="refreshAllDashboards()">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Refresh All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load Grafana status
+    checkGrafanaStatus();
+    
+    // Load dashboards
+    loadWeatherDashboard();
+    loadAirportDashboard();
+    
+    // Set up airport selector change handler
+    document.getElementById('airport-selector').addEventListener('change', function() {
+        loadAirportDashboard();
+    });
+    
+    // Set up status check button
+    document.getElementById('check-grafana-status').addEventListener('click', function() {
+        checkGrafanaStatus();
+    });
+});
+
+async function checkGrafanaStatus() {
+    try {
+        const response = await fetch('/api/v1/grafana/status');
+        const data = await response.json();
+        
+        const statusDiv = document.getElementById('grafana-status');
+        statusDiv.style.display = 'block';
+        
+        if (data.status === 'connected') {
+            statusDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Grafana Connected</strong><br>
+                    Dashboards: ${data.stats.dashboards_count} | 
+                    Datasources: ${data.stats.datasources_count} | 
+                    Alert Rules: ${data.stats.alert_rules_count}
+                </div>
+            `;
+        } else {
+            statusDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Grafana Disconnected</strong><br>
+                    Please check your Grafana instance and Docker containers.
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error checking Grafana status:', error);
+        const statusDiv = document.getElementById('grafana-status');
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Error</strong><br>
+                Failed to connect to Grafana service.
+            </div>
+        `;
+    }
+}
+
+async function loadWeatherDashboard() {
+    try {
+        const response = await fetch('/api/v1/grafana/weather-dashboard');
+        const data = await response.json();
+        
+        const iframe = document.getElementById('weather-dashboard');
+        const link = document.getElementById('weather-dashboard-link');
+        
+        iframe.src = data.url;
+        link.href = data.url;
+        
+    } catch (error) {
+        console.error('Error loading weather dashboard:', error);
+        document.getElementById('weather-dashboard').src = 'about:blank';
+    }
+}
+
+async function loadAirportDashboard() {
+    const selectedAirport = document.getElementById('airport-selector').value;
+    
+    try {
+        const response = await fetch(`/api/v1/grafana/airport-dashboard?airport=${selectedAirport}`);
+        const data = await response.json();
+        
+        const iframe = document.getElementById('airport-dashboard');
+        const link = document.getElementById('airport-dashboard-link');
+        
+        iframe.src = data.url;
+        link.href = data.url;
+        
+    } catch (error) {
+        console.error('Error loading airport dashboard:', error);
+        document.getElementById('airport-dashboard').src = 'about:blank';
+    }
+}
+
+function refreshWeatherDashboard() {
+    loadWeatherDashboard();
+}
+
+function refreshAirportDashboard() {
+    loadAirportDashboard();
+}
+
+function refreshAllDashboards() {
+    loadWeatherDashboard();
+    loadAirportDashboard();
+    checkGrafanaStatus();
+}
+
+function openGrafanaAdmin() {
+    window.open('http://localhost:3000', '_blank');
+}
+
+async function createWeatherAlert() {
+    const selectedAirport = document.getElementById('airport-selector').value;
+    
+    try {
+        const response = await fetch(`/api/v1/grafana/alerts/weather/${selectedAirport}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('airpuff_token')}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            alert(`Weather alert created for ${data.airport}`);
+        } else {
+            alert('Failed to create weather alert. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error creating weather alert:', error);
+        alert('Error creating weather alert. Please try again.');
+    }
+}
+
+function exportDashboardData() {
+    // This would typically export dashboard data as CSV or JSON
+    alert('Dashboard data export feature coming soon!');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+---
+# RRD Data Upload Task
+# This task handles uploading RRD data to the server
+
+- name: Create RRD data directory
+  file:
+    path: "{{ airpuff_app_home }}/rrd-data"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+
+- name: Check if RRD data exists locally
+  stat:
+    path: "{{ rrd_data_source_path | default('/var/airpuff/rrd-data') }}"
+  register: rrd_data_local
+  delegate_to: localhost
+  when: rrd_data_source_path is defined
+
+- name: Upload RRD data from local machine
+  synchronize:
+    src: "{{ rrd_data_source_path }}/"
+    dest: "{{ airpuff_app_home }}/rrd-data/"
+    delete: yes
+    recursive: yes
+    rsync_opts:
+      - "--exclude=*.tmp"
+      - "--exclude=*.lock"
+      - "--progress"
+  when: 
+    - rrd_data_source_path is defined
+    - rrd_data_local.stat.exists
+    - rrd_data_local.stat.isdir
+
+- name: Set RRD data permissions
+  file:
+    path: "{{ airpuff_app_home }}/rrd-data"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+    recurse: yes
+
+- name: Count RRD files
+  find:
+    paths: "{{ airpuff_app_home }}/rrd-data"
+    patterns: "*.rrd"
+  register: rrd_files
+
+- name: Display RRD file count
+  debug:
+    msg: "Found {{ rrd_files.matched }} RRD files in {{ airpuff_app_home }}/rrd-data"
+
+- name: Create RRD data backup
+  archive:
+    path: "{{ airpuff_app_home }}/rrd-data"
+    dest: "{{ backup_dir }}/rrd-data-backup-{{ ansible_date_time.epoch }}.tar.gz"
+    format: gz
+  when: backup_enabled | default(false)
+

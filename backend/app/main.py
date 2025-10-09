@@ -1,6 +1,8 @@
 """Main FastAPI application for AirPuff."""
 
+import logging
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,23 +10,32 @@ from contextlib import asynccontextmanager
 
 from .config import settings
 from .database import init_timescaledb
-from .api.v1 import airports, weather, routes, auth
+from .api.v1 import airports, weather, routes, auth, users, realtime, grafana, imessage, migration
 from .api.curl.v1 import airports as curl_airports, weather as curl_weather, routes as curl_routes
 from .services.websocket_manager import WebSocketManager
+from .services.realtime_service import realtime_service
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
-    print("Starting AirPuff application...")
+    logger.info("Starting AirPuff application...")
     init_timescaledb()
-    print("TimescaleDB initialized")
+    logger.info("TimescaleDB initialized")
+    
+    # Start real-time service
+    await realtime_service.start()
+    logger.info("Real-time service started")
     
     yield
     
     # Shutdown
-    print("Shutting down AirPuff application...")
+    await realtime_service.stop()
+    logger.info("Real-time service stopped")
+    logger.info("Shutting down AirPuff application...")
 
 
 # Create FastAPI application
@@ -58,6 +69,11 @@ app.include_router(airports.router, prefix="/api/v1/airports", tags=["airports"]
 app.include_router(weather.router, prefix="/api/v1/weather", tags=["weather"])
 app.include_router(routes.router, prefix="/api/v1/routes", tags=["routes"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+app.include_router(realtime.router, prefix="/api/v1/realtime", tags=["realtime"])
+app.include_router(grafana.router, prefix="/api/v1/grafana", tags=["grafana"])
+app.include_router(imessage.router, prefix="/api/v1/imessage", tags=["imessage"])
+app.include_router(migration.router, prefix="/api/v1/migration", tags=["migration"])
 
 # Include cURL-friendly routers
 app.include_router(curl_airports.router, prefix="/curl/v1/airports", tags=["curl-airports"])
@@ -83,6 +99,48 @@ async def api_health_check():
     return {"status": "healthy", "api_version": "v1"}
 
 
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Login page."""
+    return templates.TemplateResponse("login.html", {"request": request, "title": "Login - AirPuff"})
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    """User dashboard."""
+    return templates.TemplateResponse("dashboard.html", {"request": request, "title": "Dashboard - AirPuff"})
+
+
+@app.get("/airports", response_class=HTMLResponse)
+async def airports_page(request: Request):
+    """Airports listing page."""
+    return templates.TemplateResponse("airports.html", {"request": request, "title": "Airports - AirPuff"})
+
+
+@app.get("/route-planner", response_class=HTMLResponse)
+async def route_planner(request: Request):
+    """Route planner page."""
+    return templates.TemplateResponse("route-planner.html", {"request": request, "title": "Route Planner - AirPuff"})
+
+
+@app.get("/grafana", response_class=HTMLResponse)
+async def grafana_dashboards(request: Request):
+    """Grafana dashboards page."""
+    return templates.TemplateResponse("grafana.html", {"request": request, "title": "Grafana Dashboards - AirPuff"})
+
+
+@app.get("/imessage", response_class=HTMLResponse)
+async def imessage_integration(request: Request):
+    """iMessage integration page."""
+    return templates.TemplateResponse("imessage.html", {"request": request, "title": "iMessage Integration - AirPuff"})
+
+
+@app.get("/migration", response_class=HTMLResponse)
+async def migration_page(request: Request):
+    """Data migration page."""
+    return templates.TemplateResponse("migration.html", {"request": request, "title": "Data Migration - AirPuff"})
+
+
 # WebSocket endpoint
 @app.websocket("/ws")
 async def websocket_endpoint(websocket):
@@ -91,19 +149,33 @@ async def websocket_endpoint(websocket):
     try:
         while True:
             data = await websocket.receive_text()
-            # Echo back for now - will implement proper message handling later
-            await websocket.send_text(f"Echo: {data}")
+            await ws_manager.handle_message(websocket, data)
     except Exception as e:
-        print(f"WebSocket error: {e}")
+        logger.error(f"WebSocket error: {e}")
     finally:
         ws_manager.disconnect(websocket)
+
+
+# WebSocket endpoint with user authentication
+@app.websocket("/ws/user/{user_id}")
+async def websocket_user_endpoint(websocket, user_id: int):
+    """WebSocket endpoint for authenticated user updates."""
+    await ws_manager.connect(websocket, user_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await ws_manager.handle_message(websocket, data, user_id)
+    except Exception as e:
+        logger.error(f"WebSocket error for user {user_id}: {e}")
+    finally:
+        ws_manager.disconnect(websocket, user_id)
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0",
-        port=8000,
+        host=settings.host,
+        port=settings.port,
         reload=settings.debug
     )

@@ -1,0 +1,60 @@
+---
+# Python Setup Role - Main Tasks
+
+- name: Install Python and pip
+  apt:
+    name:
+      - "python{{ python_version.split('.')[0] }}"
+      - "python{{ python_version.split('.')[0] }}-dev"
+      - "python{{ python_version.split('.')[0] }}-venv"
+      - "python{{ python_version.split('.')[0] }}-pip"
+      - "python3-setuptools"
+      - "python3-wheel"
+    state: present
+  tags: [python, packages]
+
+- name: Install pip
+  pip:
+    name: pip
+    version: "{{ python_pip_version }}"
+    state: present
+  tags: [python, pip]
+
+- name: Create virtual environment
+  pip:
+    name: virtualenv
+    state: present
+  tags: [python, virtualenv]
+
+- name: Create application virtual environment
+  command: "python3 -m venv {{ virtualenv_path }}"
+  args:
+    creates: "{{ virtualenv_path }}"
+  become_user: "{{ airpuff_app_user }}"
+  tags: [python, virtualenv]
+
+- name: Upgrade pip in virtual environment
+  pip:
+    name: pip
+    version: "{{ python_pip_version }}"
+    state: present
+    virtualenv: "{{ virtualenv_path }}"
+  become_user: "{{ airpuff_app_user }}"
+  tags: [python, pip]
+
+- name: Install Python packages
+  pip:
+    name: "{{ python_packages }}"
+    virtualenv: "{{ virtualenv_path }}"
+    state: present
+  become_user: "{{ airpuff_app_user }}"
+  tags: [python, packages]
+
+- name: Create Python requirements file
+  template:
+    src: requirements.txt.j2
+    dest: "{{ airpuff_app_home }}/requirements.txt"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0644'
+  tags: [python, requirements]

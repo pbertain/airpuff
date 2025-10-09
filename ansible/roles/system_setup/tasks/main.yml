@@ -1,0 +1,65 @@
+---
+# System Setup Role - Main Tasks
+
+- name: Update package cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags: [system, packages]
+
+- name: Install essential packages
+  apt:
+    name: "{{ apt_packages }}"
+    state: present
+  tags: [system, packages]
+
+- name: Create application user
+  user:
+    name: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    shell: /bin/bash
+    home: "{{ airpuff_app_home }}"
+    create_home: yes
+    system: no
+  tags: [system, user]
+
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+  loop:
+    - "{{ airpuff_app_home }}"
+    - "{{ airpuff_app_logs }}"
+    - "{{ airpuff_app_data }}"
+    - "{{ backup_dir }}"
+  tags: [system, directories]
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+  tags: [system, timezone]
+
+- name: Configure NTP
+  include_tasks: ntp.yml
+  tags: [system, ntp]
+
+- name: Configure logrotate
+  include_tasks: logrotate.yml
+  when: logrotate_enabled | default(true)
+  tags: [system, logrotate]
+
+- name: Configure fail2ban
+  include_tasks: fail2ban.yml
+  when: fail2ban_enabled | default(true)
+  tags: [system, fail2ban]
+
+- name: Configure system limits
+  include_tasks: limits.yml
+  tags: [system, limits]
+
+- name: Configure kernel parameters
+  include_tasks: sysctl.yml
+  tags: [system, kernel]

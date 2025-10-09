@@ -1,0 +1,88 @@
+---
+# AirPuff Complete Deployment Playbook
+# This playbook deploys the entire AirPuff application stack
+
+- name: Deploy AirPuff Application Stack
+  hosts: "{{ target | default('airpuff_dev') }}"
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    deploy_user: "{{ ansible_user }}"
+    app_repo: "https://github.com/your-org/airpuff.git"
+    app_branch: "{{ environment | default('dev') }}"
+    
+  pre_tasks:
+    - name: Display deployment information
+      debug:
+        msg:
+          - "Deploying AirPuff to {{ inventory_hostname }}"
+          - "Environment: {{ environment }}"
+          - "Domain: {{ domain }}"
+          - "User: {{ deploy_user }}"
+          - "Branch: {{ app_branch }}"
+    
+    - name: Check if running as root
+      fail:
+        msg: "This playbook should not be run as root. Use a sudo user instead."
+      when: ansible_user == "root"
+    
+    - name: Verify required variables
+      fail:
+        msg: "Required variable {{ item }} is not defined"
+      loop:
+        - "environment"
+        - "domain"
+      when: item is not defined
+
+  roles:
+    - role: system_setup
+      tags: [system, setup]
+    
+    - role: python_setup
+      tags: [python, setup]
+    
+    - role: postgresql_setup
+      tags: [database, postgresql, setup]
+    
+    - role: redis_setup
+      tags: [redis, setup]
+    
+    - role: docker_setup
+      tags: [docker, setup]
+    
+    - role: grafana_setup
+      tags: [grafana, setup]
+    
+    - role: airpuff_app
+      tags: [app, deployment]
+    
+    - role: systemd_services
+      tags: [systemd, services]
+    
+    - role: monitoring_setup
+      tags: [monitoring, setup]
+      when: monitoring_enabled | default(true)
+    
+    - role: backup_setup
+      tags: [backup, setup]
+      when: backup_enabled | default(false)
+
+  post_tasks:
+    - name: Display deployment summary
+      debug:
+        msg:
+          - "AirPuff deployment completed successfully!"
+          - "Application URL: http://{{ domain }}:{{ airpuff_app_port }}"
+          - "Grafana URL: http://{{ domain }}:{{ airpuff_grafana_port }}"
+          - "Environment: {{ environment }}"
+          - "Logs: {{ airpuff_app_logs }}"
+    
+    - name: Run post-deployment health checks
+      include_tasks: tasks/health_checks.yml
+      tags: [health, checks]
+    
+    - name: Send deployment notification
+      include_tasks: tasks/notifications.yml
+      when: notification_webhook is defined
+      tags: [notifications]

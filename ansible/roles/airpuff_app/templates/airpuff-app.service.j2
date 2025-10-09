@@ -1,0 +1,32 @@
+[Unit]
+Description=AirPuff Application Server
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=exec
+User={{ airpuff_app_user }}
+Group={{ airpuff_app_group }}
+WorkingDirectory={{ airpuff_app_home }}/backend
+Environment=PATH={{ virtualenv_path }}/bin
+ExecStart={{ virtualenv_path }}/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ airpuff_app_port }} --workers {{ airpuff_workers | default(2) }}
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=airpuff-app
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths={{ airpuff_app_home }} {{ airpuff_app_logs }} {{ airpuff_app_data }}
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=32768
+
+[Install]
+WantedBy=multi-user.target

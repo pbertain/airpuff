@@ -1,0 +1,44 @@
+---
+# PostgreSQL Configuration
+
+- name: Backup original PostgreSQL configuration
+  copy:
+    src: "{{ item }}"
+    dest: "{{ item }}.backup"
+    remote_src: yes
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  loop:
+    - "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    - "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+  tags: [postgresql, configure]
+
+- name: Configure PostgreSQL main settings
+  template:
+    src: postgresql.conf.j2
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: restart postgresql
+  tags: [postgresql, configure]
+
+- name: Configure PostgreSQL authentication
+  template:
+    src: pg_hba.conf.j2
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  notify: restart postgresql
+  tags: [postgresql, configure]
+
+- name: Create PostgreSQL data directory
+  file:
+    path: "{{ postgresql_data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0700'
+  tags: [postgresql, configure]

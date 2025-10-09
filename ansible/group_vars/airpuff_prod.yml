@@ -1,0 +1,51 @@
+# Production Environment Variables
+---
+environment: "production"
+debug: false
+log_level: "INFO"
+
+# Production-specific settings
+airpuff_secret_key: "{{ vault_airpuff_secret_key }}"
+airpuff_environment: "production"
+
+# Database settings for production
+postgresql_max_connections: 200
+postgresql_shared_buffers: "512MB"
+postgresql_effective_cache_size: "2GB"
+postgresql_work_mem: "16MB"
+postgresql_maintenance_work_mem: "256MB"
+
+# Application settings
+airpuff_workers: 4
+airpuff_reload: false
+airpuff_access_log: true
+airpuff_max_requests: 1000
+airpuff_max_requests_jitter: 100
+
+# Grafana settings
+grafana_anonymous_access: false
+grafana_disable_login_form: false
+grafana_session_timeout: "24h"
+
+# Monitoring settings
+monitoring_detailed: true
+log_retention_days: 30
+log_level: "WARNING"
+
+# Backup settings
+backup_enabled: true
+backup_compression: true
+backup_encryption: true
+backup_s3_enabled: true
+backup_s3_bucket: "{{ vault_backup_s3_bucket }}"
+
+# Security settings
+fail2ban_enabled: true
+fail2ban_max_retry: 3
+fail2ban_bantime: 3600
+fail2ban_findtime: 600
+
+# Performance settings
+postgresql_checkpoint_completion_target: 0.9
+postgresql_wal_buffers: "16MB"
+postgresql_default_statistics_target: 100

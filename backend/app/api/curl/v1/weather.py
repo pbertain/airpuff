@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
-from ...database import get_db
-from ...models.weather import WeatherObservation
-from ...models.airport import Airport
+from ....database import get_db
+from ....models.weather import WeatherObservation
+from ....models.airport import Airport
 
 router = APIRouter()
 

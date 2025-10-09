@@ -1,0 +1,268 @@
+name: AirPuff CI/CD Pipeline
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Code Quality and Testing
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: timescale/timescaledb:2.13.0-pg15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: airpuff_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Run linting
+      run: |
+        cd backend
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+    - name: Run type checking
+      run: |
+        cd backend
+        mypy app/ --ignore-missing-imports
+
+    - name: Run security scan
+      run: |
+        cd backend
+        bandit -r app/ -f json -o bandit-report.json || true
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/airpuff_test
+        REDIS_URL: redis://localhost:6379
+        SECRET_KEY: test-secret-key
+        ENVIRONMENT: test
+        DEBUG: true
+      run: |
+        cd backend
+        pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Development Deployment
+  deploy-dev:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Ansible
+      run: |
+        pip install ansible
+        ansible --version
+
+    - name: Deploy to Development
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: False
+        ANSIBLE_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+      run: |
+        # Create ansible inventory for dev
+        cat > ansible/inventory/dev-hosts.yml << EOF
+        all:
+          children:
+            web_dev:
+              hosts:
+                host74.nird.club:
+                  ansible_host: host74.nird.club
+                  ansible_user: deploy
+                  ansible_ssh_private_key_file: /tmp/dev_key
+        EOF
+        
+        # Create SSH key file
+        echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > /tmp/dev_key
+        chmod 600 /tmp/dev_key
+        
+        # Run Ansible deployment
+        cd ansible
+        ansible-playbook -i inventory/dev-hosts.yml playbooks/deploy.yml \
+          -e "environment=dev" \
+          -e "app_port=25081" \
+          -e "app_hostname=dev.airpuff.info" \
+          -e "app_directory=/opt/airpuff-dev" \
+          -e "database_name=airpuff_dev" \
+          -e "redis_database=1" \
+          --extra-vars "ansible_ssh_private_key_file=/tmp/dev_key"
+
+    - name: Health Check Dev
+      run: |
+        sleep 30
+        curl -f http://dev.airpuff.info:25081/health || exit 1
+
+    - name: Notify Deployment Success
+      if: success()
+      run: |
+        echo "✅ Development deployment successful!"
+        echo "🌐 Dev URL: http://dev.airpuff.info:25081"
+        echo "📊 Health: http://dev.airpuff.info:25081/health"
+
+  # Production Deployment
+  deploy-prod:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Ansible
+      run: |
+        pip install ansible
+        ansible --version
+
+    - name: Deploy to Production
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: False
+        ANSIBLE_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      run: |
+        # Create ansible inventory for prod
+        cat > ansible/inventory/prod-hosts.yml << EOF
+        all:
+          children:
+            web_prod:
+              hosts:
+                host74.nird.club:
+                  ansible_host: host74.nird.club
+                  ansible_user: deploy
+                  ansible_ssh_private_key_file: /tmp/prod_key
+        EOF
+        
+        # Create SSH key file
+        echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > /tmp/prod_key
+        chmod 600 /tmp/prod_key
+        
+        # Run Ansible deployment
+        cd ansible
+        ansible-playbook -i inventory/prod-hosts.yml playbooks/deploy.yml \
+          -e "environment=prod" \
+          -e "app_port=25080" \
+          -e "app_hostname=www.airpuff.info" \
+          -e "app_directory=/opt/airpuff" \
+          -e "database_name=airpuff" \
+          -e "redis_database=0" \
+          --extra-vars "ansible_ssh_private_key_file=/tmp/prod_key"
+
+    - name: Health Check Prod
+      run: |
+        sleep 30
+        curl -f http://www.airpuff.info:25080/health || exit 1
+
+    - name: Notify Deployment Success
+      if: success()
+      run: |
+        echo "✅ Production deployment successful!"
+        echo "🌐 Prod URL: http://www.airpuff.info:25080"
+        echo "📊 Health: http://www.airpuff.info:25080/health"
+
+  # Database Migration (Production only)
+  migrate-prod:
+    needs: deploy-prod
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install Ansible
+      run: |
+        pip install ansible
+        ansible --version
+
+    - name: Run Database Migrations
+      env:
+        ANSIBLE_HOST_KEY_CHECKING: False
+        ANSIBLE_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+      run: |
+        # Create SSH key file
+        echo "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > /tmp/prod_key
+        chmod 600 /tmp/prod_key
+        
+        # Run database migrations
+        cd ansible
+        ansible-playbook -i inventory/prod-hosts.yml playbooks/database.yml \
+          -e "environment=prod" \
+          -e "app_directory=/opt/airpuff" \
+          --extra-vars "ansible_ssh_private_key_file=/tmp/prod_key"
+
+    - name: Verify Migration
+      run: |
+        sleep 10
+        curl -f http://www.airpuff.info:25080/api/v1/health || exit 1

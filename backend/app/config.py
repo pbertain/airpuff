@@ -2,7 +2,7 @@
 
 import os
 from typing import Optional
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
     debug: bool = True
+    
+    # Server configuration
+    host: str = "0.0.0.0"
+    port: int = 25080
     
     # WebSocket
     websocket_ping_interval: int = 25

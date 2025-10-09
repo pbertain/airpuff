@@ -10,6 +10,7 @@ from ...database import get_db
 from ...models.route import Route, RouteAirport, ScheduledMessage
 from ...models.airport import Airport
 from ...models.user import User
+from .auth import get_current_user
 
 router = APIRouter()
 
@@ -140,10 +141,13 @@ async def get_route(route_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=RouteResponse)
-async def create_route(route: RouteCreate, db: Session = Depends(get_db)):
+async def create_route(
+    route: RouteCreate, 
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Create a new route."""
-    # TODO: Add user authentication to get user_id
-    user_id = 1  # Placeholder - will be replaced with actual user from auth
+    user_id = current_user.id
     
     # Create route
     db_route = Route(
@@ -181,12 +185,17 @@ async def create_route(route: RouteCreate, db: Session = Depends(get_db)):
 async def update_route(
     route_id: int,
     route: RouteUpdate,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Update an existing route."""
     db_route = db.query(Route).filter(Route.id == route_id).first()
     if not db_route:
         raise HTTPException(status_code=404, detail="Route not found")
+    
+    # Check if user owns the route
+    if db_route.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this route")
     
     # Update route fields
     for field, value in route.dict(exclude_unset=True).items():
@@ -217,11 +226,19 @@ async def update_route(
 
 
 @router.delete("/{route_id}")
-async def delete_route(route_id: int, db: Session = Depends(get_db)):
+async def delete_route(
+    route_id: int, 
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Delete a route."""
     route = db.query(Route).filter(Route.id == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
+    
+    # Check if user owns the route
+    if route.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this route")
     
     # Delete associated route airports
     db.query(RouteAirport).filter(RouteAirport.route_id == route_id).delete()

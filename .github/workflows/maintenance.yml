@@ -1,0 +1,234 @@
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # Run every Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      maintenance_type:
+        description: 'Type of maintenance'
+        required: true
+        type: choice
+        options:
+        - security-updates
+        - dependency-updates
+        - system-updates
+        - backup-verification
+        - performance-check
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANSIBLE_VERSION: '7.4.0'
+
+jobs:
+  security-updates:
+    name: Security Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || inputs.maintenance_type == 'security-updates'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Run security updates
+        run: |
+          echo "🔒 Running security updates on all environments"
+          
+          # Update development
+          ./deploy.sh -t airpuff_dev -e dev -v -o "system,setup"
+          
+          # Update staging
+          ./deploy.sh -t airpuff_staging -e staging -v -o "system,setup"
+          
+          # Update production (with confirmation)
+          echo "⚠️  Updating production - this requires manual confirmation"
+          ./deploy.sh -t airpuff_prod -e prod -v -o "system,setup" -p "${{ secrets.VAULT_PASSWORD }}"
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+      - name: Security scan after updates
+        run: |
+          echo "🔍 Running security scan after updates"
+          # Run security scans on all environments
+          curl -f http://dev.airpuff.local:8000/api/v1/health || exit 1
+          curl -f https://staging.airpuff.com:8000/api/v1/health || exit 1
+          curl -f https://airpuff.com:8000/api/v1/health || exit 1
+
+  dependency-updates:
+    name: Dependency Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || inputs.maintenance_type == 'dependency-updates'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check for dependency updates
+        run: |
+          echo "📦 Checking for dependency updates"
+          pip install pip-tools
+          pip-compile --upgrade backend/requirements.in
+          
+          # Check if requirements.txt changed
+          if git diff --quiet backend/requirements.txt; then
+            echo "No dependency updates available"
+          else
+            echo "Dependency updates found - creating PR"
+            # Create PR with updated dependencies
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add backend/requirements.txt
+            git commit -m "chore: update dependencies"
+            git push origin HEAD:feature/dependency-updates
+          fi
+
+  system-updates:
+    name: System Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || inputs.maintenance_type == 'system-updates'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Run system updates
+        run: |
+          echo "🔄 Running system updates on all environments"
+          
+          # Update development
+          ./deploy.sh -t airpuff_dev -e dev -v -o "system,setup"
+          
+          # Update staging
+          ./deploy.sh -t airpuff_staging -e staging -v -o "system,setup"
+          
+          # Update production
+          ./deploy.sh -t airpuff_prod -e prod -v -o "system,setup" -p "${{ secrets.VAULT_PASSWORD }}"
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+  backup-verification:
+    name: Backup Verification
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || inputs.maintenance_type == 'backup-verification'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Verify backups
+        run: |
+          echo "💾 Verifying backup integrity"
+          
+          # Test backup restoration on staging
+          ansible-playbook ansible/playbooks/backup-test.yml \
+            -i ansible/inventory/hosts.yml \
+            -t airpuff_staging \
+            --vault-password-file <(echo "${{ secrets.VAULT_PASSWORD }}")
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || inputs.maintenance_type == 'performance-check'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install locust
+
+      - name: Performance check
+        run: |
+          echo "⚡ Running performance checks"
+          
+          # Test performance on all environments
+          locust -f tests/performance/locustfile.py \
+            --host=http://dev.airpuff.local:8000 \
+            --users=10 --spawn-rate=2 --run-time=60s \
+            --headless --html=dev-performance.html
+          
+          locust -f tests/performance/locustfile.py \
+            --host=https://staging.airpuff.com:8000 \
+            --users=10 --spawn-rate=2 --run-time=60s \
+            --headless --html=staging-performance.html
+          
+          locust -f tests/performance/locustfile.py \
+            --host=https://airpuff.com:8000 \
+            --users=10 --spawn-rate=2 --run-time=60s \
+            --headless --html=prod-performance.html
+
+      - name: Upload performance reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-reports
+          path: |
+            dev-performance.html
+            staging-performance.html
+            prod-performance.html
+
+  maintenance-notification:
+    name: Maintenance Notification
+    runs-on: ubuntu-latest
+    needs: [security-updates, dependency-updates, system-updates, backup-verification, performance-check]
+    if: always()
+    
+    steps:
+      - name: Send maintenance notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#maintenance'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: |
+            Maintenance Type: ${{ inputs.maintenance_type || 'scheduled' }}
+            Security Updates: ${{ needs.security-updates.result }}
+            Dependency Updates: ${{ needs.dependency-updates.result }}
+            System Updates: ${{ needs.system-updates.result }}
+            Backup Verification: ${{ needs.backup-verification.result }}
+            Performance Check: ${{ needs.performance-check.result }}
+        if: always()

@@ -1,0 +1,141 @@
+# AirPuff Global Variables
+---
+# Application Configuration
+airpuff_app_name: "airpuff"
+airpuff_app_user: "airpuff"
+airpuff_app_group: "airpuff"
+airpuff_app_home: "/opt/airpuff"
+airpuff_app_logs: "/var/log/airpuff"
+airpuff_app_data: "/var/lib/airpuff"
+
+# Python Configuration
+python_version: "3.11"
+python_pip_version: "23.3.1"
+virtualenv_path: "{{ airpuff_app_home }}/backend/venv"
+
+# Database Configuration
+postgresql_version: "15"
+timescaledb_version: "2.13.0"
+postgresql_data_dir: "/var/lib/postgresql/15/main"
+postgresql_config_dir: "/etc/postgresql/15/main"
+
+# Database Credentials
+postgresql_db_name: "airpuff"
+postgresql_db_user: "airpuff"
+postgresql_db_password: "{{ vault_postgresql_password | default('airpuff_dev_password') }}"
+postgresql_admin_user: "postgres"
+postgresql_admin_password: "{{ vault_postgresql_admin_password | default('postgres_admin') }}"
+
+# Redis Configuration
+redis_version: "7.0"
+redis_data_dir: "/var/lib/redis"
+redis_config_dir: "/etc/redis"
+
+# Docker Configuration
+docker_version: "24.0"
+docker_compose_version: "2.21.0"
+docker_data_root: "/var/lib/docker"
+
+# Grafana Configuration
+grafana_version: "10.2.0"
+grafana_data_dir: "/var/lib/grafana"
+grafana_config_dir: "/etc/grafana"
+grafana_admin_user: "admin"
+grafana_admin_password: "{{ vault_grafana_password | default('admin') }}"
+
+# Application Ports (can be overridden per environment)
+airpuff_app_port: 25080
+airpuff_grafana_port: 3000
+airpuff_timescaledb_port: 5432
+airpuff_redis_port: 6379
+
+# Application Hostname (can be overridden per environment)
+airpuff_app_hostname: www.airpuff.info
+
+# SSL Configuration
+ssl_cert_path: "/etc/ssl/certs/airpuff.crt"
+ssl_key_path: "/etc/ssl/private/airpuff.key"
+ssl_ca_path: "/etc/ssl/certs/airpuff-ca.crt"
+
+# Backup Configuration
+backup_dir: "/var/backups/airpuff"
+backup_retention_days: 30
+backup_schedule: "0 2 * * *"  # Daily at 2 AM
+
+# Monitoring Configuration
+monitoring_enabled: true
+logrotate_enabled: true
+logrotate_max_size: "100M"
+logrotate_keep_days: 30
+
+# Security Configuration
+fail2ban_enabled: true
+fail2ban_jails:
+  - "sshd"
+  - "nginx-http-auth"
+  - "nginx-limit-req"
+
+# System Configuration
+timezone: "UTC"
+ntp_servers:
+  - "pool.ntp.org"
+  - "time.nist.gov"
+
+# Package Management
+apt_packages:
+  - "curl"
+  - "wget"
+  - "git"
+  - "htop"
+  - "vim"
+  - "unzip"
+  - "software-properties-common"
+  - "apt-transport-https"
+  - "ca-certificates"
+  - "gnupg"
+  - "lsb-release"
+  - "build-essential"
+  - "python3-dev"
+  - "python3-pip"
+  - "python3-venv"
+  - "postgresql-client"
+  - "redis-tools"
+  - "jq"
+  - "tree"
+  - "htop"
+  - "iotop"
+  - "nethogs"
+
+# Python Packages
+python_packages:
+  - "fastapi==0.104.1"
+  - "uvicorn[standard]==0.24.0"
+  - "sqlalchemy==2.0.23"
+  - "alembic==1.12.1"
+  - "psycopg2-binary==2.9.9"
+  - "redis==5.0.1"
+  - "httpx==0.25.2"
+  - "pydantic==2.5.0"
+  - "pydantic-settings==2.1.0"
+  - "python-jose[cryptography]==3.3.0"
+  - "passlib[bcrypt]==1.7.4"
+  - "python-multipart==0.0.6"
+  - "jinja2==3.1.2"
+  - "python-dotenv==1.0.0"
+  - "cryptography==41.0.8"
+  - "bcrypt==4.1.2"
+  - "websockets==12.0"
+  - "asyncio-mqtt==0.16.1"
+  - "aiofiles==23.2.1"
+  - "pillow==10.1.0"
+  - "requests==2.31.0"
+  - "beautifulsoup4==4.12.2"
+  - "lxml==4.9.3"
+  - "pandas==2.1.4"
+  - "numpy==1.25.2"
+  - "matplotlib==3.8.2"
+  - "seaborn==0.13.0"
+  - "plotly==5.17.0"
+  - "dash==2.14.2"
+  - "gunicorn==21.2.0"
+  - "supervisor==4.2.5"

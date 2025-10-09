@@ -1,0 +1,86 @@
+name: Emergency Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      reason:
+        description: 'Reason for emergency deployment'
+        required: true
+        type: string
+      skip_tests:
+        description: 'Skip all tests (emergency only)'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANSIBLE_VERSION: '7.4.0'
+
+jobs:
+  emergency-deploy:
+    name: Emergency Deployment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==${{ env.ANSIBLE_VERSION }}
+
+      - name: Emergency deployment
+        run: |
+          echo "🚨 EMERGENCY DEPLOYMENT INITIATED 🚨"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Skip Tests: ${{ inputs.skip_tests }}"
+          
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            ./deploy.sh -t airpuff_prod -e prod -v -p "${{ secrets.VAULT_PASSWORD }}"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            ./deploy.sh -t airpuff_staging -e staging -v
+          else
+            ./deploy.sh -t airpuff_dev -e dev -v
+          fi
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
+
+      - name: Emergency health check
+        run: |
+          sleep 30
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            curl -f https://airpuff.com:8000/health || exit 1
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            curl -f https://staging.airpuff.com:8000/health || exit 1
+          else
+            curl -f http://dev.airpuff.local:8000/health || exit 1
+          fi
+
+      - name: Emergency notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#emergency'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: |
+            Environment: ${{ inputs.environment }}
+            Reason: ${{ inputs.reason }}
+            Skip Tests: ${{ inputs.skip_tests }}
+        if: always()
