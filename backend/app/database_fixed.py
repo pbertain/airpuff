@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 # Create database engine
 engine = create_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
+    settings.database_url,
+    echo=settings.debug,
     pool_pre_ping=True,
     pool_recycle=300,
 )
