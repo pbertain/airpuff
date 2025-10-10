@@ -125,6 +125,7 @@ jobs:
       env:
         ANSIBLE_HOST_KEY_CHECKING: False
         ANSIBLE_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+        ANSIBLE_ROLES_PATH: roles
       run: |
         # Create ansible inventory for dev
         cat > ansible/inventory/dev-hosts.yml << EOF
@@ -145,7 +146,6 @@ jobs:
         # Run Ansible deployment
         cd ansible
         ansible-playbook -i inventory/dev-hosts.yml playbooks/deploy.yml \
-          --roles-path roles \
           -e "environment=dev" \
           -e "app_port=25081" \
           -e "app_hostname=dev.airpuff.info" \
