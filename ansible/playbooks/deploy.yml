@@ -45,44 +45,14 @@
     - role: postgresql_setup
       tags: [database, postgresql, setup]
     
-    - role: redis_setup
-      tags: [redis, setup]
-    
-    - role: docker_setup
-      tags: [docker, setup]
-    
-    - role: grafana_setup
-      tags: [grafana, setup]
-    
     - role: airpuff_app
       tags: [app, deployment]
-    
-    - role: systemd_services
-      tags: [systemd, services]
-    
-    - role: monitoring_setup
-      tags: [monitoring, setup]
-      when: monitoring_enabled | default(true)
-    
-    - role: backup_setup
-      tags: [backup, setup]
-      when: backup_enabled | default(false)
 
   post_tasks:
     - name: Display deployment summary
       debug:
         msg:
           - "AirPuff deployment completed successfully!"
-          - "Application URL: http://{{ domain }}:{{ airpuff_app_port }}"
-          - "Grafana URL: http://{{ domain }}:{{ airpuff_grafana_port }}"
+          - "Application URL: http://{{ airpuff_app_hostname }}:{{ airpuff_app_port }}"
           - "Environment: {{ environment }}"
           - "Logs: {{ airpuff_app_logs }}"
-    
-    - name: Run post-deployment health checks
-      include_tasks: tasks/health_checks.yml
-      tags: [health, checks]
-    
-    - name: Send deployment notification
-      include_tasks: tasks/notifications.yml
-      when: notification_webhook is defined
-      tags: [notifications]
