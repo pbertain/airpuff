@@ -4,7 +4,7 @@
 # Additional development tools
 mypy==1.8.0
 bandit==1.7.5
-safety==3.0.1
+# safety==3.0.1  # Commented out due to pydantic 2.x compatibility issues
 pre-commit==3.6.0
 
 # Testing utilities
