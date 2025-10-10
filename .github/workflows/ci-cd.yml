@@ -157,14 +157,15 @@ jobs:
     - name: Health Check Dev
       run: |
         sleep 30
-        curl -f http://dev.airpuff.info:25081/health || exit 1
+        curl -f http://host74.nird.club:25081/health || exit 1
 
     - name: Notify Deployment Success
       if: success()
       run: |
         echo "✅ Development deployment successful!"
-        echo "🌐 Dev URL: http://dev.airpuff.info:25081"
-        echo "📊 Health: http://dev.airpuff.info:25081/health"
+        echo "🌐 Dev URL: http://host74.nird.club:25081"
+        echo "📊 Health: http://host74.nird.club:25081/health"
+        echo "ℹ️  Note: Ports 25080/25081 are only accessible from the host itself"
 
   # Production Deployment
   deploy-prod:
