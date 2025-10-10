@@ -12,7 +12,7 @@ import logging
 from ...database import get_db
 from ...models.airport import Airport
 from ...models.weather import WeatherObservation
-from ..migration.rrd_migration_service import rrd_migration_service
+from ...services.migration.rrd_migration_service import rrd_migration_service
 
 logger = logging.getLogger(__name__)
 
