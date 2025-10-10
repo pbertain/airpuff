@@ -145,6 +145,7 @@ jobs:
         # Run Ansible deployment
         cd ansible
         ansible-playbook -i inventory/dev-hosts.yml playbooks/deploy.yml \
+          --roles-path roles \
           -e "environment=dev" \
           -e "app_port=25081" \
           -e "app_hostname=dev.airpuff.info" \
