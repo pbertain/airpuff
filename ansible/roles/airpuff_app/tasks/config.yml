@@ -1,0 +1,38 @@
+---
+# Application Configuration
+
+- name: Create environment configuration
+  template:
+    src: .env.j2
+    dest: "{{ airpuff_app_home }}/backend/.env"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0600'
+  tags: [app, config]
+
+- name: Create application configuration
+  template:
+    src: config.py.j2
+    dest: "{{ airpuff_app_home }}/backend/app/config.py"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0644'
+  tags: [app, config]
+
+- name: Create Alembic configuration
+  template:
+    src: alembic.ini.j2
+    dest: "{{ airpuff_app_home }}/backend/alembic.ini"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0644'
+  tags: [app, config]
+
+- name: Create logging configuration
+  template:
+    src: logging.conf.j2
+    dest: "{{ airpuff_app_home }}/backend/logging.conf"
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0644'
+  tags: [app, config]

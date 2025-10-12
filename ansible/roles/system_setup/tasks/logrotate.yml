@@ -1,0 +1,23 @@
+---
+# Logrotate Configuration
+
+- name: Install logrotate
+  apt:
+    name: logrotate
+    state: present
+  tags: [logrotate]
+
+- name: Configure AirPuff logrotate
+  template:
+    src: airpuff.logrotate.j2
+    dest: /etc/logrotate.d/airpuff
+    owner: root
+    group: root
+    mode: '0644'
+  tags: [logrotate]
+
+- name: Test logrotate configuration
+  command: logrotate -d /etc/logrotate.d/airpuff
+  register: logrotate_test
+  changed_when: false
+  tags: [logrotate]

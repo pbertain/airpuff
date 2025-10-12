@@ -1,0 +1,11 @@
+[Unit]
+Description=Run AirPuff Weather Fetcher every 5 minutes
+Requires=airpuff-fetcher.service
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target

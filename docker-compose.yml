@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: airpuff-timescaledb
+    environment:
+      POSTGRES_DB: airpuff
+      POSTGRES_USER: airpuff
+      POSTGRES_PASSWORD: airpuff
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./docker/timescaledb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - airpuff-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: airpuff-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - airpuff-network
+    depends_on:
+      - timescaledb
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: airpuff-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - airpuff-network
+    restart: unless-stopped
+
+volumes:
+  timescaledb_data:
+  grafana_data:
+  redis_data:
+
+networks:
+  airpuff-network:
+    driver: bridge

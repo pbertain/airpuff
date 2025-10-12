@@ -1,0 +1,31 @@
+# Development Environment Variables
+---
+environment: "development"
+debug: true
+log_level: "DEBUG"
+
+# Development-specific settings
+airpuff_secret_key: "dev-secret-key-change-in-production"
+airpuff_environment: "development"
+
+# Database settings for development
+postgresql_max_connections: 100
+postgresql_shared_buffers: "256MB"
+postgresql_effective_cache_size: "1GB"
+
+# Application settings
+airpuff_workers: 2
+airpuff_reload: true
+airpuff_access_log: true
+
+# Grafana settings
+grafana_anonymous_access: true
+grafana_disable_login_form: false
+
+# Monitoring settings
+monitoring_detailed: true
+log_retention_days: 7
+
+# Backup settings
+backup_enabled: false
+backup_compression: true

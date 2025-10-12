@@ -1,0 +1,26 @@
+---
+# Kernel Parameters Configuration
+
+- name: Configure kernel parameters
+  template:
+    src: sysctl.conf.j2
+    dest: /etc/sysctl.d/99-airpuff.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload sysctl
+  tags: [sysctl]
+
+- name: Apply kernel parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop:
+    - { name: "net.core.somaxconn", value: "65535" }
+    - { name: "net.core.netdev_max_backlog", value: "5000" }
+    - { name: "vm.swappiness", value: "10" }
+    - { name: "vm.dirty_ratio", value: "15" }
+    - { name: "vm.dirty_background_ratio", value: "5" }
+  tags: [sysctl]

@@ -1,0 +1,63 @@
+---
+# SystemD Service Setup
+
+- name: Create AirPuff application service
+  template:
+    src: airpuff-app.service.j2
+    dest: /etc/systemd/system/airpuff-app.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [app, systemd]
+
+- name: Create AirPuff weather service
+  template:
+    src: airpuff-weather.service.j2
+    dest: /etc/systemd/system/airpuff-weather.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [app, systemd]
+
+- name: Create AirPuff weather timer
+  template:
+    src: airpuff-weather.timer.j2
+    dest: /etc/systemd/system/airpuff-weather.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [app, systemd]
+
+- name: Create AirPuff iMessage service
+  template:
+    src: airpuff-imessage.service.j2
+    dest: /etc/systemd/system/airpuff-imessage.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [app, systemd]
+
+- name: Create AirPuff iMessage timer
+  template:
+    src: airpuff-imessage.timer.j2
+    dest: /etc/systemd/system/airpuff-imessage.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+  tags: [app, systemd]
+
+- name: Enable and start timers
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - airpuff-weather.timer
+    - airpuff-imessage.timer
+  tags: [app, systemd]

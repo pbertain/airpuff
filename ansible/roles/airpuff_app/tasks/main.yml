@@ -1,0 +1,61 @@
+---
+# AirPuff Application Deployment Role - Main Tasks
+
+- name: Clone AirPuff repository
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ airpuff_app_home }}"
+    version: "{{ app_branch }}"
+    force: yes
+  become_user: "{{ airpuff_app_user }}"
+  tags: [app, git]
+
+- name: Install application dependencies
+  pip:
+    requirements: "{{ airpuff_app_home }}/backend/requirements.txt"
+    virtualenv: "{{ virtualenv_path }}"
+    state: present
+  become_user: "{{ airpuff_app_user }}"
+  tags: [app, dependencies]
+
+- name: Create application configuration
+  include_tasks: config.yml
+  tags: [app, config]
+
+- name: Run database migrations
+  include_tasks: migrations.yml
+  tags: [app, database]
+
+- name: Create application directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+  loop:
+    - "{{ airpuff_app_home }}/backend/logs"
+    - "{{ airpuff_app_home }}/backend/static"
+    - "{{ airpuff_app_home }}/backend/uploads"
+  tags: [app, directories]
+
+- name: Set up static files
+  include_tasks: static.yml
+  tags: [app, static]
+
+- name: Handle RRD data
+  include_tasks: rrd_data.yml
+  tags: [app, rrd_data]
+  when: rrd_data_enabled | default(false)
+
+- name: Create systemd service files
+  include_tasks: systemd.yml
+  tags: [app, systemd]
+
+- name: Start AirPuff application
+  systemd:
+    name: airpuff-app
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: [app, service]

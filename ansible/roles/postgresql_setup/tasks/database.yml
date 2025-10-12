@@ -1,0 +1,39 @@
+---
+# Database Creation
+
+- name: Create AirPuff database user
+  postgresql_user:
+    name: "{{ postgresql_db_user }}"
+    password: "{{ postgresql_db_password }}"
+    state: present
+    db: "{{ postgresql_db_name }}"
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Create AirPuff database
+  postgresql_db:
+    name: "{{ postgresql_db_name }}"
+    owner: "{{ postgresql_db_user }}"
+    state: present
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Grant database privileges
+  postgresql_privs:
+    database: "{{ postgresql_db_name }}"
+    roles: "{{ postgresql_db_user }}"
+    privs: ALL
+    type: database
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Create database extensions
+  postgresql_db:
+    name: "{{ postgresql_db_name }}"
+    extensions:
+      - "uuid-ossp"
+      - "pg_trgm"
+      - "btree_gin"
+      - "btree_gist"
+  become_user: postgres
+  tags: [postgresql, database]

@@ -1,0 +1,39 @@
+[Unit]
+Description=AirPuff Weather Data Fetcher
+After=network.target postgresql.service redis.service airpuff-app.service
+Wants=postgresql.service redis.service airpuff-app.service
+
+[Service]
+Type=oneshot
+User={{ airpuff_app_user }}
+Group={{ airpuff_app_group }}
+WorkingDirectory={{ airpuff_app_home }}/backend
+Environment=PATH={{ virtualenv_path }}/bin
+ExecStart={{ virtualenv_path }}/bin/python -c "
+import asyncio
+import sys
+sys.path.append('{{ airpuff_app_home }}/backend')
+from app.services.realtime_service import realtime_service
+
+async def main():
+    await realtime_service.fetch_weather_data()
+
+asyncio.run(main())
+"
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=airpuff-weather
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths={{ airpuff_app_home }} {{ airpuff_app_logs }} {{ airpuff_app_data }}
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=32768
+
+[Install]
+WantedBy=multi-user.target

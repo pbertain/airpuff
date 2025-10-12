@@ -1,0 +1,17 @@
+# Development and testing dependencies
+-r requirements.txt
+
+# Additional development tools
+mypy==1.8.0
+bandit==1.7.5
+# safety==3.0.1  # Commented out due to pydantic 2.x compatibility issues
+pre-commit==3.6.0
+
+# Testing utilities
+pytest-mock==3.12.0
+pytest-xdist==3.5.0
+httpx==0.25.2
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8

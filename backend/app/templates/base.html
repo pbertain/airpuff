@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AirPuff{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', path='/css/airpuff.css') }}" rel="stylesheet">
+    
+    <!-- HTMX for dynamic updates -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-dark text-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="me-2">✈️</span>
+                <span class="me-2">AirPuff</span>
+                <img src="{{ url_for('static', path='/icons/airpuff-logo.png') }}" alt="AirPuff" height="40">
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/airports">Airports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/route-planner">Route Planner</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/grafana">Grafana</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/imessage">iMessage</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/migration">Migration</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api/docs">API</a>
+                        </li>
+                    </ul>
+                
+                    <ul class="navbar-nav">
+                        <li class="nav-item" id="login-nav" style="display: none;">
+                            <a class="nav-link" href="/login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown" id="user-nav" style="display: none;">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> <span id="user-name">User</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" href="/dashboard">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="/api/docs">API Docs</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container-fluid py-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark border-top mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2024 AirPuff. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">
+                        <small class="text-muted">
+                            Powered by <a href="https://fli-rite.net" target="_blank" class="text-decoration-none">Fli-Rite</a>
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- WebSocket connection -->
+    <script>
+        // WebSocket connection for real-time updates
+        let ws = null;
+        let reconnectInterval = null;
+        
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function(event) {
+                console.log('WebSocket connected');
+                if (reconnectInterval) {
+                    clearInterval(reconnectInterval);
+                    reconnectInterval = null;
+                }
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                // Attempt to reconnect every 5 seconds
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(connectWebSocket, 5000);
+                }
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        }
+        
+        function handleWebSocketMessage(data) {
+            if (data.type === 'weather_update') {
+                // Update weather display for specific airport
+                updateAirportWeather(data.airport, data.data);
+            } else if (data.type === 'airport_list_update') {
+                // Update airport list
+                updateAirportList(data.airports);
+            }
+        }
+        
+        function updateAirportWeather(icao, weatherData) {
+            // Find and update weather display for this airport
+            const weatherElement = document.querySelector(`[data-airport="${icao}"]`);
+            if (weatherElement) {
+                // Update the weather display
+                weatherElement.innerHTML = formatWeatherData(weatherData);
+            }
+        }
+        
+        function formatWeatherData(data) {
+            // Format weather data for display
+            return `
+                <div class="weather-card">
+                    <div class="flight-category ${data.flight_category?.toLowerCase() || 'unknown'}">
+                        ${data.flight_category || 'UNK'}
+                    </div>
+                    <div class="temperature">${data.temperature_f || '--'}°F</div>
+                    <div class="wind">${data.wind_dir_deg || '--'}@${data.wind_speed_kts || '--'}</div>
+                    <div class="visibility">${data.visibility_mi || '--'}SM</div>
+                </div>
+            `;
+        }
+        
+            // Authentication functions
+            function checkAuthState() {
+                const token = localStorage.getItem('airpuff_token');
+                const loginNav = document.getElementById('login-nav');
+                const userNav = document.getElementById('user-nav');
+                
+                if (token) {
+                    loginNav.style.display = 'none';
+                    userNav.style.display = 'block';
+                    loadUserInfo();
+                } else {
+                    loginNav.style.display = 'block';
+                    userNav.style.display = 'none';
+                }
+            }
+            
+            function loadUserInfo() {
+                const token = localStorage.getItem('airpuff_token');
+                if (!token) return;
+                
+                fetch('/api/v1/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('user-name').textContent = user.name || user.email;
+                })
+                .catch(error => {
+                    console.error('Error loading user info:', error);
+                    logout();
+                });
+            }
+            
+            function logout() {
+                localStorage.removeItem('airpuff_token');
+                checkAuthState();
+                window.location.href = '/';
+            }
+            
+            // Connect WebSocket when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                connectWebSocket();
+                checkAuthState();
+            });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

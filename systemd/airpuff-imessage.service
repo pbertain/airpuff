@@ -1,0 +1,25 @@
+[Unit]
+Description=AirPuff iMessage Scheduled Message Processor
+After=network.target
+
+[Service]
+Type=oneshot
+User=airpuff
+Group=airpuff
+WorkingDirectory=/opt/airpuff/backend
+ExecStart=/opt/airpuff/backend/venv/bin/python -c "
+import asyncio
+import sys
+sys.path.append('/opt/airpuff/backend')
+from app.services.imessage_service import imessage_service
+
+async def main():
+    await imessage_service.process_scheduled_messages()
+
+asyncio.run(main())
+"
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

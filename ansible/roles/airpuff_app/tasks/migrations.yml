@@ -1,0 +1,22 @@
+---
+# Database Migrations
+
+- name: Initialize Alembic
+  command: "{{ virtualenv_path }}/bin/alembic init alembic"
+  args:
+    chdir: "{{ airpuff_app_home }}/backend"
+  become_user: "{{ airpuff_app_user }}"
+  tags: [app, migrations]
+
+- name: Run database migrations
+  command: "{{ virtualenv_path }}/bin/alembic upgrade head"
+  args:
+    chdir: "{{ airpuff_app_home }}/backend"
+  become_user: "{{ airpuff_app_user }}"
+  environment:
+    DATABASE_URL: "postgresql://{{ postgresql_db_user }}:{{ postgresql_db_password }}@localhost:{{ airpuff_timescaledb_port }}/{{ postgresql_db_name }}"
+  tags: [app, migrations]
+
+- name: Create initial data
+  include_tasks: seed_data.yml
+  tags: [app, data]

@@ -1,0 +1,31 @@
+[Unit]
+Description=AirPuff Web Application
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=exec
+User=airpuff
+Group=airpuff
+WorkingDirectory=/opt/airpuff/backend
+Environment=PATH=/opt/airpuff/venv/bin
+Environment=PYTHONPATH=/opt/airpuff/backend
+ExecStart=/opt/airpuff/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/airpuff
+ReadWritePaths=/var/log/airpuff
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target
