@@ -36,9 +36,6 @@
       when: item is not defined
 
   roles:
-    - role: system_setup
-      tags: [system, setup]
-    
     - role: python_setup
       tags: [python, setup]
     
