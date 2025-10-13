@@ -2,10 +2,10 @@
 # TimescaleDB Configuration
 
 - name: Enable TimescaleDB extension
-  postgresql_db:
-    name: "{{ postgresql_db_name }}"
-    extensions:
-      - "timescaledb"
+  postgresql_ext:
+    name: "timescaledb"
+    db: "{{ postgresql_db_name }}"
+    state: present
   become_user: postgres
   tags: [timescaledb, configure]
 
