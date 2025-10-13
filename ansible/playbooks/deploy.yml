@@ -10,14 +10,14 @@
   vars:
     deploy_user: "{{ ansible_user }}"
     app_repo: "https://github.com/pbertain/airpuff.git"
-    app_branch: "{{ environment | default('dev') }}"
+    app_branch: "{{ deployment_env | default('dev') }}"
     
   pre_tasks:
     - name: Display deployment information
       debug:
         msg:
           - "Deploying AirPuff to {{ inventory_hostname }}"
-          - "Environment: {{ environment }}"
+          - "Environment: {{ deployment_env }}"
           - "Domain: {{ domain }}"
           - "User: {{ deploy_user }}"
           - "Branch: {{ app_branch }}"
@@ -31,7 +31,7 @@
       fail:
         msg: "Required variable {{ item }} is not defined"
       loop:
-        - "environment"
+        - "deployment_env"
         - "domain"
       when: item is not defined
 
@@ -54,5 +54,5 @@
         msg:
           - "AirPuff deployment completed successfully!"
           - "Application URL: http://{{ airpuff_app_hostname }}:{{ airpuff_app_port }}"
-          - "Environment: {{ environment }}"
+          - "Environment: {{ deployment_env }}"
           - "Logs: {{ airpuff_app_logs }}"

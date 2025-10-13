@@ -138,7 +138,7 @@ jobs:
                   ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/dev_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
-                  environment: development
+                  deployment_env: development
                   domain: dev.airpuff.info
               vars:
                 # Include all group variables
@@ -188,7 +188,7 @@ jobs:
         cd ansible
         ansible-playbook -i inventory/dev-hosts.yml playbooks/deploy.yml \
           -e "target=web_dev" \
-          -e "environment=dev" \
+          -e "deployment_env=dev" \
           -e "app_port=25081" \
           -e "app_hostname=dev.airpuff.info" \
           -e "app_directory=/opt/airpuff-dev" \
@@ -247,7 +247,7 @@ jobs:
                   ansible_user: deploy
                   ansible_ssh_private_key_file: /tmp/prod_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
-                  environment: production
+                  deployment_env: production
                   domain: www.airpuff.info
               vars:
                 # Include all group variables
@@ -297,7 +297,7 @@ jobs:
         cd ansible
         ansible-playbook -i inventory/prod-hosts.yml playbooks/deploy.yml \
           -e "target=web_prod" \
-          -e "environment=prod" \
+          -e "deployment_env=prod" \
           -e "app_port=25080" \
           -e "app_hostname=www.airpuff.info" \
           -e "app_directory=/opt/airpuff" \
