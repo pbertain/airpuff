@@ -39,16 +39,7 @@ jobs:
         run: |
           echo "🏥 Running health checks on all environments"
           
-          # Check development (using correct URL)
-          DEV_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://host74.nird.club:25081/health || echo "000")
-          if [ "$DEV_STATUS" != "200" ]; then
-            echo "❌ Development environment is down (HTTP $DEV_STATUS)"
-            echo "DEV_DOWN=true" >> $GITHUB_ENV
-          else
-            echo "✅ Development environment is healthy"
-          fi
-          
-          # Check production (using correct URL)
+          # Check production (using correct URL through NGINX proxy)
           PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://www.airpuff.info/health || echo "000")
           if [ "$PROD_STATUS" != "200" ]; then
             echo "❌ Production environment is down (HTTP $PROD_STATUS)"
@@ -56,6 +47,10 @@ jobs:
           else
             echo "✅ Production environment is healthy"
           fi
+          
+          # Note: Development environment (port 25081) is not accessible from GitHub Actions
+          # as non-standard ports are not reachable from the internet
+          echo "ℹ️  Development environment check skipped (port 25081 not accessible from GitHub)"
 
       - name: Send health alerts
         uses: 8398a7/action-slack@v3
@@ -64,9 +59,9 @@ jobs:
           channel: '#alerts'
           webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
-            Development: ${{ env.DEV_DOWN == 'true' && '❌ DOWN' || '✅ HEALTHY' }}
             Production: ${{ env.PROD_DOWN == 'true' && '❌ DOWN' || '✅ HEALTHY' }}
-        if: env.DEV_DOWN == 'true' || env.PROD_DOWN == 'true'
+            Development: ℹ️ Not accessible from GitHub (port 25081)
+        if: env.PROD_DOWN == 'true'
 
   performance-monitoring:
     name: Performance Monitoring
@@ -92,20 +87,14 @@ jobs:
         run: |
           echo "⚡ Running performance checks"
           
-          # Check response times (using correct URLs)
-          DEV_TIME=$(curl -s -o /dev/null -w "%{time_total}" http://host74.nird.club:25081/health || echo "10.0")
+          # Check response times (only production accessible from GitHub)
           PROD_TIME=$(curl -s -o /dev/null -w "%{time_total}" http://www.airpuff.info/health || echo "10.0")
           
           echo "Response times:"
-          echo "Development: ${DEV_TIME}s"
           echo "Production: ${PROD_TIME}s"
+          echo "Development: Not accessible from GitHub (port 25081)"
           
           # Check if response times are acceptable (under 5 seconds)
-          if (( $(echo "$DEV_TIME > 5.0" | bc -l) )); then
-            echo "⚠️ Development response time is slow: ${DEV_TIME}s"
-            echo "DEV_SLOW=true" >> $GITHUB_ENV
-          fi
-          
           if (( $(echo "$PROD_TIME > 5.0" | bc -l) )); then
             echo "⚠️ Production response time is slow: ${PROD_TIME}s"
             echo "PROD_SLOW=true" >> $GITHUB_ENV
@@ -118,9 +107,9 @@ jobs:
           channel: '#performance'
           webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
-            Development: ${{ env.DEV_SLOW == 'true' && '⚠️ SLOW' || '✅ OK' }}
             Production: ${{ env.PROD_SLOW == 'true' && '⚠️ SLOW' || '✅ OK' }}
-        if: env.DEV_SLOW == 'true' || env.PROD_SLOW == 'true'
+            Development: ℹ️ Not accessible from GitHub (port 25081)
+        if: env.PROD_SLOW == 'true'
 
   security-monitoring:
     name: Security Monitoring
