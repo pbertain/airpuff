@@ -93,12 +93,31 @@
     var: postgres_logs.stdout_lines
   tags: [timescaledb, debug]
 
+- name: Check if weather_observations table exists
+  postgresql_query:
+    db: "{{ postgresql_db_name }}"
+    query: |
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'weather_observations'
+      );
+  become_user: postgres
+  register: weather_table_exists
+  tags: [timescaledb, configure]
+
+- name: Display weather_observations table existence
+  debug:
+    var: weather_table_exists.query_result
+  tags: [timescaledb, debug]
+
 - name: Create TimescaleDB hypertables
   postgresql_query:
     db: "{{ postgresql_db_name }}"
     query: |
       SELECT create_hypertable('weather_observations', 'time', if_not_exists => TRUE);
   become_user: postgres
+  when: weather_table_exists.query_result[0].exists == true
   tags: [timescaledb, configure]
 
 - name: Set data retention policy
@@ -107,6 +126,7 @@
     query: |
       SELECT add_retention_policy('weather_observations', INTERVAL '1 year', if_not_exists => TRUE);
   become_user: postgres
+  when: weather_table_exists.query_result[0].exists == true
   tags: [timescaledb, configure]
 
 - name: Create TimescaleDB views
@@ -114,7 +134,7 @@
     db: "{{ postgresql_db_name }}"
     query: |
       CREATE OR REPLACE VIEW weather_summary AS
-      SELECT 
+      SELECT
           wo.time,
           a.icao as icao_code,
           a.name as airport_name,
@@ -129,7 +149,7 @@
           wo.visibility_mi,
           wo.altimeter_hg,
           wo.ceiling_code,
-          CASE 
+          CASE
               WHEN wo.flight_category = 'VFR' THEN 1
               WHEN wo.flight_category = 'MVFR' THEN 2
               WHEN wo.flight_category = 'IFR' THEN 3
@@ -140,4 +160,5 @@
       JOIN airports a ON wo.airport_id = a.id
       ORDER BY wo.time DESC;
   become_user: postgres
+  when: weather_table_exists.query_result[0].exists == true
   tags: [timescaledb, configure]
