@@ -140,6 +140,39 @@ jobs:
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
                   environment: development
                   domain: dev.airpuff.info
+              vars:
+                # Include all group variables
+                apt_packages:
+                  - "curl"
+                  - "wget"
+                  - "git"
+                  - "htop"
+                  - "vim"
+                  - "unzip"
+                  - "software-properties-common"
+                  - "apt-transport-https"
+                  - "ca-certificates"
+                  - "gnupg"
+                  - "lsb-release"
+                  - "build-essential"
+                  - "python3-dev"
+                  - "python3-pip"
+                python_packages:
+                  - "fastapi==0.104.1"
+                  - "uvicorn[standard]==0.24.0"
+                  - "sqlalchemy==2.0.23"
+                  - "alembic==1.12.1"
+                  - "psycopg2-binary==2.9.9"
+                  - "redis==5.0.1"
+                  - "httpx==0.25.2"
+                  - "pydantic==2.5.0"
+                  - "pydantic-settings==2.1.0"
+                  - "python-jose[cryptography]==3.3.0"
+                  - "passlib[bcrypt]==1.7.4"
+                  - "python-multipart==0.0.6"
+                  - "jinja2==3.1.2"
+                  - "python-dotenv==1.0.0"
+                timezone: "UTC"
         EOF
         
         # Create SSH key file
@@ -211,6 +244,39 @@ jobs:
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
                   environment: production
                   domain: www.airpuff.info
+              vars:
+                # Include all group variables
+                apt_packages:
+                  - "curl"
+                  - "wget"
+                  - "git"
+                  - "htop"
+                  - "vim"
+                  - "unzip"
+                  - "software-properties-common"
+                  - "apt-transport-https"
+                  - "ca-certificates"
+                  - "gnupg"
+                  - "lsb-release"
+                  - "build-essential"
+                  - "python3-dev"
+                  - "python3-pip"
+                python_packages:
+                  - "fastapi==0.104.1"
+                  - "uvicorn[standard]==0.24.0"
+                  - "sqlalchemy==2.0.23"
+                  - "alembic==1.12.1"
+                  - "psycopg2-binary==2.9.9"
+                  - "redis==5.0.1"
+                  - "httpx==0.25.2"
+                  - "pydantic==2.5.0"
+                  - "pydantic-settings==2.1.0"
+                  - "python-jose[cryptography]==3.3.0"
+                  - "passlib[bcrypt]==1.7.4"
+                  - "python-multipart==0.0.6"
+                  - "jinja2==3.1.2"
+                  - "python-dotenv==1.0.0"
+                timezone: "UTC"
         EOF
         
         # Create SSH key file
