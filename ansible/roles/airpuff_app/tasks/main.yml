@@ -1,6 +1,13 @@
 ---
 # AirPuff Application Deployment Role - Main Tasks
 
+- name: Remove existing application directory if it exists
+  file:
+    path: "{{ airpuff_app_home }}"
+    state: absent
+  when: ansible_check_mode is not defined
+  tags: [app, git]
+
 - name: Clone AirPuff repository
   git:
     repo: "{{ app_repo }}"
