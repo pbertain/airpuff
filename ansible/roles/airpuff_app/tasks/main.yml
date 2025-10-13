@@ -5,7 +5,6 @@
   file:
     path: "{{ airpuff_app_home }}"
     state: absent
-  when: not ansible_check_mode
   tags: [app, git]
 
 - name: Clone AirPuff repository
