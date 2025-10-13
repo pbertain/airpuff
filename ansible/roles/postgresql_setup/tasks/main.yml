@@ -13,6 +13,7 @@
     url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
     state: present
   tags: [postgresql, repository]
+  ignore_errors: yes
 
 - name: Install PostgreSQL
   apt:
@@ -36,6 +37,7 @@
     url: https://packagecloud.io/timescale/timescaledb/gpgkey
     state: present
   tags: [timescaledb, repository]
+  ignore_errors: yes
 
 - name: Install TimescaleDB
   apt:
