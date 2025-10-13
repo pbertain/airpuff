@@ -52,13 +52,45 @@
     var: available_extensions.query_result
   tags: [timescaledb, debug]
 
+- name: Check if TimescaleDB extension is already enabled
+  postgresql_query:
+    db: "{{ postgresql_db_name }}"
+    query: "SELECT extname FROM pg_extension WHERE extname = 'timescaledb';"
+  become_user: postgres
+  register: timescaledb_enabled
+  tags: [timescaledb, debug]
+
+- name: Display TimescaleDB extension status
+  debug:
+    var: timescaledb_enabled.query_result
+  tags: [timescaledb, debug]
+
 - name: Enable TimescaleDB extension
   postgresql_ext:
     name: "timescaledb"
     db: "{{ postgresql_db_name }}"
     state: present
   become_user: postgres
+  ignore_errors: yes
+  register: timescaledb_result
   tags: [timescaledb, configure]
+
+- name: Display TimescaleDB extension result
+  debug:
+    var: timescaledb_result
+  tags: [timescaledb, debug]
+
+- name: Check PostgreSQL logs for errors
+  command: tail -n 20 /var/log/postgresql/postgresql-16-main.log
+  become_user: postgres
+  register: postgres_logs
+  ignore_errors: yes
+  tags: [timescaledb, debug]
+
+- name: Display PostgreSQL logs
+  debug:
+    var: postgres_logs.stdout_lines
+  tags: [timescaledb, debug]
 
 - name: Create TimescaleDB hypertables
   postgresql_query:
