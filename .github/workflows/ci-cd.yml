@@ -148,6 +148,7 @@ jobs:
         # Run Ansible deployment
         cd ansible
         ansible-playbook -i inventory/dev-hosts.yml playbooks/deploy.yml \
+          -e "target=web_dev" \
           -e "environment=dev" \
           -e "app_port=25081" \
           -e "app_hostname=dev.airpuff.info" \
@@ -217,6 +218,7 @@ jobs:
         # Run Ansible deployment
         cd ansible
         ansible-playbook -i inventory/prod-hosts.yml playbooks/deploy.yml \
+          -e "target=web_prod" \
           -e "environment=prod" \
           -e "app_port=25080" \
           -e "app_hostname=www.airpuff.info" \
