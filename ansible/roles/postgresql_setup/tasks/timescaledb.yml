@@ -30,8 +30,9 @@
   tags: [timescaledb, debug]
 
 - name: Check if TimescaleDB package is installed
-  command: dpkg -l | grep timescaledb
+  shell: dpkg -l | grep timescaledb
   register: timescaledb_package
+  ignore_errors: yes
   tags: [timescaledb, debug]
 
 - name: Display TimescaleDB package status

@@ -19,6 +19,12 @@ max_connections = {{ postgresql_max_connections | default(100) }}
 superuser_reserved_connections = 3
 
 #------------------------------------------------------------------------------
+# SHARED LIBRARY PRELOADING
+#------------------------------------------------------------------------------
+
+shared_preload_libraries = 'timescaledb'
+
+#------------------------------------------------------------------------------
 # RESOURCE USAGE
 #------------------------------------------------------------------------------
 
@@ -102,7 +108,6 @@ track_counts = on
 track_io_timing = on
 track_functions = none
 track_activity_query_size = 1024
-stats_temp_directory = 'pg_stat_tmp'
 
 #------------------------------------------------------------------------------
 # AUTOVACUUM

@@ -31,47 +31,8 @@
     state: present
   tags: [postgresql, packages]
 
-- name: Add TimescaleDB APT repository (official method)
-  shell: |
-    sh -c 'echo "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ $(lsb_release -c -s) main" > /etc/apt/sources.list.d/timescaledb.list'
-  register: timescaledb_repo_add
-  tags: [timescaledb, repository]
-
-- name: Display TimescaleDB repository add result
-  debug:
-    var: timescaledb_repo_add
-  tags: [timescaledb, debug]
-
-- name: Add TimescaleDB GPG key (official method)
-  shell: |
-    wget --quiet -O - https://packagecloud.io/timescale/timescaledb/gpgkey | apt-key add -
-  register: timescaledb_key_add
-  tags: [timescaledb, repository]
-
-- name: Display TimescaleDB key add result
-  debug:
-    var: timescaledb_key_add
-  tags: [timescaledb, debug]
-
-- name: Update package cache
-  apt:
-    update_cache: yes
-  tags: [timescaledb, repository]
-
-- name: Install TimescaleDB
-  apt:
-    name: "timescaledb-2-postgresql-{{ postgresql_version }}"
-    state: present
-  register: timescaledb_install_result
-  tags: [timescaledb, packages]
-
-- name: Display TimescaleDB installation result
-  debug:
-    var: timescaledb_install_result
-  tags: [timescaledb, debug]
-
 - name: Verify TimescaleDB package installation
-  command: dpkg -l | grep timescaledb
+  shell: dpkg -l | grep timescaledb
   register: timescaledb_verify
   ignore_errors: yes
   tags: [timescaledb, debug]
