@@ -32,6 +32,7 @@
     dest: "{{ airpuff_app_home }}"
     version: "{{ app_branch }}"
     update: yes
+    force: yes
   become_user: "{{ airpuff_app_user }}"
   when: git_repo_exists.stat.exists
   tags: [app, git]
