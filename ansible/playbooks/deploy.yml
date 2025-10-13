@@ -9,7 +9,7 @@
   
   vars:
     deploy_user: "{{ ansible_user }}"
-    app_repo: "https://github.com/your-org/airpuff.git"
+    app_repo: "https://github.com/pbertain/airpuff.git"
     app_branch: "{{ environment | default('dev') }}"
     
   pre_tasks:
