@@ -1,0 +1,50 @@
+[loggers]
+keys = root,airpuff,sqlalchemy,uvicorn
+
+[handlers]
+keys = consoleHandler,fileHandler
+
+[formatters]
+keys = simpleFormatter,detailedFormatter
+
+[logger_root]
+level = {{ log_level }}
+handlers = consoleHandler,fileHandler
+
+[logger_airpuff]
+level = {{ log_level }}
+handlers = consoleHandler,fileHandler
+qualname = airpuff
+propagate = 0
+
+[logger_sqlalchemy]
+level = WARNING
+handlers = consoleHandler,fileHandler
+qualname = sqlalchemy.engine
+propagate = 0
+
+[logger_uvicorn]
+level = INFO
+handlers = consoleHandler,fileHandler
+qualname = uvicorn
+propagate = 0
+
+[handler_consoleHandler]
+class = StreamHandler
+level = {{ log_level }}
+formatter = simpleFormatter
+args = (sys.stdout,)
+
+[handler_fileHandler]
+class = FileHandler
+level = {{ log_level }}
+formatter = detailedFormatter
+args = ('{{ airpuff_app_logs }}/airpuff.log',)
+
+[formatter_simpleFormatter]
+format = %(asctime)s - %(name)s - %(levelname)s - %(message)s
+datefmt = %Y-%m-%d %H:%M:%S
+
+[formatter_detailedFormatter]
+format = %(asctime)s - %(name)s - %(levelname)s - %(module)s - %(funcName)s - %(lineno)d - %(message)s
+datefmt = %Y-%m-%d %H:%M:%S

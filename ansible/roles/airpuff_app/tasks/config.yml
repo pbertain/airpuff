@@ -3,7 +3,7 @@
 
 - name: Create environment configuration
   template:
-    src: .env.j2
+    src: env.j2
     dest: "{{ airpuff_app_home }}/backend/.env"
     owner: "{{ airpuff_app_user }}"
     group: "{{ airpuff_app_group }}"
