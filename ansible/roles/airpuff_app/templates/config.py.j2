@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "{{ deployment_env }}"
     debug: bool = {% if debug %}True{% else %}False{% endif %}
+    log_level: str = "{{ log_level }}"
     
     # Server configuration
     host: str = "0.0.0.0"
