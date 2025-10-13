@@ -1,11 +1,18 @@
 ---
 # Database Migrations
 
+- name: Check if Alembic is already initialized
+  stat:
+    path: "{{ airpuff_app_home }}/backend/alembic"
+  register: alembic_exists
+  tags: [app, migrations]
+
 - name: Initialize Alembic
   command: "{{ virtualenv_path }}/bin/alembic init alembic"
   args:
     chdir: "{{ airpuff_app_home }}/backend"
   become_user: "{{ airpuff_app_user }}"
+  when: not alembic_exists.stat.exists
   tags: [app, migrations]
 
 - name: Run database migrations
