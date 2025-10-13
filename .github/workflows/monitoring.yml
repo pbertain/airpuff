@@ -2,8 +2,8 @@ name: Monitoring & Alerting
 
 on:
   schedule:
-    # Run every 30 minutes instead of every 5 minutes
-    - cron: '*/30 * * * *'
+    # Run every 2 hours instead of every 30 minutes
+    - cron: '0 */2 * * *'
   workflow_dispatch:
     inputs:
       check_type:
