@@ -12,6 +12,15 @@
     state: present
   tags: [python, packages]
 
+- name: Create application directory
+  file:
+    path: "{{ airpuff_app_home }}"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+  tags: [python, directories]
+
 - name: Create application virtual environment
   command: "python3 -m venv {{ virtualenv_path }}"
   args:
