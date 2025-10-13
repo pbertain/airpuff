@@ -149,6 +149,7 @@ jobs:
                 airpuff_app_data: "/var/lib/airpuff-dev"
                 airpuff_app_port: 25081
                 backup_dir: "/var/backups/airpuff-dev"
+                python_version: "3.12"
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -260,6 +261,7 @@ jobs:
                 airpuff_app_data: "/var/lib/airpuff"
                 airpuff_app_port: 25080
                 backup_dir: "/var/backups/airpuff"
+                python_version: "3.12"
                 apt_packages:
                   - "curl"
                   - "wget"
