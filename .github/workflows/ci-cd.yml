@@ -152,6 +152,7 @@ jobs:
           -e "app_directory=/opt/airpuff-dev" \
           -e "database_name=airpuff_dev" \
           -e "redis_database=1" \
+          --roles-path roles \
           --extra-vars "ansible_ssh_private_key_file=/tmp/dev_key"
 
     - name: Health Check Dev
@@ -218,6 +219,7 @@ jobs:
           -e "app_directory=/opt/airpuff" \
           -e "database_name=airpuff" \
           -e "redis_database=0" \
+          --roles-path roles \
           --extra-vars "ansible_ssh_private_key_file=/tmp/prod_key"
 
     - name: Health Check Prod
