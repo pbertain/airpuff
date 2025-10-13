@@ -147,6 +147,7 @@ jobs:
                 airpuff_app_home: "/opt/airpuff-dev"
                 airpuff_app_logs: "/var/log/airpuff-dev"
                 airpuff_app_data: "/var/lib/airpuff-dev"
+                backup_dir: "/var/backups/airpuff-dev"
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -256,6 +257,7 @@ jobs:
                 airpuff_app_home: "/opt/airpuff"
                 airpuff_app_logs: "/var/log/airpuff"
                 airpuff_app_data: "/var/lib/airpuff"
+                backup_dir: "/var/backups/airpuff"
                 apt_packages:
                   - "curl"
                   - "wget"
