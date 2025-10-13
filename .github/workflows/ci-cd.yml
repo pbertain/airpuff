@@ -150,6 +150,31 @@ jobs:
                 airpuff_app_port: 25081
                 backup_dir: "/var/backups/airpuff-dev"
                 python_version: "3.12"
+                python_pip_version: "24.0"
+                virtualenv_path: "/opt/airpuff-dev/venv"
+                postgresql_version: "16"
+                postgresql_db_name: "airpuff_dev"
+                postgresql_db_user: "airpuff_dev"
+                postgresql_db_password: "dev_password_123"
+                postgresql_data_dir: "/var/lib/postgresql/16/main"
+                airpuff_timescaledb_port: 5432
+                postgresql_max_connections: 100
+                postgresql_shared_buffers: "256MB"
+                postgresql_work_mem: "4MB"
+                postgresql_maintenance_work_mem: "64MB"
+                postgresql_wal_buffers: "16MB"
+                postgresql_checkpoint_completion_target: 0.9
+                airpuff_redis_port: 6379
+                airpuff_secret_key: "dev-secret-key-change-in-production"
+                environment: "development"
+                debug: true
+                log_level: "INFO"
+                airpuff_grafana_port: 3000
+                grafana_admin_user: "admin"
+                grafana_admin_password: "admin123"
+                airpuff_workers: 2
+                airpuff_max_requests: 1000
+                airpuff_max_requests_jitter: 100
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -262,6 +287,31 @@ jobs:
                 airpuff_app_port: 25080
                 backup_dir: "/var/backups/airpuff"
                 python_version: "3.12"
+                python_pip_version: "24.0"
+                virtualenv_path: "/opt/airpuff/venv"
+                postgresql_version: "16"
+                postgresql_db_name: "airpuff"
+                postgresql_db_user: "airpuff"
+                postgresql_db_password: "prod_password_123"
+                postgresql_data_dir: "/var/lib/postgresql/16/main"
+                airpuff_timescaledb_port: 5432
+                postgresql_max_connections: 100
+                postgresql_shared_buffers: "256MB"
+                postgresql_work_mem: "4MB"
+                postgresql_maintenance_work_mem: "64MB"
+                postgresql_wal_buffers: "16MB"
+                postgresql_checkpoint_completion_target: 0.9
+                airpuff_redis_port: 6379
+                airpuff_secret_key: "prod-secret-key-change-in-production"
+                environment: "production"
+                debug: false
+                log_level: "INFO"
+                airpuff_grafana_port: 3000
+                grafana_admin_user: "admin"
+                grafana_admin_password: "admin123"
+                airpuff_workers: 4
+                airpuff_max_requests: 1000
+                airpuff_max_requests_jitter: 100
                 apt_packages:
                   - "curl"
                   - "wget"
