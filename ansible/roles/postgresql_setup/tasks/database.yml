@@ -27,12 +27,14 @@
   tags: [postgresql, database]
 
 - name: Create database extensions
-  postgresql_db:
-    name: "{{ postgresql_db_name }}"
-    extensions:
-      - "uuid-ossp"
-      - "pg_trgm"
-      - "btree_gin"
-      - "btree_gist"
+  postgresql_ext:
+    name: "{{ item }}"
+    db: "{{ postgresql_db_name }}"
+    state: present
   become_user: postgres
+  loop:
+    - "uuid-ossp"
+    - "pg_trgm"
+    - "btree_gin"
+    - "btree_gist"
   tags: [postgresql, database]
