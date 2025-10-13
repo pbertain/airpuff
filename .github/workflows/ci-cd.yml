@@ -142,6 +142,8 @@ jobs:
                   domain: dev.airpuff.info
               vars:
                 # Include all group variables
+                airpuff_app_user: "www-data"
+                airpuff_app_group: "www-data"
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -246,6 +248,8 @@ jobs:
                   domain: www.airpuff.info
               vars:
                 # Include all group variables
+                airpuff_app_user: "www-data"
+                airpuff_app_group: "www-data"
                 apt_packages:
                   - "curl"
                   - "wget"

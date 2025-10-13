@@ -2,8 +2,8 @@
 ---
 # Application Configuration
 airpuff_app_name: "airpuff"
-airpuff_app_user: "airpuff"
-airpuff_app_group: "airpuff"
+airpuff_app_user: "www-data"
+airpuff_app_group: "www-data"
 airpuff_app_home: "/opt/airpuff"
 airpuff_app_logs: "/var/log/airpuff"
 airpuff_app_data: "/var/lib/airpuff"
