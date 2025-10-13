@@ -1,19 +1,25 @@
 ---
 # PostgreSQL Setup Role - Main Tasks
 
+- name: Add PostgreSQL signing key
+  get_url:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    dest: /tmp/postgresql-key.asc
+    mode: '0644'
+  tags: [postgresql, repository]
+
+- name: Add PostgreSQL signing key to apt
+  apt_key:
+    file: /tmp/postgresql-key.asc
+    state: present
+  tags: [postgresql, repository]
+
 - name: Add PostgreSQL APT repository
   apt_repository:
     repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
     state: present
     update_cache: yes
   tags: [postgresql, repository]
-
-- name: Add PostgreSQL signing key
-  apt_key:
-    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-    state: present
-  tags: [postgresql, repository]
-  ignore_errors: yes
 
 - name: Install PostgreSQL
   apt:
@@ -25,19 +31,25 @@
     state: present
   tags: [postgresql, packages]
 
+- name: Add TimescaleDB signing key
+  get_url:
+    url: https://packagecloud.io/timescale/timescaledb/gpgkey
+    dest: /tmp/timescaledb-key.asc
+    mode: '0644'
+  tags: [timescaledb, repository]
+
+- name: Add TimescaleDB signing key to apt
+  apt_key:
+    file: /tmp/timescaledb-key.asc
+    state: present
+  tags: [timescaledb, repository]
+
 - name: Install TimescaleDB repository
   apt_repository:
     repo: "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
     update_cache: yes
   tags: [timescaledb, repository]
-
-- name: Add TimescaleDB signing key
-  apt_key:
-    url: https://packagecloud.io/timescale/timescaledb/gpgkey
-    state: present
-  tags: [timescaledb, repository]
-  ignore_errors: yes
 
 - name: Install TimescaleDB
   apt:
