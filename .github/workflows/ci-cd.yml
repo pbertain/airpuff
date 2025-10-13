@@ -124,8 +124,8 @@ jobs:
     - name: Deploy to Development
       env:
         ANSIBLE_HOST_KEY_CHECKING: False
-        ANSIBLE_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
         ANSIBLE_ROLES_PATH: roles
+        ANSIBLE_SSH_ARGS: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
       run: |
         # Create ansible inventory for dev
         cat > ansible/inventory/dev-hosts.yml << EOF
@@ -137,8 +137,7 @@ jobs:
                   ansible_host: host74.nird.club
                   ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/dev_key
-                  environment: development
-                  domain: dev.airpuff.info
+                  ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         EOF
         
         # Create SSH key file
@@ -155,7 +154,7 @@ jobs:
           -e "app_directory=/opt/airpuff-dev" \
           -e "database_name=airpuff_dev" \
           -e "redis_database=1" \
-          --extra-vars "ansible_ssh_private_key_file=/tmp/dev_key"
+          --private-key=/tmp/dev_key
 
     - name: Health Check Dev
       run: |
@@ -194,8 +193,8 @@ jobs:
     - name: Deploy to Production
       env:
         ANSIBLE_HOST_KEY_CHECKING: False
-        ANSIBLE_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         ANSIBLE_ROLES_PATH: roles
+        ANSIBLE_SSH_ARGS: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
       run: |
         # Create ansible inventory for prod
         cat > ansible/inventory/prod-hosts.yml << EOF
@@ -207,8 +206,7 @@ jobs:
                   ansible_host: host74.nird.club
                   ansible_user: deploy
                   ansible_ssh_private_key_file: /tmp/prod_key
-                  environment: production
-                  domain: www.airpuff.info
+                  ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
         EOF
         
         # Create SSH key file
@@ -225,7 +223,7 @@ jobs:
           -e "app_directory=/opt/airpuff" \
           -e "database_name=airpuff" \
           -e "redis_database=0" \
-          --extra-vars "ansible_ssh_private_key_file=/tmp/prod_key"
+          --private-key=/tmp/prod_key
 
     - name: Health Check Prod
       run: |
