@@ -166,7 +166,7 @@ jobs:
                 postgresql_checkpoint_completion_target: 0.9
                 airpuff_redis_port: 6379
                 airpuff_secret_key: "dev-secret-key-change-in-production"
-                environment: "development"
+                deployment_env: "development"
                 debug: true
                 log_level: "INFO"
                 airpuff_grafana_port: 3000
@@ -303,7 +303,7 @@ jobs:
                 postgresql_checkpoint_completion_target: 0.9
                 airpuff_redis_port: 6379
                 airpuff_secret_key: "prod-secret-key-change-in-production"
-                environment: "production"
+                deployment_env: "production"
                 debug: false
                 log_level: "INFO"
                 airpuff_grafana_port: 3000

@@ -7,24 +7,10 @@
       - "python{{ python_version.split('.')[0] }}"
       - "python{{ python_version.split('.')[0] }}-dev"
       - "python{{ python_version.split('.')[0] }}-venv"
-      - "python{{ python_version.split('.')[0] }}-pip"
       - "python3-setuptools"
       - "python3-wheel"
     state: present
   tags: [python, packages]
-
-- name: Install pip
-  pip:
-    name: pip
-    version: "{{ python_pip_version }}"
-    state: present
-  tags: [python, pip]
-
-- name: Create virtual environment
-  pip:
-    name: virtualenv
-    state: present
-  tags: [python, virtualenv]
 
 - name: Create application virtual environment
   command: "python3 -m venv {{ virtualenv_path }}"
