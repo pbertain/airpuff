@@ -224,14 +224,14 @@ jobs:
     - name: Health Check Prod
       run: |
         sleep 30
-        curl -f http://www.airpuff.info:25080/health || exit 1
+        curl -f http://www.airpuff.info/health || exit 1
 
     - name: Notify Deployment Success
       if: success()
       run: |
         echo "✅ Production deployment successful!"
-        echo "🌐 Prod URL: http://www.airpuff.info:25080"
-        echo "📊 Health: http://www.airpuff.info:25080/health"
+        echo "🌐 Prod URL: http://www.airpuff.info"
+        echo "📊 Health: http://www.airpuff.info/health"
 
   # Database Migration (Production only)
   migrate-prod:
