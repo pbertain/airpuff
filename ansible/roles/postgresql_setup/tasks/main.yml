@@ -36,26 +36,61 @@
     url: https://packagecloud.io/timescale/timescaledb/gpgkey
     dest: /tmp/timescaledb-key.asc
     mode: '0644'
+  register: timescaledb_key_download
   tags: [timescaledb, repository]
+
+- name: Display TimescaleDB key download result
+  debug:
+    var: timescaledb_key_download
+  tags: [timescaledb, debug]
 
 - name: Add TimescaleDB signing key to apt
   apt_key:
     file: /tmp/timescaledb-key.asc
     state: present
+  register: timescaledb_key_add
   tags: [timescaledb, repository]
+
+- name: Display TimescaleDB key add result
+  debug:
+    var: timescaledb_key_add
+  tags: [timescaledb, debug]
 
 - name: Install TimescaleDB repository
   apt_repository:
     repo: "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main"
     state: present
     update_cache: yes
+  register: timescaledb_repo_add
   tags: [timescaledb, repository]
+
+- name: Display TimescaleDB repository add result
+  debug:
+    var: timescaledb_repo_add
+  tags: [timescaledb, debug]
 
 - name: Install TimescaleDB
   apt:
     name: "timescaledb-2-postgresql-{{ postgresql_version }}"
     state: present
+  register: timescaledb_install_result
   tags: [timescaledb, packages]
+
+- name: Display TimescaleDB installation result
+  debug:
+    var: timescaledb_install_result
+  tags: [timescaledb, debug]
+
+- name: Verify TimescaleDB package installation
+  command: dpkg -l | grep timescaledb
+  register: timescaledb_verify
+  ignore_errors: yes
+  tags: [timescaledb, debug]
+
+- name: Display TimescaleDB verification result
+  debug:
+    var: timescaledb_verify.stdout_lines
+  tags: [timescaledb, debug]
 
 - name: Configure PostgreSQL
   include_tasks: configure.yml
