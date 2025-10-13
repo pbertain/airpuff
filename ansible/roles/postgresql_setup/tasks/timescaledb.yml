@@ -1,6 +1,23 @@
 ---
 # TimescaleDB Configuration
 
+- name: Ensure PostgreSQL is running
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  become: yes
+  tags: [timescaledb, service]
+
+- name: Wait for PostgreSQL to be ready
+  wait_for:
+    port: 5432
+    host: localhost
+    delay: 5
+    timeout: 60
+  become_user: postgres
+  tags: [timescaledb, service]
+
 - name: Enable TimescaleDB extension
   postgresql_ext:
     name: "timescaledb"

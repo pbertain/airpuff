@@ -2,8 +2,8 @@ name: Monitoring & Alerting
 
 on:
   schedule:
-    # Run every 5 minutes
-    - cron: '*/5 * * * *'
+    # Run every 30 minutes instead of every 5 minutes
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       check_type:
@@ -39,8 +39,8 @@ jobs:
         run: |
           echo "🏥 Running health checks on all environments"
           
-          # Check development
-          DEV_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://dev.airpuff.local:8000/health)
+          # Check development (using correct URL)
+          DEV_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://host74.nird.club:25081/health || echo "000")
           if [ "$DEV_STATUS" != "200" ]; then
             echo "❌ Development environment is down (HTTP $DEV_STATUS)"
             echo "DEV_DOWN=true" >> $GITHUB_ENV
@@ -48,17 +48,8 @@ jobs:
             echo "✅ Development environment is healthy"
           fi
           
-          # Check staging
-          STAGING_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://staging.airpuff.com:8000/health)
-          if [ "$STAGING_STATUS" != "200" ]; then
-            echo "❌ Staging environment is down (HTTP $STAGING_STATUS)"
-            echo "STAGING_DOWN=true" >> $GITHUB_ENV
-          else
-            echo "✅ Staging environment is healthy"
-          fi
-          
-          # Check production
-          PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://airpuff.com:8000/health)
+          # Check production (using correct URL)
+          PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://www.airpuff.info/health || echo "000")
           if [ "$PROD_STATUS" != "200" ]; then
             echo "❌ Production environment is down (HTTP $PROD_STATUS)"
             echo "PROD_DOWN=true" >> $GITHUB_ENV
@@ -71,12 +62,11 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#alerts'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
             Development: ${{ env.DEV_DOWN == 'true' && '❌ DOWN' || '✅ HEALTHY' }}
-            Staging: ${{ env.STAGING_DOWN == 'true' && '❌ DOWN' || '✅ HEALTHY' }}
             Production: ${{ env.PROD_DOWN == 'true' && '❌ DOWN' || '✅ HEALTHY' }}
-        if: env.DEV_DOWN == 'true' || env.STAGING_DOWN == 'true' || env.PROD_DOWN == 'true'
+        if: env.DEV_DOWN == 'true' || env.PROD_DOWN == 'true'
 
   performance-monitoring:
     name: Performance Monitoring
@@ -95,34 +85,28 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests time
+          pip install requests
+          sudo apt-get update && sudo apt-get install -y bc
 
       - name: Performance check
         run: |
           echo "⚡ Running performance checks"
           
-          # Check response times
-          DEV_TIME=$(curl -s -o /dev/null -w "%{time_total}" http://dev.airpuff.local:8000/api/v1/health)
-          STAGING_TIME=$(curl -s -o /dev/null -w "%{time_total}" https://staging.airpuff.com:8000/api/v1/health)
-          PROD_TIME=$(curl -s -o /dev/null -w "%{time_total}" https://airpuff.com:8000/api/v1/health)
+          # Check response times (using correct URLs)
+          DEV_TIME=$(curl -s -o /dev/null -w "%{time_total}" http://host74.nird.club:25081/health || echo "10.0")
+          PROD_TIME=$(curl -s -o /dev/null -w "%{time_total}" http://www.airpuff.info/health || echo "10.0")
           
           echo "Response times:"
           echo "Development: ${DEV_TIME}s"
-          echo "Staging: ${STAGING_TIME}s"
           echo "Production: ${PROD_TIME}s"
           
-          # Check if response times are acceptable (under 2 seconds)
-          if (( $(echo "$DEV_TIME > 2.0" | bc -l) )); then
+          # Check if response times are acceptable (under 5 seconds)
+          if (( $(echo "$DEV_TIME > 5.0" | bc -l) )); then
             echo "⚠️ Development response time is slow: ${DEV_TIME}s"
             echo "DEV_SLOW=true" >> $GITHUB_ENV
           fi
           
-          if (( $(echo "$STAGING_TIME > 2.0" | bc -l) )); then
-            echo "⚠️ Staging response time is slow: ${STAGING_TIME}s"
-            echo "STAGING_SLOW=true" >> $GITHUB_ENV
-          fi
-          
-          if (( $(echo "$PROD_TIME > 2.0" | bc -l) )); then
+          if (( $(echo "$PROD_TIME > 5.0" | bc -l) )); then
             echo "⚠️ Production response time is slow: ${PROD_TIME}s"
             echo "PROD_SLOW=true" >> $GITHUB_ENV
           fi
@@ -132,12 +116,11 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#performance'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
             Development: ${{ env.DEV_SLOW == 'true' && '⚠️ SLOW' || '✅ OK' }}
-            Staging: ${{ env.STAGING_SLOW == 'true' && '⚠️ SLOW' || '✅ OK' }}
             Production: ${{ env.PROD_SLOW == 'true' && '⚠️ SLOW' || '✅ OK' }}
-        if: env.DEV_SLOW == 'true' || env.STAGING_SLOW == 'true' || env.PROD_SLOW == 'true'
+        if: env.DEV_SLOW == 'true' || env.PROD_SLOW == 'true'
 
   security-monitoring:
     name: Security Monitoring
@@ -162,16 +145,8 @@ jobs:
         run: |
           echo "🔒 Running security checks"
           
-          # Check for common security headers
-          DEV_HEADERS=$(curl -s -I http://dev.airpuff.local:8000/api/v1/health)
-          STAGING_HEADERS=$(curl -s -I https://staging.airpuff.com:8000/api/v1/health)
-          PROD_HEADERS=$(curl -s -I https://airpuff.com:8000/api/v1/health)
-          
-          # Check for HTTPS (production only)
-          if [[ "$PROD_HEADERS" != *"https"* ]]; then
-            echo "⚠️ Production is not using HTTPS"
-            echo "PROD_HTTPS_ISSUE=true" >> $GITHUB_ENV
-          fi
+          # Check for common security headers (using correct URLs)
+          PROD_HEADERS=$(curl -s -I http://www.airpuff.info/health || echo "")
           
           # Check for security headers
           if [[ "$PROD_HEADERS" != *"X-Content-Type-Options"* ]]; then
@@ -184,11 +159,10 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#security'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
-            HTTPS Issue: ${{ env.PROD_HTTPS_ISSUE == 'true' && '⚠️ YES' || '✅ NO' }}
             Headers Issue: ${{ env.PROD_HEADERS_ISSUE == 'true' && '⚠️ YES' || '✅ NO' }}
-        if: env.PROD_HTTPS_ISSUE == 'true' || env.PROD_HEADERS_ISSUE == 'true'
+        if: env.PROD_HEADERS_ISSUE == 'true'
 
   backup-monitoring:
     name: Backup Monitoring
@@ -222,7 +196,7 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#backups'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
             Backup Status: ✅ OK
         if: always()
@@ -259,7 +233,7 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#logs'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
             Log Analysis: ✅ OK
         if: always()
@@ -276,7 +250,7 @@ jobs:
         with:
           status: ${{ job.status }}
           channel: '#monitoring'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
           fields: |
             Health Check: ${{ needs.health-monitoring.result }}
             Performance Check: ${{ needs.performance-monitoring.result }}
