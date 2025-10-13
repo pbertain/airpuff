@@ -135,8 +135,10 @@ jobs:
               hosts:
                 host74.nird.club:
                   ansible_host: host74.nird.club
-                  ansible_user: ansible
+                  ansible_user: deploy
                   ansible_ssh_private_key_file: /tmp/dev_key
+                  environment: development
+                  domain: dev.airpuff.info
         EOF
         
         # Create SSH key file
@@ -204,6 +206,8 @@ jobs:
                   ansible_host: host74.nird.club
                   ansible_user: deploy
                   ansible_ssh_private_key_file: /tmp/prod_key
+                  environment: production
+                  domain: www.airpuff.info
         EOF
         
         # Create SSH key file
