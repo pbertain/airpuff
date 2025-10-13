@@ -152,7 +152,6 @@ jobs:
           -e "app_directory=/opt/airpuff-dev" \
           -e "database_name=airpuff_dev" \
           -e "redis_database=1" \
-          --roles-path roles \
           --extra-vars "ansible_ssh_private_key_file=/tmp/dev_key"
 
     - name: Health Check Dev
@@ -193,6 +192,7 @@ jobs:
       env:
         ANSIBLE_HOST_KEY_CHECKING: False
         ANSIBLE_PRIVATE_KEY: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        ANSIBLE_ROLES_PATH: roles
       run: |
         # Create ansible inventory for prod
         cat > ansible/inventory/prod-hosts.yml << EOF
@@ -219,7 +219,6 @@ jobs:
           -e "app_directory=/opt/airpuff" \
           -e "database_name=airpuff" \
           -e "redis_database=0" \
-          --roles-path roles \
           --extra-vars "ansible_ssh_private_key_file=/tmp/prod_key"
 
     - name: Health Check Prod
