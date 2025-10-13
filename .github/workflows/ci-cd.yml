@@ -138,6 +138,8 @@ jobs:
                   ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/dev_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+                  environment: development
+                  domain: dev.airpuff.info
         EOF
         
         # Create SSH key file
@@ -207,6 +209,8 @@ jobs:
                   ansible_user: deploy
                   ansible_ssh_private_key_file: /tmp/prod_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+                  environment: production
+                  domain: www.airpuff.info
         EOF
         
         # Create SSH key file
