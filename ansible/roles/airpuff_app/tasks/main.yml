@@ -7,6 +7,15 @@
     state: absent
   tags: [app, git]
 
+- name: Ensure application directory exists with proper permissions
+  file:
+    path: "{{ airpuff_app_home }}"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    mode: '0755'
+  tags: [app, git]
+
 - name: Clone AirPuff repository
   git:
     repo: "{{ app_repo }}"
