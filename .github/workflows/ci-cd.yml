@@ -144,6 +144,9 @@ jobs:
                 # Include all group variables
                 airpuff_app_user: "www-data"
                 airpuff_app_group: "www-data"
+                airpuff_app_home: "/opt/airpuff-dev"
+                airpuff_app_logs: "/var/log/airpuff-dev"
+                airpuff_app_data: "/var/lib/airpuff-dev"
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -250,6 +253,9 @@ jobs:
                 # Include all group variables
                 airpuff_app_user: "www-data"
                 airpuff_app_group: "www-data"
+                airpuff_app_home: "/opt/airpuff"
+                airpuff_app_logs: "/var/log/airpuff"
+                airpuff_app_data: "/var/lib/airpuff"
                 apt_packages:
                   - "curl"
                   - "wget"
