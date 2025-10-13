@@ -6,7 +6,6 @@
     name: "{{ postgresql_db_user }}"
     password: "{{ postgresql_db_password }}"
     state: present
-    db: "{{ postgresql_db_name }}"
   become_user: postgres
   tags: [postgresql, database]
 
