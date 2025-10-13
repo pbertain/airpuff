@@ -18,6 +18,40 @@
   become_user: postgres
   tags: [timescaledb, service]
 
+- name: Check PostgreSQL status
+  command: pg_isready -h localhost -p 5432
+  become_user: postgres
+  register: pg_status
+  tags: [timescaledb, debug]
+
+- name: Display PostgreSQL status
+  debug:
+    var: pg_status.stdout_lines
+  tags: [timescaledb, debug]
+
+- name: Check if TimescaleDB package is installed
+  command: dpkg -l | grep timescaledb
+  register: timescaledb_package
+  tags: [timescaledb, debug]
+
+- name: Display TimescaleDB package status
+  debug:
+    var: timescaledb_package.stdout_lines
+  tags: [timescaledb, debug]
+
+- name: Check PostgreSQL extensions
+  postgresql_query:
+    db: postgres
+    query: "SELECT name FROM pg_available_extensions WHERE name LIKE '%timescale%';"
+  become_user: postgres
+  register: available_extensions
+  tags: [timescaledb, debug]
+
+- name: Display available TimescaleDB extensions
+  debug:
+    var: available_extensions.query_result
+  tags: [timescaledb, debug]
+
 - name: Enable TimescaleDB extension
   postgresql_ext:
     name: "timescaledb"
