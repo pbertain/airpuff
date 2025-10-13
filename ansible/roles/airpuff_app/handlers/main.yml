@@ -1,0 +1,8 @@
+---
+# AirPuff App Handlers
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes
+  tags: [app, systemd]
