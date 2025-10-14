@@ -4,7 +4,7 @@
 - name: Create AirPuff application service
   template:
     src: airpuff-app.service.j2
-    dest: /etc/systemd/system/airpuff-app.service
+    dest: /etc/systemd/system/airpuff-{{ deployment_env }}-app.service
     owner: root
     group: root
     mode: '0644'
