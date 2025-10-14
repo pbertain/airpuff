@@ -10,31 +10,19 @@
     mode: '0755'
   tags: [app, git]
 
-- name: Check if git repository exists
-  stat:
-    path: "{{ airpuff_app_home }}/.git"
-  register: git_repo_exists
+- name: Remove existing directory if it exists
+  file:
+    path: "{{ airpuff_app_home }}"
+    state: absent
   tags: [app, git]
 
-- name: Clone AirPuff repository (first time)
+- name: Clone AirPuff repository
   git:
     repo: "{{ app_repo }}"
     dest: "{{ airpuff_app_home }}"
     version: "{{ app_branch }}"
     force: yes
   become_user: "{{ airpuff_app_user }}"
-  when: not git_repo_exists.stat.exists
-  tags: [app, git]
-
-- name: Update AirPuff repository (existing)
-  git:
-    repo: "{{ app_repo }}"
-    dest: "{{ airpuff_app_home }}"
-    version: "{{ app_branch }}"
-    update: yes
-    force: yes
-  become_user: "{{ airpuff_app_user }}"
-  when: git_repo_exists.stat.exists
   tags: [app, git]
 
 - name: Install application dependencies
@@ -87,3 +75,4 @@
     enabled: yes
     daemon_reload: yes
   tags: [app, service]
+
