@@ -346,7 +346,7 @@ jobs:
         EOF
         
         # Create SSH key file
-        echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > /tmp/prod_key
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/prod_key
         chmod 600 /tmp/prod_key
         
         # Run Ansible deployment
