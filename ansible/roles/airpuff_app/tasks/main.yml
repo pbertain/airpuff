@@ -8,12 +8,14 @@
     owner: "{{ airpuff_app_user }}"
     group: "{{ airpuff_app_group }}"
     mode: '0755'
+  become: yes
   tags: [app, git]
 
 - name: Remove existing application code
   file:
     path: "{{ airpuff_app_home }}/backend"
     state: absent
+  become: yes
   tags: [app, git]
 
 - name: Clone AirPuff repository
