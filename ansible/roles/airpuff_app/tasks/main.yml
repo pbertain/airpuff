@@ -10,9 +10,9 @@
     mode: '0755'
   tags: [app, git]
 
-- name: Remove existing directory if it exists
+- name: Remove existing application code
   file:
-    path: "{{ airpuff_app_home }}"
+    path: "{{ airpuff_app_home }}/backend"
     state: absent
   tags: [app, git]
 
