@@ -272,7 +272,7 @@ jobs:
               hosts:
                 host74.nird.club:
                   ansible_host: host74.nird.club
-                  ansible_user: deploy
+                  ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/prod_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
                   deployment_env: production
@@ -346,7 +346,7 @@ jobs:
         EOF
         
         # Create SSH key file
-        echo "${{ secrets.DEV_SSH_PRIVATE_KEY }}" > /tmp/prod_key
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/prod_key
         chmod 600 /tmp/prod_key
         
         # Run Ansible deployment
