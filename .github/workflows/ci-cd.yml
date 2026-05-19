@@ -133,8 +133,8 @@ jobs:
           children:
             web_dev:
               hosts:
-                host74.nird.club:
-                  ansible_host: host74.nird.club
+                host78.nird.club:
+                  ansible_host: host78.nird.club
                   ansible_user: ansible
                   ansible_ssh_private_key_file: /tmp/dev_key
                   ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
@@ -200,10 +200,10 @@ jobs:
                   - "httpx==0.25.2"
                   - "pydantic==2.5.0"
                   - "pydantic-settings==2.1.0"
-                  - "python-jose[cryptography]==3.3.0"
+                  - "python-jose[cryptography]==3.4.0"
                   - "passlib[bcrypt]==1.7.4"
-                  - "python-multipart==0.0.6"
-                  - "jinja2==3.1.2"
+                  - "python-multipart==0.0.7"
+                  - "jinja2==3.1.4"
                   - "python-dotenv==1.0.0"
                 timezone: "UTC"
         EOF
@@ -226,15 +226,15 @@ jobs:
 
     - name: Health Check Dev
       run: |
-        echo "Skipping health check - ports 25080/25081 are only accessible from host74.nird.club itself"
-        echo "To verify deployment, SSH to host74.nird.club and run: curl http://localhost:25081/health"
+        echo "Skipping health check - ports 25080/25081 are only accessible from host78.nird.club itself"
+        echo "To verify deployment, SSH to host78.nird.club and run: curl http://localhost:25081/health"
 
     - name: Notify Deployment Success
       if: success()
       run: |
         echo "✅ Development deployment successful!"
-        echo "🌐 Dev URL: http://host74.nird.club:25081"
-        echo "📊 Health: http://host74.nird.club:25081/health"
+        echo "🌐 Dev URL: http://host78.nird.club:25081"
+        echo "📊 Health: http://host78.nird.club:25081/health"
         echo "ℹ️  Note: Ports 25080/25081 are only accessible from the host itself"
 
   # Production Deployment
@@ -337,10 +337,10 @@ jobs:
                   - "httpx==0.25.2"
                   - "pydantic==2.5.0"
                   - "pydantic-settings==2.1.0"
-                  - "python-jose[cryptography]==3.3.0"
+                  - "python-jose[cryptography]==3.4.0"
                   - "passlib[bcrypt]==1.7.4"
-                  - "python-multipart==0.0.6"
-                  - "jinja2==3.1.2"
+                  - "python-multipart==0.0.7"
+                  - "jinja2==3.1.4"
                   - "python-dotenv==1.0.0"
                 timezone: "UTC"
         EOF
