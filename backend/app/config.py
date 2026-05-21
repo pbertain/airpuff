@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     google_client_secret: Optional[str] = None
     apple_client_id: Optional[str] = None
     apple_client_secret: Optional[str] = None
+
+    # OIDC (Keycloak via cloudpuff)
+    oidc_issuer: Optional[str] = None
+    oidc_client_id: str = "airpuff-web"
+    oidc_client_secret: Optional[str] = None
+    oidc_redirect_uri: Optional[str] = None
+    session_secret: str = "change-me-in-production"
+    base_url: str = "http://localhost:25080"
     
     # Security
     secret_key: str = "your-secret-key-change-in-production"

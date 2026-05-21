@@ -6,11 +6,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from contextlib import asynccontextmanager
 
 from .config import settings
 from .database import init_timescaledb
-from .api.v1 import airports, weather, routes, auth, users, realtime, grafana, imessage, migration
+from .api.v1 import airports, weather, routes, auth, users, realtime, grafana, imessage, migration, oidc
 from .api.curl.v1 import airports as curl_airports, weather as curl_weather, routes as curl_routes
 from .services.websocket_manager import WebSocketManager
 from .services.realtime_service import realtime_service
@@ -55,6 +56,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Session middleware (required by Authlib's Starlette OIDC client and the
+# session-cookie auth flow in app/api/v1/oidc.py)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.session_secret,
+    https_only=not settings.debug,
+    same_site="lax",
+    max_age=60 * 60 * 24 * 30,
+)
+
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -69,6 +80,7 @@ app.include_router(airports.router, prefix="/api/v1/airports", tags=["airports"]
 app.include_router(weather.router, prefix="/api/v1/weather", tags=["weather"])
 app.include_router(routes.router, prefix="/api/v1/routes", tags=["routes"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(oidc.router, prefix="/api/v1/auth/oidc", tags=["auth-oidc"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(realtime.router, prefix="/api/v1/realtime", tags=["realtime"])
 app.include_router(grafana.router, prefix="/api/v1/grafana", tags=["grafana"])

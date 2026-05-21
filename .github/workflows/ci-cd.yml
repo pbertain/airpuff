@@ -175,6 +175,12 @@ jobs:
                 airpuff_workers: 2
                 airpuff_max_requests: 1000
                 airpuff_max_requests_jitter: 100
+                airpuff_oidc_issuer: "https://auth-dev.cloudpuff.org/realms/cloudpuff"
+                airpuff_oidc_client_id: "airpuff-web"
+                airpuff_oidc_client_secret: "${{ secrets.DEV_OIDC_CLIENT_SECRET }}"
+                airpuff_oidc_redirect_uri: "https://dev.airpuff.info/api/v1/auth/oidc/callback"
+                airpuff_session_secret: "${{ secrets.DEV_SESSION_SECRET }}"
+                airpuff_base_url: "https://dev.airpuff.info"
                 apt_packages:
                   - "curl"
                   - "wget"
@@ -312,6 +318,12 @@ jobs:
                 airpuff_workers: 4
                 airpuff_max_requests: 1000
                 airpuff_max_requests_jitter: 100
+                airpuff_oidc_issuer: "https://auth.cloudpuff.org/realms/cloudpuff"
+                airpuff_oidc_client_id: "airpuff-web"
+                airpuff_oidc_client_secret: "${{ secrets.OIDC_CLIENT_SECRET }}"
+                airpuff_oidc_redirect_uri: "https://www.airpuff.info/api/v1/auth/oidc/callback"
+                airpuff_session_secret: "${{ secrets.SESSION_SECRET }}"
+                airpuff_base_url: "https://www.airpuff.info"
                 apt_packages:
                   - "curl"
                   - "wget"
