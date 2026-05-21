@@ -3,9 +3,9 @@
 # Override global variables for production
 
 # Application Configuration
-airpuff_app_home: "/opt/airpuff"
-airpuff_app_logs: "/var/log/airpuff"
-airpuff_app_data: "/var/lib/airpuff"
+airpuff_app_home: "/opt/prod/airpuff"
+airpuff_app_logs: "/var/log/prod/airpuff"
+airpuff_app_data: "/var/lib/prod/airpuff"
 
 # Application Ports
 airpuff_app_port: 25080

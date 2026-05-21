@@ -18,13 +18,36 @@
   become: yes
   tags: [app, git]
 
-- name: Clone AirPuff repository
+- name: Remove any prior staging clone directory
+  file:
+    path: "/tmp/airpuff-{{ deployment_env }}-clone"
+    state: absent
+  become: yes
+  tags: [app, git]
+
+- name: Clone AirPuff repository to a staging directory
   git:
     repo: "{{ app_repo }}"
-    dest: "{{ airpuff_app_home }}"
+    dest: "/tmp/airpuff-{{ deployment_env }}-clone"
     version: "{{ app_branch }}"
     force: yes
+  become: yes
   become_user: "{{ airpuff_app_user }}"
+  tags: [app, git]
+
+- name: Copy repository contents into application directory (preserves venv)
+  command: cp -a . {{ airpuff_app_home }}/
+  args:
+    chdir: "/tmp/airpuff-{{ deployment_env }}-clone"
+  become: yes
+  become_user: "{{ airpuff_app_user }}"
+  tags: [app, git]
+
+- name: Remove staging clone directory
+  file:
+    path: "/tmp/airpuff-{{ deployment_env }}-clone"
+    state: absent
+  become: yes
   tags: [app, git]
 
 - name: Install application dependencies

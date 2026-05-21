@@ -4,9 +4,9 @@
 airpuff_app_name: "airpuff"
 airpuff_app_user: "www-data"
 airpuff_app_group: "www-data"
-airpuff_app_home: "/opt/airpuff"
-airpuff_app_logs: "/var/log/airpuff"
-airpuff_app_data: "/var/lib/airpuff"
+airpuff_app_home: "/opt/prod/airpuff"
+airpuff_app_logs: "/var/log/prod/airpuff"
+airpuff_app_data: "/var/lib/prod/airpuff"
 
 # Python Configuration
 python_version: "3.11"
@@ -58,7 +58,7 @@ ssl_key_path: "/etc/ssl/private/airpuff.key"
 ssl_ca_path: "/etc/ssl/certs/airpuff-ca.crt"
 
 # Backup Configuration
-backup_dir: "/var/backups/airpuff"
+backup_dir: "/var/backups/prod/airpuff"
 backup_retention_days: 30
 backup_schedule: "0 2 * * *"  # Daily at 2 AM
 

@@ -144,14 +144,14 @@ jobs:
                 # Include all group variables
                 airpuff_app_user: "www-data"
                 airpuff_app_group: "www-data"
-                airpuff_app_home: "/opt/airpuff-dev"
-                airpuff_app_logs: "/var/log/airpuff-dev"
-                airpuff_app_data: "/var/lib/airpuff-dev"
+                airpuff_app_home: "/opt/dev/airpuff"
+                airpuff_app_logs: "/var/log/dev/airpuff"
+                airpuff_app_data: "/var/lib/dev/airpuff"
                 airpuff_app_port: 25081
-                backup_dir: "/var/backups/airpuff-dev"
+                backup_dir: "/var/backups/dev/airpuff"
                 python_version: "3.12"
                 python_pip_version: "24.0"
-                virtualenv_path: "/opt/airpuff-dev/venv"
+                virtualenv_path: "/opt/dev/airpuff/venv"
                 postgresql_version: "16"
                 postgresql_db_name: "airpuff_dev"
                 postgresql_db_user: "airpuff_dev"
@@ -219,7 +219,7 @@ jobs:
           -e "deployment_env=dev" \
           -e "app_port=25081" \
           -e "app_hostname=dev.airpuff.info" \
-          -e "app_directory=/opt/airpuff-dev" \
+          -e "app_directory=/opt/dev/airpuff" \
           -e "database_name=airpuff_dev" \
           -e "redis_database=1" \
           --private-key=/tmp/dev_key
@@ -281,14 +281,14 @@ jobs:
                 # Include all group variables
                 airpuff_app_user: "www-data"
                 airpuff_app_group: "www-data"
-                airpuff_app_home: "/opt/airpuff"
-                airpuff_app_logs: "/var/log/airpuff"
-                airpuff_app_data: "/var/lib/airpuff"
+                airpuff_app_home: "/opt/prod/airpuff"
+                airpuff_app_logs: "/var/log/prod/airpuff"
+                airpuff_app_data: "/var/lib/prod/airpuff"
                 airpuff_app_port: 25080
-                backup_dir: "/var/backups/airpuff"
+                backup_dir: "/var/backups/prod/airpuff"
                 python_version: "3.12"
                 python_pip_version: "24.0"
-                virtualenv_path: "/opt/airpuff/venv"
+                virtualenv_path: "/opt/prod/airpuff/venv"
                 postgresql_version: "16"
                 postgresql_db_name: "airpuff"
                 postgresql_db_user: "airpuff"
@@ -356,7 +356,7 @@ jobs:
           -e "deployment_env=prod" \
           -e "app_port=25080" \
           -e "app_hostname=www.airpuff.info" \
-          -e "app_directory=/opt/airpuff" \
+          -e "app_directory=/opt/prod/airpuff" \
           -e "database_name=airpuff" \
           -e "redis_database=0" \
           --private-key=/tmp/prod_key
