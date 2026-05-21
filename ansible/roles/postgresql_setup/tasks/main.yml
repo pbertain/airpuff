@@ -78,7 +78,10 @@
   tags: [postgresql, database]
 
 - name: Restart PostgreSQL so timescaledb is preloaded before enabling the extension
-  meta: flush_handlers
+  systemd:
+    name: postgresql
+    state: restarted
+  become: yes
 
 - name: Configure TimescaleDB
   include_tasks: timescaledb.yml
