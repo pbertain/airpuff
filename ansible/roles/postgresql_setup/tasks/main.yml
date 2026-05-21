@@ -31,6 +31,33 @@
     state: present
   tags: [postgresql, packages]
 
+- name: Add TimescaleDB signing key
+  get_url:
+    url: https://packagecloud.io/timescale/timescaledb/gpgkey
+    dest: /tmp/timescaledb-key.asc
+    mode: '0644'
+  tags: [timescaledb, repository]
+
+- name: Add TimescaleDB signing key to apt
+  apt_key:
+    file: /tmp/timescaledb-key.asc
+    state: present
+  tags: [timescaledb, repository]
+
+- name: Add TimescaleDB APT repository
+  apt_repository:
+    repo: "deb https://packagecloud.io/timescale/timescaledb/debian/ {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+  tags: [timescaledb, repository]
+
+- name: Install TimescaleDB
+  apt:
+    name: "timescaledb-2-postgresql-{{ postgresql_version }}"
+    state: present
+  notify: restart postgresql
+  tags: [timescaledb, packages]
+
 - name: Verify TimescaleDB package installation
   shell: dpkg -l | grep timescaledb
   register: timescaledb_verify
