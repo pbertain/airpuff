@@ -9,17 +9,7 @@ User={{ airpuff_app_user }}
 Group={{ airpuff_app_group }}
 WorkingDirectory={{ airpuff_app_home }}/backend
 Environment=PATH={{ virtualenv_path }}/bin
-ExecStart={{ virtualenv_path }}/bin/python -c "
-import asyncio
-import sys
-sys.path.append('{{ airpuff_app_home }}/backend')
-from app.services.imessage_service import imessage_service
-
-async def main():
-    await imessage_service.process_scheduled_messages()
-
-asyncio.run(main())
-"
+ExecStart={{ virtualenv_path }}/bin/python -c "import asyncio, sys; sys.path.insert(0, '{{ airpuff_app_home }}/backend'); from app.services.imessage_service import imessage_service; asyncio.run(imessage_service.process_scheduled_messages())"
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=airpuff-imessage
