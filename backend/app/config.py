@@ -1,7 +1,7 @@
 """Configuration management for AirPuff application."""
 
-import os
 from typing import Optional
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     oidc_client_id: str = "airpuff-web"
     oidc_client_secret: Optional[str] = None
     oidc_redirect_uri: Optional[str] = None
+    oidc_admin_roles: str = "admin,airpuff-admin"
     session_secret: str = "change-me-in-production"
     base_url: str = "http://localhost:25080"
     
@@ -50,6 +51,17 @@ class Settings(BaseSettings):
     # WebSocket
     websocket_ping_interval: int = 25
     websocket_ping_timeout: int = 20
+
+    @model_validator(mode="after")
+    def apply_environment_defaults(self):
+        """Apply environment-specific defaults after settings load."""
+
+        if not self.oidc_issuer:
+            env = (self.environment or "").strip().lower()
+            host = "auth.cloudpuff.org" if env in {"production", "prod"} else "auth-dev.cloudpuff.org"
+            self.oidc_issuer = f"https://{host}/realms/cloudpuff"
+
+        return self
     
     class Config:
         env_file = ".env"

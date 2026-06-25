@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - AirPuff{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-light">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h3 class="mb-1">Admin Setup</h3>
+                            <p class="text-muted mb-0">
+                                Manage monitored airports and shared route templates.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-4 text-center">
+                            <div>
+                                <div class="text-primary fs-4" id="summary-monitored">-</div>
+                                <small class="text-muted">Monitored Airports</small>
+                            </div>
+                            <div>
+                                <div class="text-success fs-4" id="summary-airports">-</div>
+                                <small class="text-muted">All Airports</small>
+                            </div>
+                            <div>
+                                <div class="text-warning fs-4" id="summary-templates">-</div>
+                                <small class="text-muted">Route Templates</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 mb-4">
+            <div class="card bg-dark border-light h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Monitored Airports</h5>
+                </div>
+                <div class="card-body">
+                    <form id="airport-form" class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-icao">ICAO</label>
+                            <input id="airport-icao" class="form-control" maxlength="4" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label" for="airport-name">Name</label>
+                            <input id="airport-name" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-city">City</label>
+                            <input id="airport-city" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-state">State</label>
+                            <input id="airport-state" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-country">Country</label>
+                            <input id="airport-country" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-latitude">Latitude</label>
+                            <input id="airport-latitude" class="form-control" type="number" step="0.000001">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-longitude">Longitude</label>
+                            <input id="airport-longitude" class="form-control" type="number" step="0.000001">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="airport-elevation">Elevation Ft</label>
+                            <input id="airport-elevation" class="form-control" type="number">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="airport-atis">ATIS Phone</label>
+                            <input id="airport-atis" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="airport-tower">Tower Phone</label>
+                            <input id="airport-tower" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input id="airport-monitored" class="form-check-input" type="checkbox" checked>
+                                <label class="form-check-label" for="airport-monitored">
+                                    Monitor this airport
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex gap-2">
+                            <button class="btn btn-primary" type="submit">Save Airport</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="resetAirportForm()">Clear</button>
+                        </div>
+                    </form>
+
+                    <div class="input-group mb-3">
+                        <input id="airport-search" class="form-control" placeholder="Search airports">
+                        <button class="btn btn-outline-light" type="button" onclick="loadAirports()">Search</button>
+                    </div>
+
+                    <div id="airports-list" class="small"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 mb-4">
+            <div class="card bg-dark border-light h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Route Templates</h5>
+                </div>
+                <div class="card-body">
+                    <form id="route-template-form" class="row g-3 mb-4">
+                        <input id="route-template-id" type="hidden">
+                        <div class="col-md-8">
+                            <label class="form-label" for="route-template-name">Name</label>
+                            <input id="route-template-name" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="route-template-active">Status</label>
+                            <select id="route-template-active" class="form-select">
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="route-template-description">Description</label>
+                            <textarea id="route-template-description" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="route-template-airports">Airport ICAOs</label>
+                            <input
+                                id="route-template-airports"
+                                class="form-control"
+                                placeholder="KSFO, KLAX, KSEA"
+                                required
+                            >
+                            <div class="form-text">Airports must already exist in the airport catalog.</div>
+                        </div>
+                        <div class="col-12 d-flex gap-2">
+                            <button class="btn btn-primary" type="submit">Save Template</button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="resetRouteTemplateForm()">Clear</button>
+                        </div>
+                    </form>
+
+                    <div id="route-templates-list" class="small"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function airportPayloadFromForm() {
+    return {
+        icao: document.getElementById('airport-icao').value.trim().toUpperCase(),
+        name: document.getElementById('airport-name').value.trim() || null,
+        city: document.getElementById('airport-city').value.trim() || null,
+        state: document.getElementById('airport-state').value.trim() || null,
+        country: document.getElementById('airport-country').value.trim() || null,
+        latitude: document.getElementById('airport-latitude').value || null,
+        longitude: document.getElementById('airport-longitude').value || null,
+        elevation_ft: document.getElementById('airport-elevation').value || null,
+        atis_phone: document.getElementById('airport-atis').value.trim() || null,
+        tower_phone: document.getElementById('airport-tower').value.trim() || null,
+        is_monitored: document.getElementById('airport-monitored').checked
+    };
+}
+
+function routeTemplatePayloadFromForm() {
+    return {
+        name: document.getElementById('route-template-name').value.trim(),
+        description: document.getElementById('route-template-description').value.trim() || null,
+        airport_icaos: document.getElementById('route-template-airports').value
+            .split(',')
+            .map(value => value.trim().toUpperCase())
+            .filter(Boolean),
+        is_active: document.getElementById('route-template-active').value === 'true'
+    };
+}
+
+function resetAirportForm() {
+    document.getElementById('airport-form').reset();
+    document.getElementById('airport-monitored').checked = true;
+}
+
+function resetRouteTemplateForm() {
+    document.getElementById('route-template-form').reset();
+    document.getElementById('route-template-id').value = '';
+    document.getElementById('route-template-active').value = 'true';
+}
+
+function fillAirportForm(airport) {
+    document.getElementById('airport-icao').value = airport.icao;
+    document.getElementById('airport-name').value = airport.name || '';
+    document.getElementById('airport-city').value = airport.city || '';
+    document.getElementById('airport-state').value = airport.state || '';
+    document.getElementById('airport-country').value = airport.country || '';
+    document.getElementById('airport-latitude').value = airport.latitude || '';
+    document.getElementById('airport-longitude').value = airport.longitude || '';
+    document.getElementById('airport-elevation').value = airport.elevation_ft || '';
+    document.getElementById('airport-atis').value = airport.atis_phone || '';
+    document.getElementById('airport-tower').value = airport.tower_phone || '';
+    document.getElementById('airport-monitored').checked = airport.is_monitored;
+}
+
+function fillAirportFormFromJson(encodedAirport) {
+    fillAirportForm(JSON.parse(decodeURIComponent(encodedAirport)));
+}
+
+function fillRouteTemplateForm(routeTemplate) {
+    document.getElementById('route-template-id').value = routeTemplate.id;
+    document.getElementById('route-template-name').value = routeTemplate.name;
+    document.getElementById('route-template-description').value = routeTemplate.description || '';
+    document.getElementById('route-template-airports').value = routeTemplate.airports.map(airport => airport.icao).join(', ');
+    document.getElementById('route-template-active').value = String(routeTemplate.is_active);
+}
+
+function fillRouteTemplateFormFromJson(encodedRouteTemplate) {
+    fillRouteTemplateForm(JSON.parse(decodeURIComponent(encodedRouteTemplate)));
+}
+
+async function loadSummary() {
+    const response = await window.airpuffApiFetch('/api/v1/admin/summary');
+    const data = await response.json();
+    document.getElementById('summary-monitored').textContent = data.counts.monitored_airports;
+    document.getElementById('summary-airports').textContent = data.counts.all_airports;
+    document.getElementById('summary-templates').textContent = data.counts.route_templates;
+}
+
+async function loadAirports() {
+    const search = document.getElementById('airport-search').value.trim();
+    const query = search ? `?search=${encodeURIComponent(search)}` : '';
+    const response = await window.airpuffApiFetch(`/api/v1/admin/airports${query}`);
+    const airports = await response.json();
+    const container = document.getElementById('airports-list');
+
+    if (airports.length === 0) {
+        container.innerHTML = '<div class="text-muted">No airports found.</div>';
+        return;
+    }
+
+    container.innerHTML = airports.map(airport => `
+        <div class="card bg-secondary border-light mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <strong>${airport.icao}</strong> ${airport.name || ''}
+                        <div class="text-muted">${airport.city || ''} ${airport.state || ''} ${airport.country || ''}</div>
+                        <div class="mt-1">
+                            ${airport.is_monitored ? '<span class="badge bg-success">Monitored</span>' : '<span class="badge bg-secondary">Not Monitored</span>'}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button
+                            class="btn btn-sm btn-outline-light"
+                            data-airport="${encodeURIComponent(JSON.stringify(airport))}"
+                            onclick="fillAirportFormFromJson(this.dataset.airport)"
+                        >
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteAirport('${airport.icao}')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function deleteAirport(icao) {
+    if (!confirm(`Delete airport ${icao}?`)) {
+        return;
+    }
+
+    await window.airpuffApiFetch(`/api/v1/admin/airports/${icao}`, {
+        method: 'DELETE'
+    });
+    await loadSummary();
+    await loadAirports();
+}
+
+async function loadRouteTemplates() {
+    const response = await window.airpuffApiFetch('/api/v1/admin/route-templates');
+    const routeTemplates = await response.json();
+    const container = document.getElementById('route-templates-list');
+
+    if (routeTemplates.length === 0) {
+        container.innerHTML = '<div class="text-muted">No route templates yet.</div>';
+        return;
+    }
+
+    container.innerHTML = routeTemplates.map(routeTemplate => `
+        <div class="card bg-secondary border-light mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <strong>${routeTemplate.name}</strong>
+                        <div class="text-muted">${routeTemplate.description || 'No description'}</div>
+                        <div class="mt-1">
+                            <span class="badge ${routeTemplate.is_active ? 'bg-success' : 'bg-secondary'}">
+                                ${routeTemplate.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span class="badge bg-primary">${routeTemplate.airports.length} airports</span>
+                        </div>
+                        <div class="mt-1 text-light">${routeTemplate.airports.map(airport => airport.icao).join(' -> ')}</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button
+                            class="btn btn-sm btn-outline-light"
+                            data-route-template="${encodeURIComponent(JSON.stringify(routeTemplate))}"
+                            onclick="fillRouteTemplateFormFromJson(this.dataset.routeTemplate)"
+                        >
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRouteTemplate(${routeTemplate.id})">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function deleteRouteTemplate(templateId) {
+    if (!confirm(`Delete route template ${templateId}?`)) {
+        return;
+    }
+
+    await window.airpuffApiFetch(`/api/v1/admin/route-templates/${templateId}`, {
+        method: 'DELETE'
+    });
+    await loadSummary();
+    await loadRouteTemplates();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    resetAirportForm();
+    resetRouteTemplateForm();
+    loadSummary();
+    loadAirports();
+    loadRouteTemplates();
+
+    document.getElementById('airport-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        await window.airpuffApiFetch('/api/v1/admin/airports', {
+            method: 'POST',
+            body: JSON.stringify(airportPayloadFromForm())
+        });
+        resetAirportForm();
+        await loadSummary();
+        await loadAirports();
+    });
+
+    document.getElementById('route-template-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const templateId = document.getElementById('route-template-id').value;
+        const url = templateId
+            ? `/api/v1/admin/route-templates/${templateId}`
+            : '/api/v1/admin/route-templates';
+        const method = templateId ? 'PUT' : 'POST';
+
+        await window.airpuffApiFetch(url, {
+            method,
+            body: JSON.stringify(routeTemplatePayloadFromForm())
+        });
+
+        resetRouteTemplateForm();
+        await loadSummary();
+        await loadRouteTemplates();
+    });
+});
+</script>
+{% endblock %}

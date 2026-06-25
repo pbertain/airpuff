@@ -1,6 +1,6 @@
 """User model for authentication and user management."""
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
+from sqlalchemy import Column, Integer, String, Boolean, Text
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import relationship
 from ..database import Base
@@ -19,6 +19,7 @@ class User(Base):
     # OAuth provider info
     provider = Column(String(50), nullable=False)  # google, apple, keycloak
     provider_id = Column(String(255), nullable=False)
+    role = Column(String(32), nullable=False, default="user")
     
     # User preferences
     units = Column(String(10), default="imperial")  # imperial, metric

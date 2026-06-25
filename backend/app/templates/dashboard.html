@@ -166,21 +166,10 @@
 </div>
 
 <script>
-let authToken = localStorage.getItem('airpuff_token');
-
-// Check authentication
-if (!authToken) {
-    window.location.href = '/login';
-}
-
 // Load user stats
 async function loadUserStats() {
     try {
-        const response = await fetch('/api/v1/users/me/stats', {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        });
+        const response = await window.airpuffApiFetch('/api/v1/users/me/stats');
         
         if (response.ok) {
             const stats = await response.json();
@@ -197,11 +186,7 @@ async function loadUserStats() {
 // Load user routes
 async function loadUserRoutes() {
     try {
-        const response = await fetch('/api/v1/routes/', {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        });
+        const response = await window.airpuffApiFetch('/api/v1/routes/');
         
         if (response.ok) {
             const routes = await response.json();
@@ -244,9 +229,9 @@ function displayRoutes(routes) {
                             Actions
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="#" onclick="viewRoute(${route.id})">View</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="editRoute(${route.id})">Edit</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="deleteRoute(${route.id})">Delete</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="viewRoute(event, ${route.id})">View</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="editRoute(event, ${route.id})">Edit</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="deleteRoute(event, ${route.id})">Delete</a></li>
                         </ul>
                     </div>
                 </div>
@@ -268,11 +253,10 @@ async function createRoute() {
     const isPublic = document.getElementById('route-public').checked;
     
     try {
-        const response = await fetch('/api/v1/routes/', {
+        const response = await window.airpuffApiFetch('/api/v1/routes/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 name,
@@ -292,6 +276,61 @@ async function createRoute() {
     } catch (error) {
         console.error('Error creating route:', error);
         alert('Error creating route');
+    }
+}
+
+async function viewRoute(event, routeId) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    try {
+        const response = await window.airpuffApiFetch(`/api/v1/routes/${routeId}`);
+        if (!response.ok) {
+            alert('Unable to load route details');
+            return;
+        }
+
+        const route = await response.json();
+        const airports = route.airports.map(airport => airport.icao).join(' -> ') || 'No airports';
+        alert(`${route.name}\n${airports}`);
+    } catch (error) {
+        console.error('Error loading route:', error);
+        alert('Unable to load route details');
+    }
+}
+
+function editRoute(event, routeId) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    window.location.href = `/route-planner?route_id=${routeId}`;
+}
+
+async function deleteRoute(event, routeId) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    if (!confirm('Delete this route?')) {
+        return;
+    }
+
+    try {
+        const response = await window.airpuffApiFetch(`/api/v1/routes/${routeId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            loadUserRoutes();
+            loadUserStats();
+        } else {
+            alert('Error deleting route');
+        }
+    } catch (error) {
+        console.error('Error deleting route:', error);
+        alert('Error deleting route');
     }
 }
 

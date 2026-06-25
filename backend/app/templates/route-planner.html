@@ -338,19 +338,11 @@ async function saveRoute() {
         return;
     }
     
-    const token = localStorage.getItem('airpuff_token');
-    if (!token) {
-        alert('Please log in to save routes');
-        window.location.href = '/login';
-        return;
-    }
-    
     try {
-        const response = await fetch('/api/v1/routes/', {
+        const response = await window.airpuffApiFetch('/api/v1/routes/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 name,

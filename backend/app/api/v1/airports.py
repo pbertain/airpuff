@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from ...database import get_db
 from ...models.airport import Airport
+from .auth import require_admin
 
 router = APIRouter()
 
@@ -24,6 +25,7 @@ class AirportResponse(BaseModel):
     city: Optional[str]
     state: Optional[str]
     country: Optional[str]
+    is_monitored: bool
 
     class Config:
         from_attributes = True
@@ -41,6 +43,7 @@ class AirportCreate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     country: Optional[str] = None
+    is_monitored: bool = False
 
 
 @router.get("/", response_model=List[AirportResponse])
@@ -74,7 +77,11 @@ async def get_airport(icao: str, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=AirportResponse)
-async def create_airport(airport: AirportCreate, db: Session = Depends(get_db)):
+async def create_airport(
+    airport: AirportCreate,
+    db: Session = Depends(get_db),
+    admin_user=Depends(require_admin),
+):
     """Create a new airport."""
     # Check if airport already exists
     existing = db.query(Airport).filter(Airport.icao == airport.icao.upper()).first()
@@ -92,7 +99,8 @@ async def create_airport(airport: AirportCreate, db: Session = Depends(get_db)):
         tower_phone=airport.tower_phone,
         city=airport.city,
         state=airport.state,
-        country=airport.country
+        country=airport.country,
+        is_monitored=airport.is_monitored,
     )
     
     db.add(db_airport)
@@ -106,7 +114,8 @@ async def create_airport(airport: AirportCreate, db: Session = Depends(get_db)):
 async def update_airport(
     icao: str, 
     airport: AirportCreate, 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    admin_user=Depends(require_admin),
 ):
     """Update an existing airport."""
     db_airport = db.query(Airport).filter(Airport.icao == icao.upper()).first()
@@ -114,7 +123,7 @@ async def update_airport(
         raise HTTPException(status_code=404, detail="Airport not found")
     
     # Update fields
-    for field, value in airport.dict(exclude_unset=True).items():
+    for field, value in airport.model_dump(exclude_unset=True).items():
         setattr(db_airport, field, value)
     
     db.commit()
@@ -124,7 +133,11 @@ async def update_airport(
 
 
 @router.delete("/{icao}")
-async def delete_airport(icao: str, db: Session = Depends(get_db)):
+async def delete_airport(
+    icao: str,
+    db: Session = Depends(get_db),
+    admin_user=Depends(require_admin),
+):
     """Delete an airport."""
     airport = db.query(Airport).filter(Airport.icao == icao.upper()).first()
     if not airport:

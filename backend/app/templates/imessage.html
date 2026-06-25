@@ -318,12 +318,7 @@ async function checkImessageStatus() {
 
 async function loadScheduledMessages() {
     try {
-        const token = localStorage.getItem('airpuff_token');
-        const response = await fetch('/api/v1/imessage/schedule', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await window.airpuffApiFetch('/api/v1/imessage/schedule');
         
         if (response.ok) {
             const messages = await response.json();
@@ -402,12 +397,7 @@ function displayScheduledMessages(messages) {
 
 async function loadUserRoutes() {
     try {
-        const token = localStorage.getItem('airpuff_token');
-        const response = await fetch('/api/v1/users/me/routes', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await window.airpuffApiFetch('/api/v1/routes/');
         
         if (response.ok) {
             const routes = await response.json();
@@ -461,13 +451,8 @@ async function createScheduledMessage() {
     }
     
     try {
-        const token = localStorage.getItem('airpuff_token');
-        const response = await fetch('/api/v1/imessage/schedule', {
+        const response = await window.airpuffApiFetch('/api/v1/imessage/schedule', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 route_id: parseInt(routeId),
                 schedule_time: scheduleTime,
@@ -491,12 +476,8 @@ async function createScheduledMessage() {
 
 async function sendScheduledNow(messageId) {
     try {
-        const token = localStorage.getItem('airpuff_token');
-        const response = await fetch(`/api/v1/imessage/schedule/${messageId}/send`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await window.airpuffApiFetch(`/api/v1/imessage/schedule/${messageId}/send`, {
+            method: 'POST'
         });
         
         if (response.ok) {
@@ -517,12 +498,8 @@ async function deleteScheduledMessage(messageId) {
     }
     
     try {
-        const token = localStorage.getItem('airpuff_token');
-        const response = await fetch(`/api/v1/imessage/schedule/${messageId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await window.airpuffApiFetch(`/api/v1/imessage/schedule/${messageId}`, {
+            method: 'DELETE'
         });
         
         if (response.ok) {

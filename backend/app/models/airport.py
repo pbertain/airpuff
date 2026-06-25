@@ -1,6 +1,6 @@
 """Airport model for storing airport information."""
 
-from sqlalchemy import Column, Integer, String, Numeric, Text
+from sqlalchemy import Boolean, Column, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 from ..database import Base
 
@@ -21,6 +21,7 @@ class Airport(Base):
     city = Column(String(100), nullable=True)
     state = Column(String(50), nullable=True)
     country = Column(String(50), nullable=True)
+    is_monitored = Column(Boolean, nullable=False, default=False)
     
     # Relationships
     weather_observations = relationship("WeatherObservation", back_populates="airport")

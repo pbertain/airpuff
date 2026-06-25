@@ -298,16 +298,8 @@ let airpuffWS = null;
 
 // Initialize WebSocket when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Get user ID from localStorage or page data
-    const token = localStorage.getItem('airpuff_token');
-    let userId = null;
-    
-    if (token) {
-        // In a real app, you'd decode the JWT to get user ID
-        // For now, we'll use a placeholder
-        userId = 1; // This should be extracted from the token
-    }
-    
+    const userId = window.airpuffCurrentUser?.id || null;
+
     // Initialize WebSocket
     airpuffWS = new AirPuffWebSocket(userId);
     airpuffWS.connect();

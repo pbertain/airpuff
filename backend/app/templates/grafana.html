@@ -299,12 +299,8 @@ async function createWeatherAlert() {
     const selectedAirport = document.getElementById('airport-selector').value;
     
     try {
-        const response = await fetch(`/api/v1/grafana/alerts/weather/${selectedAirport}`, {
+        const response = await window.airpuffApiFetch(`/api/v1/grafana/alerts/weather/${selectedAirport}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('airpuff_token')}`
-            }
         });
         
         if (response.ok) {

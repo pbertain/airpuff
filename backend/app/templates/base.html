@@ -47,6 +47,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/dashboard">Dashboard</a>
                         </li>
+                        <li class="nav-item" id="admin-nav" style="display: none;">
+                            <a class="nav-link" href="/admin">Admin</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/grafana">Grafana</a>
                         </li>
@@ -180,52 +183,63 @@
             `;
         }
         
-            // Authentication functions
-            function checkAuthState() {
-                const token = localStorage.getItem('airpuff_token');
-                const loginNav = document.getElementById('login-nav');
-                const userNav = document.getElementById('user-nav');
-                
-                if (token) {
-                    loginNav.style.display = 'none';
-                    userNav.style.display = 'block';
-                    loadUserInfo();
-                } else {
-                    loginNav.style.display = 'block';
-                    userNav.style.display = 'none';
+        async function airpuffApiFetch(url, options = {}) {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                ...options,
+                headers: {
+                    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                    ...(options.headers || {})
                 }
-            }
-            
-            function loadUserInfo() {
-                const token = localStorage.getItem('airpuff_token');
-                if (!token) return;
-                
-                fetch('/api/v1/users/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
-                .then(response => response.json())
-                .then(user => {
-                    document.getElementById('user-name').textContent = user.name || user.email;
-                })
-                .catch(error => {
-                    console.error('Error loading user info:', error);
-                    logout();
-                });
-            }
-            
-            function logout() {
-                localStorage.removeItem('airpuff_token');
-                checkAuthState();
-                window.location.href = '/';
-            }
-            
-            // Connect WebSocket when page loads
-            document.addEventListener('DOMContentLoaded', function() {
-                connectWebSocket();
-                checkAuthState();
             });
+
+            if (response.status === 401) {
+                window.location.href = '/login';
+                throw new Error('Unauthorized');
+            }
+
+            return response;
+        }
+
+        async function checkAuthState() {
+            const loginNav = document.getElementById('login-nav');
+            const userNav = document.getElementById('user-nav');
+            const adminNav = document.getElementById('admin-nav');
+
+            try {
+                const response = await fetch('/api/v1/auth/me', {
+                    credentials: 'same-origin'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Not authenticated');
+                }
+
+                const user = await response.json();
+                window.airpuffCurrentUser = user;
+                document.getElementById('user-name').textContent = user.name || user.email;
+                loginNav.style.display = 'none';
+                userNav.style.display = 'block';
+                adminNav.style.display = user.is_admin ? 'block' : 'none';
+            } catch (error) {
+                window.airpuffCurrentUser = null;
+                loginNav.style.display = 'block';
+                userNav.style.display = 'none';
+                adminNav.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            window.location.href = '/api/v1/auth/oidc/logout';
+        }
+
+        window.airpuffApiFetch = airpuffApiFetch;
+
+        // Connect WebSocket when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            checkAuthState();
+        });
     </script>
     
     {% block extra_scripts %}{% endblock %}

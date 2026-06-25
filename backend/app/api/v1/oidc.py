@@ -54,6 +54,33 @@ def _redirect_uri() -> str:
     return settings.oidc_redirect_uri or f"{settings.base_url.rstrip('/')}/api/v1/auth/oidc/callback"
 
 
+def _resolved_role(userinfo: dict) -> str:
+    """Map Keycloak claims to an AirPuff role."""
+
+    configured_roles = {
+        role.strip().lower()
+        for role in settings.oidc_admin_roles.split(",")
+        if role.strip()
+    }
+
+    roles = set()
+    top_level_roles = userinfo.get("roles")
+    if isinstance(top_level_roles, list):
+        roles.update(str(role).lower() for role in top_level_roles)
+
+    realm_access = userinfo.get("realm_access") or {}
+    realm_roles = realm_access.get("roles") or []
+    roles.update(str(role).lower() for role in realm_roles)
+
+    resource_access = userinfo.get("resource_access") or {}
+    client_roles = (
+        resource_access.get(settings.oidc_client_id, {}).get("roles") or []
+    )
+    roles.update(str(role).lower() for role in client_roles)
+
+    return "admin" if configured_roles.intersection(roles) else "user"
+
+
 @router.get("/login")
 async def login(request: Request):
     return await _keycloak().authorize_redirect(request, _redirect_uri())
@@ -75,6 +102,7 @@ async def callback(request: Request, db: Session = Depends(get_db)):
     email = userinfo.get("email") or ""
     name = userinfo.get("name") or userinfo.get("preferred_username") or ""
     email_verified = bool(userinfo.get("email_verified", False))
+    role = _resolved_role(userinfo)
     now = datetime.now(timezone.utc)
 
     user = (
@@ -88,6 +116,7 @@ async def callback(request: Request, db: Session = Depends(get_db)):
             name=name,
             provider="keycloak",
             provider_id=sub,
+            role=role,
             is_active=True,
             is_verified=email_verified,
             created_at=now,
@@ -99,6 +128,7 @@ async def callback(request: Request, db: Session = Depends(get_db)):
             user.email = email
         if name:
             user.name = name
+        user.role = role
         user.is_verified = email_verified or user.is_verified
         user.last_login = now
     db.commit()
@@ -109,6 +139,7 @@ async def callback(request: Request, db: Session = Depends(get_db)):
         "sub": sub,
         "email": user.email,
         "name": user.name,
+        "role": user.role,
     }
     return RedirectResponse(url="/", status_code=302)
 
@@ -122,6 +153,8 @@ async def me(request: Request):
         "id": sess.get("id"),
         "email": sess.get("email"),
         "name": sess.get("name"),
+        "role": sess.get("role"),
+        "is_admin": sess.get("role") == "admin",
         "gravatar_hash": _gravatar_hash(sess.get("email", "")),
     }
 

@@ -1,18 +1,20 @@
 """Main FastAPI application for AirPuff."""
 
 import logging
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from contextlib import asynccontextmanager
+from sqlalchemy.orm import Session
 
 from .config import settings
-from .database import init_timescaledb
-from .api.v1 import airports, weather, routes, auth, users, realtime, grafana, imessage, migration, oidc
+from .database import get_db, init_timescaledb
+from .api.v1 import admin, airports, weather, routes, auth, users, realtime, grafana, imessage, migration, oidc
 from .api.curl.v1 import airports as curl_airports, weather as curl_weather, routes as curl_routes
+from .api.v1.auth import get_session_user, is_admin
 from .services.websocket_manager import WebSocketManager
 from .services.realtime_service import realtime_service
 
@@ -81,6 +83,7 @@ app.include_router(weather.router, prefix="/api/v1/weather", tags=["weather"])
 app.include_router(routes.router, prefix="/api/v1/routes", tags=["routes"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(oidc.router, prefix="/api/v1/auth/oidc", tags=["auth-oidc"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(realtime.router, prefix="/api/v1/realtime", tags=["realtime"])
 app.include_router(grafana.router, prefix="/api/v1/grafana", tags=["grafana"])
@@ -112,14 +115,18 @@ async def api_health_check():
 
 
 @app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(request: Request, db: Session = Depends(get_db)):
     """Login page."""
+    if get_session_user(request, db):
+        return RedirectResponse(url="/dashboard", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request, "title": "Login - AirPuff"})
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(request: Request):
+async def dashboard(request: Request, db: Session = Depends(get_db)):
     """User dashboard."""
+    if not get_session_user(request, db):
+        return RedirectResponse(url="/login", status_code=302)
     return templates.TemplateResponse("dashboard.html", {"request": request, "title": "Dashboard - AirPuff"})
 
 
@@ -130,27 +137,49 @@ async def airports_page(request: Request):
 
 
 @app.get("/route-planner", response_class=HTMLResponse)
-async def route_planner(request: Request):
+async def route_planner(request: Request, db: Session = Depends(get_db)):
     """Route planner page."""
+    if not get_session_user(request, db):
+        return RedirectResponse(url="/login", status_code=302)
     return templates.TemplateResponse("route-planner.html", {"request": request, "title": "Route Planner - AirPuff"})
 
 
 @app.get("/grafana", response_class=HTMLResponse)
-async def grafana_dashboards(request: Request):
+async def grafana_dashboards(request: Request, db: Session = Depends(get_db)):
     """Grafana dashboards page."""
+    if not get_session_user(request, db):
+        return RedirectResponse(url="/login", status_code=302)
     return templates.TemplateResponse("grafana.html", {"request": request, "title": "Grafana Dashboards - AirPuff"})
 
 
 @app.get("/imessage", response_class=HTMLResponse)
-async def imessage_integration(request: Request):
+async def imessage_integration(request: Request, db: Session = Depends(get_db)):
     """iMessage integration page."""
+    if not get_session_user(request, db):
+        return RedirectResponse(url="/login", status_code=302)
     return templates.TemplateResponse("imessage.html", {"request": request, "title": "iMessage Integration - AirPuff"})
 
 
 @app.get("/migration", response_class=HTMLResponse)
-async def migration_page(request: Request):
+async def migration_page(request: Request, db: Session = Depends(get_db)):
     """Data migration page."""
+    user = get_session_user(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    if not is_admin(user):
+        return RedirectResponse(url="/dashboard", status_code=302)
     return templates.TemplateResponse("migration.html", {"request": request, "title": "Data Migration - AirPuff"})
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request, db: Session = Depends(get_db)):
+    """Admin setup page for monitored airports and route templates."""
+    user = get_session_user(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    if not is_admin(user):
+        return RedirectResponse(url="/dashboard", status_code=302)
+    return templates.TemplateResponse("admin.html", {"request": request, "title": "Admin - AirPuff"})
 
 
 # WebSocket endpoint

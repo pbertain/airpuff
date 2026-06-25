@@ -13,10 +13,11 @@ from ...database import get_db
 from ...models.airport import Airport
 from ...models.weather import WeatherObservation
 from ...services.migration.rrd_migration_service import rrd_migration_service
+from .auth import require_admin
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_admin)])
 
 @router.post("/rrd/migrate")
 async def migrate_rrd_data(
