@@ -73,6 +73,26 @@
   include_tasks: configure.yml
   tags: [postgresql, configure]
 
+- name: Apply PostgreSQL configuration changes now
+  meta: flush_handlers
+  tags: [postgresql, configure]
+
+- name: Ensure PostgreSQL is running before database bootstrap
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  become: yes
+  tags: [postgresql, service]
+
+- name: Wait for PostgreSQL to accept local connections
+  wait_for:
+    port: 5432
+    host: localhost
+    delay: 5
+    timeout: 60
+  tags: [postgresql, service]
+
 - name: Create AirPuff database
   include_tasks: database.yml
   tags: [postgresql, database]
