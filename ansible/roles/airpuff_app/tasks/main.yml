@@ -11,6 +11,12 @@
   become: yes
   tags: [app, git]
 
+- name: Stop AirPuff application before replacing code
+  systemd:
+    name: airpuff-{{ deployment_env }}-app
+    state: stopped
+  tags: [app, service]
+
 - name: Remove existing application code
   file:
     path: "{{ airpuff_app_home }}/backend"
@@ -103,4 +109,3 @@
     enabled: yes
     daemon_reload: yes
   tags: [app, service]
-
