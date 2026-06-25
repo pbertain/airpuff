@@ -50,12 +50,13 @@
     state: absent
   loop:
     - /etc/apt/sources.list.d/timescaledb.list
+    - /etc/apt/sources.list.d/packagecloud_io_timescale_timescaledb_debian.list
     - /etc/apt/sources.list.d/packagecloud_io_timescale_timescaledb_ubuntu.list
   tags: [timescaledb, repository]
 
 - name: Add TimescaleDB APT repository
   apt_repository:
-    repo: "deb https://packagecloud.io/timescale/timescaledb/ubuntu/ {{ ansible_distribution_release }} main"
+    repo: "deb https://packagecloud.io/timescale/timescaledb/debian/ {{ ansible_distribution_release }} main"
     filename: timescaledb
     state: present
     update_cache: yes
