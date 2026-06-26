@@ -11,10 +11,22 @@
   become: yes
   tags: [app, git]
 
+- name: Gather service facts
+  service_facts:
+  become: yes
+  tags: [app, service]
+
 - name: Stop AirPuff application before replacing code
   systemd:
-    name: airpuff-{{ deployment_env }}-app
+    name: "{{ item }}"
     state: stopped
+  loop:
+    - "airpuff-{{ deployment_env }}-app"
+    - airpuff-app
+  when:
+    - ansible_facts.services is defined
+    - item + ".service" in ansible_facts.services or item in ansible_facts.services
+  failed_when: false
   tags: [app, service]
 
 - name: Remove existing application code
