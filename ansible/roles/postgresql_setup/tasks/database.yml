@@ -26,6 +26,38 @@
   become_user: postgres
   tags: [postgresql, database]
 
+- name: Grant schema privileges for existing objects
+  postgresql_privs:
+    database: "{{ postgresql_db_name }}"
+    roles: "{{ postgresql_db_user }}"
+    privs: USAGE,CREATE
+    type: schema
+    objs: public
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Grant table privileges for existing objects
+  postgresql_privs:
+    database: "{{ postgresql_db_name }}"
+    roles: "{{ postgresql_db_user }}"
+    privs: ALL
+    type: table
+    objs: ALL_IN_SCHEMA
+    schema: public
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Grant sequence privileges for existing objects
+  postgresql_privs:
+    database: "{{ postgresql_db_name }}"
+    roles: "{{ postgresql_db_user }}"
+    privs: ALL
+    type: sequence
+    objs: ALL_IN_SCHEMA
+    schema: public
+  become_user: postgres
+  tags: [postgresql, database]
+
 - name: Create database extensions
   postgresql_ext:
     name: "{{ item }}"
