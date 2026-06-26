@@ -11,6 +11,7 @@ from ..config import settings
 from ..models.airport import Airport
 from ..models.weather import WeatherObservation
 from .flight_category import calculate_flight_category
+from .flirite_service import parse_fli_rite_response
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class WeatherFetcher:
     """Service for fetching weather data from external APIs."""
     
     def __init__(self):
-        self.fli_rite_url = "https://fli-rite.net/api/metars"
+        self.fli_rite_url = (settings.fli_rite_base_url or "https://dev.fli-rite.net").rstrip("/") + "/api/metars"
         self.checkwx_url = "https://api.checkwx.com/metar"
         self.session: Optional[aiohttp.ClientSession] = None
     
@@ -92,17 +93,7 @@ class WeatherFetcher:
     
     def _parse_fli_rite_response(self, data: Dict) -> List[Dict]:
         """Parse Fli-Rite API response."""
-        # TODO: Implement Fli-Rite response parsing
-        # This will depend on the actual Fli-Rite API response format
-        weather_data = []
-        
-        if "data" in data:
-            for item in data["data"]:
-                parsed = self._parse_metar_data(item)
-                if parsed:
-                    weather_data.append(parsed)
-        
-        return weather_data
+        return parse_fli_rite_response(data)
     
     def _parse_checkwx_response(self, data: Dict) -> List[Dict]:
         """Parse CheckWX API response."""

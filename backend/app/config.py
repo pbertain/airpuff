@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # API Keys
     fli_rite_api_key: Optional[str] = None
     checkwx_api_key: Optional[str] = None
+    fli_rite_base_url: Optional[str] = None
     
     # OAuth
     google_client_id: Optional[str] = None
@@ -70,10 +71,15 @@ class Settings(BaseSettings):
     def apply_environment_defaults(self):
         """Apply environment-specific defaults after settings load."""
 
+        env = (self.environment or "").strip().lower()
+
         if not self.oidc_issuer:
-            env = (self.environment or "").strip().lower()
             host = "auth.cloudpuff.org" if env in {"production", "prod"} else "auth-dev.cloudpuff.org"
             self.oidc_issuer = f"https://{host}/realms/cloudpuff"
+
+        if not self.fli_rite_base_url:
+            host = "www.fli-rite.net" if env in {"production", "prod"} else "dev.fli-rite.net"
+            self.fli_rite_base_url = f"https://{host}"
 
         return self
     

@@ -54,9 +54,14 @@
     - /etc/apt/sources.list.d/packagecloud_io_timescale_timescaledb_ubuntu.list
   tags: [timescaledb, repository]
 
+- name: Set TimescaleDB repository platform
+  set_fact:
+    timescaledb_repo_platform: "{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }}"
+  tags: [timescaledb, repository]
+
 - name: Add TimescaleDB APT repository
   apt_repository:
-    repo: "deb https://packagecloud.io/timescale/timescaledb/debian/ {{ ansible_distribution_release }} main"
+    repo: "deb https://packagecloud.io/timescale/timescaledb/{{ timescaledb_repo_platform }}/ {{ ansible_distribution_release }} main"
     filename: timescaledb
     state: present
     update_cache: yes

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from ....database import get_db
 from ....models.weather import WeatherObservation
 from ....models.airport import Airport
+from ....services.flirite_service import flirite_service
 
 router = APIRouter()
 
@@ -43,23 +44,61 @@ def format_weather_summary(weather: WeatherObservation, airport: Airport) -> str
     return f"{airport.icao}: {weather.flight_category or 'UNK'} | {weather.temperature_f or '--'}°F | {weather.wind_dir_deg or '--'}°@{weather.wind_speed_kts or '--'}kt | {weather.visibility_mi or '--'}SM | {weather.ceiling_ft or '--'}ft"
 
 
+def format_live_weather_summary(weather: dict, airport: Optional[Airport]) -> str:
+    """Format live Fli-Rite weather data as a brief summary."""
+    airport_code = (airport.icao if airport else weather.get("icao") or "UNK").upper()
+    return (
+        f"{airport_code}: {weather.get('flight_category') or 'UNK'} | "
+        f"{weather.get('temperature_f') or weather.get('temp_f') or '--'}°F | "
+        f"{weather.get('wind_dir_deg') or weather.get('wind_dir_degrees') or '--'}@"
+        f"{weather.get('wind_speed_kts') or weather.get('wind_speed_kt') or '--'}kt | "
+        f"{weather.get('visibility_mi') or '--'}SM | "
+        f"{weather.get('ceiling_ft') or '--'}ft"
+    )
+
+
 @router.get("/{icao}", response_class=Response)
 async def get_current_weather_curl(icao: str, db: Session = Depends(get_db)):
     """Get current weather for an airport in clear text format."""
     # Get airport
     airport = db.query(Airport).filter(Airport.icao == icao.upper()).first()
+
+    if airport:
+        # Get latest weather observation
+        weather = db.query(WeatherObservation).filter(
+            WeatherObservation.airport_id == airport.id
+        ).order_by(WeatherObservation.time.desc()).first()
+
+        if weather:
+            return Response(content=format_weather_text(weather, airport), media_type="text/plain")
+
+    live_weather = await flirite_service.get_weather(icao.upper())
+    if live_weather:
+        airport_name = airport.name if airport and airport.name else "Unknown"
+        lines = [
+            f"Airport: {icao.upper()} - {airport_name}",
+            f"Observation Time: {live_weather.get('time') or live_weather.get('observed_time') or 'N/A'}",
+            f"Raw METAR: {live_weather.get('raw_metar') or live_weather.get('raw_text') or 'N/A'}",
+            "",
+            "Current Conditions:",
+            f"  Flight Category: {live_weather.get('flight_category') or 'UNK'}",
+            f"  Temperature: {live_weather.get('temperature_f') or live_weather.get('temp_f') or 'N/A'}°F ({live_weather.get('temperature_c') or live_weather.get('temp_c') or 'N/A'}°C)",
+            f"  Dewpoint: {live_weather.get('dewpoint_f') or 'N/A'}°F ({live_weather.get('dewpoint_c') or 'N/A'}°C)",
+            f"  Temp-Dewpoint Spread: {live_weather.get('temp_dewpoint_spread_f') or 'N/A'}°F",
+            f"  Wind: {live_weather.get('wind_dir_deg') or live_weather.get('wind_dir_degrees') or 'N/A'}° @ {live_weather.get('wind_speed_kts') or live_weather.get('wind_speed_kt') or 'N/A'} kts",
+            f"  Visibility: {live_weather.get('visibility_mi') or 'N/A'} SM ({live_weather.get('visibility_m') or 'N/A'} m)",
+            f"  Ceiling: {live_weather.get('ceiling_ft') or 'N/A'} ft AGL ({live_weather.get('ceiling_code') or 'N/A'})",
+            f"  Altimeter: {live_weather.get('altimeter_hg') or live_weather.get('altimeter_in_hg') or 'N/A'}\" Hg ({live_weather.get('altimeter_mb') or 'N/A'} mb)",
+            f"  Wind Chill: {live_weather.get('wind_chill_f') or 'N/A'}°F",
+            f"  Sky Cover: {live_weather.get('sky_cover') or 'N/A'}",
+            "---",
+        ]
+        return Response(content="\n".join(lines), media_type="text/plain")
+
     if not airport:
         return Response(content=f"Airport {icao.upper()} not found.\n", media_type="text/plain", status_code=404)
-    
-    # Get latest weather observation
-    weather = db.query(WeatherObservation).filter(
-        WeatherObservation.airport_id == airport.id
-    ).order_by(WeatherObservation.time.desc()).first()
-    
-    if not weather:
-        return Response(content=f"No weather data available for {icao.upper()}.\n", media_type="text/plain", status_code=404)
-    
-    return Response(content=format_weather_text(weather, airport), media_type="text/plain")
+
+    return Response(content=f"No weather data available for {icao.upper()}.\n", media_type="text/plain", status_code=404)
 
 
 @router.get("/{icao}/history", response_class=Response)
@@ -131,6 +170,10 @@ async def get_multiple_weather_curl(
         if weather:
             output_lines.append(format_weather_summary(weather, airport))
         else:
-            output_lines.append(f"{icao}: No weather data available")
+            live_weather = await flirite_service.get_weather(icao)
+            if live_weather:
+                output_lines.append(format_live_weather_summary(live_weather, airport))
+            else:
+                output_lines.append(f"{icao}: No weather data available")
     
     return Response(content="\n".join(output_lines), media_type="text/plain")

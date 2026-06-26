@@ -17,6 +17,7 @@ def test_settings_accept_generated_env_fields():
         oidc_admin_roles="admin,airpuff-admin",
         session_secret="dev-session-secret",
         base_url="https://dev.airpuff.info",
+        fli_rite_base_url="https://dev.fli-rite.net",
         grafana_url="http://localhost:3000",
         grafana_username="admin",
         grafana_password="admin",
@@ -35,4 +36,5 @@ def test_settings_accept_generated_env_fields():
 
     assert settings.oidc_issuer == "https://auth-dev.cloudpuff.org/realms/cloudpuff"
     assert settings.base_url == "https://dev.airpuff.info"
+    assert settings.fli_rite_base_url == "https://dev.fli-rite.net"
     assert settings.session_secret == "dev-session-secret"
