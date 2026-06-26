@@ -46,7 +46,16 @@
   args:
     chdir: "/tmp/airpuff-{{ deployment_env }}-clone"
   become: yes
-  become_user: "{{ airpuff_app_user }}"
+  tags: [app, git]
+
+- name: Fix application directory ownership after copy
+  file:
+    path: "{{ airpuff_app_home }}"
+    state: directory
+    owner: "{{ airpuff_app_user }}"
+    group: "{{ airpuff_app_group }}"
+    recurse: yes
+  become: yes
   tags: [app, git]
 
 - name: Remove staging clone directory
