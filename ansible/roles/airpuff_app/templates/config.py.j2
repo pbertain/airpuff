@@ -1,63 +1,83 @@
 """Configuration management for AirPuff application."""
 
-import os
 from typing import Optional
+
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
-    
+
     # Database
     database_url: str = "postgresql://{{ postgresql_db_user }}:{{ postgresql_db_password }}@localhost:{{ airpuff_timescaledb_port }}/{{ postgresql_db_name }}"
     timescaledb_url: str = "postgresql://{{ postgresql_db_user }}:{{ postgresql_db_password }}@localhost:{{ airpuff_timescaledb_port }}/{{ postgresql_db_name }}"
-    
-    # Redis Configuration
+
+    # Redis
     redis_url: str = "redis://localhost:{{ airpuff_redis_port }}"
-    
+
     # API Keys
     fli_rite_api_key: Optional[str] = None
     checkwx_api_key: Optional[str] = None
-    
+
     # OAuth
     google_client_id: Optional[str] = None
     google_client_secret: Optional[str] = None
     apple_client_id: Optional[str] = None
     apple_client_secret: Optional[str] = None
-    
+
+    # OIDC (Keycloak via cloudpuff)
+    oidc_issuer: Optional[str] = None
+    oidc_client_id: str = "airpuff-web"
+    oidc_client_secret: Optional[str] = None
+    oidc_redirect_uri: Optional[str] = None
+    oidc_admin_roles: str = "admin,airpuff-admin"
+    session_secret: str = "{{ airpuff_secret_key }}"
+    base_url: str = "http://localhost:25080"
+
+    # Grafana
+    grafana_url: str = "http://localhost:{{ airpuff_grafana_port }}"
+    grafana_username: str = "{{ grafana_admin_user }}"
+    grafana_password: str = "{{ grafana_admin_password }}"
+
     # Security
     secret_key: str = "{{ airpuff_secret_key }}"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
-    
+
     # iMessage
     imessage_bridge_url: Optional[str] = None
     imessage_api_key: Optional[str] = None
-    
+
     # Environment
-    environment: str = "{{ deployment_env }}"
+    environment: str = "{{ airpuff_environment | default('development') }}"
     debug: bool = {% if debug %}True{% else %}False{% endif %}
-    
     log_level: str = "{{ log_level }}"
-    
+
     # Server configuration
     host: str = "0.0.0.0"
     port: int = {{ airpuff_app_port }}
-    
+
     # WebSocket
     websocket_ping_interval: int = 25
     websocket_ping_timeout: int = 20
-    
-    # Grafana Configuration
-    grafana_url: str = "http://localhost:{{ airpuff_grafana_port }}"
-    grafana_username: str = "{{ grafana_admin_user }}"
-    grafana_password: str = "{{ grafana_admin_password }}"
-    
-    # Performance Configuration
+
+    # Performance
     workers: int = {{ airpuff_workers | default(2) }}
     max_requests: int = {{ airpuff_max_requests | default(1000) }}
     max_requests_jitter: int = {{ airpuff_max_requests_jitter | default(100) }}
-    
+
+    @model_validator(mode="after")
+    def apply_environment_defaults(self):
+        """Apply environment-specific defaults after settings load."""
+
+        if not self.oidc_issuer:
+            env = (self.environment or "").strip().lower()
+            host = "auth.cloudpuff.org" if env in {"production", "prod"} else "auth-dev.cloudpuff.org"
+            self.oidc_issuer = f"https://{host}/realms/cloudpuff"
+
+        return self
+
     class Config:
         env_file = ".env"
         case_sensitive = False
