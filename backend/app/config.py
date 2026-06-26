@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql://airpuff:airpuff@localhost:5432/airpuff"
     timescaledb_url: str = "postgresql://airpuff:airpuff@localhost:5432/airpuff"
+
+    # Redis
+    redis_url: str = "redis://localhost:6379"
     
     # API Keys
     fli_rite_api_key: Optional[str] = None
@@ -30,6 +33,11 @@ class Settings(BaseSettings):
     oidc_admin_roles: str = "admin,airpuff-admin"
     session_secret: str = "change-me-in-production"
     base_url: str = "http://localhost:25080"
+
+    # Grafana
+    grafana_url: str = "http://localhost:3000"
+    grafana_username: str = "admin"
+    grafana_password: str = "admin"
     
     # Security
     secret_key: str = "your-secret-key-change-in-production"
@@ -43,10 +51,16 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
     debug: bool = True
+    log_level: str = "INFO"
     
     # Server configuration
     host: str = "0.0.0.0"
     port: int = 25080
+
+    # Performance
+    workers: int = 2
+    max_requests: int = 1000
+    max_requests_jitter: int = 100
     
     # WebSocket
     websocket_ping_interval: int = 25
