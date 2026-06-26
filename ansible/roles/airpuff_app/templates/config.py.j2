@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "{{ airpuff_environment | default('development') }}"
     debug: bool = {% if debug %}True{% else %}False{% endif %}
+
     log_level: str = "{{ log_level }}"
 
     # Server configuration
