@@ -1,18 +1,22 @@
 [Unit]
-Description=AirPuff iMessage Scheduled Message Processor
-After=network.target postgresql.service redis.service airpuff-app.service
-Wants=postgresql.service redis.service airpuff-app.service
+Description=AirPuff Web Application
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
 
 [Service]
-Type=oneshot
+Type=exec
 User={{ airpuff_app_user }}
 Group={{ airpuff_app_group }}
 WorkingDirectory={{ airpuff_app_home }}/backend
 Environment=PATH={{ virtualenv_path }}/bin
-ExecStart={{ virtualenv_path }}/bin/python -c "import asyncio, sys; sys.path.insert(0, '{{ airpuff_app_home }}/backend'); from app.services.imessage_service import imessage_service; asyncio.run(imessage_service.process_scheduled_messages())"
+Environment=PYTHONPATH={{ airpuff_app_home }}/backend
+ExecStart={{ virtualenv_path }}/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ airpuff_app_port }} --workers {{ airpuff_workers | default(2) }}
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=airpuff-imessage
+SyslogIdentifier=airpuff-web
 
 # Security settings
 NoNewPrivileges=yes

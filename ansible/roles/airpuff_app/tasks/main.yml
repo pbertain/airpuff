@@ -16,16 +16,23 @@
   become: yes
   tags: [app, service]
 
-- name: Stop AirPuff application before replacing code
+- name: Stop AirPuff services before replacing code
   systemd:
     name: "{{ item }}"
     state: stopped
   loop:
+    - airpuff-web
+    - airpuff-fetcher
+    - airpuff-fetcher.timer
     - "airpuff-{{ deployment_env }}-app"
     - airpuff-app
+    - airpuff-weather
+    - airpuff-weather.timer
+    - airpuff-imessage
+    - airpuff-imessage.timer
   when:
     - ansible_facts.services is defined
-    - item + ".service" in ansible_facts.services or item in ansible_facts.services
+    - item + ".service" in ansible_facts.services or item + ".timer" in ansible_facts.services or item in ansible_facts.services
   failed_when: false
   tags: [app, service]
 
@@ -113,9 +120,17 @@
   include_tasks: systemd.yml
   tags: [app, systemd]
 
-- name: Start AirPuff application
+- name: Start AirPuff web application
   systemd:
-    name: airpuff-{{ deployment_env }}-app
+    name: airpuff-web
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: [app, service]
+
+- name: Enable and start AirPuff fetcher timer
+  systemd:
+    name: airpuff-fetcher.timer
     state: started
     enabled: yes
     daemon_reload: yes

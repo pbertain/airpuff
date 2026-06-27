@@ -1,63 +1,56 @@
 ---
 # SystemD Service Setup
 
-- name: Create AirPuff application service
+- name: Create AirPuff web service
   template:
-    src: airpuff-app.service.j2
-    dest: /etc/systemd/system/airpuff-{{ deployment_env }}-app.service
+    src: airpuff-web.service.j2
+    dest: /etc/systemd/system/airpuff-web.service
     owner: root
     group: root
     mode: '0644'
   notify: reload systemd
   tags: [app, systemd]
 
-- name: Create AirPuff weather service
+- name: Create AirPuff fetcher service
   template:
-    src: airpuff-weather.service.j2
-    dest: /etc/systemd/system/airpuff-weather.service
+    src: airpuff-fetcher.service.j2
+    dest: /etc/systemd/system/airpuff-fetcher.service
     owner: root
     group: root
     mode: '0644'
   notify: reload systemd
   tags: [app, systemd]
 
-- name: Create AirPuff weather timer
+- name: Create AirPuff fetcher timer
   template:
-    src: airpuff-weather.timer.j2
-    dest: /etc/systemd/system/airpuff-weather.timer
+    src: airpuff-fetcher.timer.j2
+    dest: /etc/systemd/system/airpuff-fetcher.timer
     owner: root
     group: root
     mode: '0644'
   notify: reload systemd
   tags: [app, systemd]
 
-- name: Create AirPuff iMessage service
-  template:
-    src: airpuff-imessage.service.j2
-    dest: /etc/systemd/system/airpuff-imessage.service
-    owner: root
-    group: root
-    mode: '0644'
+- name: Remove legacy AirPuff systemd units
+  file:
+    path: "/etc/systemd/system/{{ item }}"
+    state: absent
+  loop:
+    - airpuff-app.service
+    - "airpuff-{{ deployment_env }}-app.service"
+    - airpuff-weather.service
+    - airpuff-weather.timer
+    - airpuff-imessage.service
+    - airpuff-imessage.timer
   notify: reload systemd
   tags: [app, systemd]
 
-- name: Create AirPuff iMessage timer
-  template:
-    src: airpuff-imessage.timer.j2
-    dest: /etc/systemd/system/airpuff-imessage.timer
-    owner: root
-    group: root
-    mode: '0644'
-  notify: reload systemd
-  tags: [app, systemd]
-
-- name: Enable and start timers
+- name: Enable and start fetcher timer
   systemd:
     name: "{{ item }}"
     state: started
     enabled: yes
     daemon_reload: yes
   loop:
-    - airpuff-weather.timer
-    - airpuff-imessage.timer
+    - airpuff-fetcher.timer
   tags: [app, systemd]
