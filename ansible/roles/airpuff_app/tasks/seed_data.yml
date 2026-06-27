@@ -24,17 +24,17 @@
   postgresql_query:
     db: "{{ postgresql_db_name }}"
     query: |
-      INSERT INTO airports (icao, name, city, state, country, latitude, longitude, elevation_ft) VALUES
-      ('KORD', 'Chicago O''Hare International Airport', 'Chicago', 'IL', 'US', 41.9786, -87.9048, 672),
-      ('KLAX', 'Los Angeles International Airport', 'Los Angeles', 'CA', 'US', 33.9425, -118.4081, 125),
-      ('KJFK', 'John F. Kennedy International Airport', 'New York', 'NY', 'US', 40.6413, -73.7781, 13),
-      ('KDFW', 'Dallas/Fort Worth International Airport', 'Dallas', 'TX', 'US', 32.8968, -97.0380, 607),
-      ('KATL', 'Hartsfield-Jackson Atlanta International Airport', 'Atlanta', 'GA', 'US', 33.6407, -84.4277, 1026),
-      ('KSEA', 'Seattle-Tacoma International Airport', 'Seattle', 'WA', 'US', 47.4502, -122.3088, 433),
-      ('KDEN', 'Denver International Airport', 'Denver', 'CO', 'US', 39.8561, -104.6737, 5431),
-      ('KMIA', 'Miami International Airport', 'Miami', 'FL', 'US', 25.7959, -80.2870, 8),
-      ('KPHX', 'Phoenix Sky Harbor International Airport', 'Phoenix', 'AZ', 'US', 33.4342, -112.0116, 1135),
-      ('KLAS', 'Harry Reid International Airport', 'Las Vegas', 'NV', 'US', 36.0840, -115.1537, 2181)
+      INSERT INTO airports (icao, name, city, state, country, latitude, longitude, elevation_ft, is_monitored) VALUES
+      ('KORD', 'Chicago O''Hare International Airport', 'Chicago', 'IL', 'US', 41.9786, -87.9048, 672, FALSE),
+      ('KLAX', 'Los Angeles International Airport', 'Los Angeles', 'CA', 'US', 33.9425, -118.4081, 125, FALSE),
+      ('KJFK', 'John F. Kennedy International Airport', 'New York', 'NY', 'US', 40.6413, -73.7781, 13, FALSE),
+      ('KDFW', 'Dallas/Fort Worth International Airport', 'Dallas', 'TX', 'US', 32.8968, -97.0380, 607, FALSE),
+      ('KATL', 'Hartsfield-Jackson Atlanta International Airport', 'Atlanta', 'GA', 'US', 33.6407, -84.4277, 1026, FALSE),
+      ('KSEA', 'Seattle-Tacoma International Airport', 'Seattle', 'WA', 'US', 47.4502, -122.3088, 433, FALSE),
+      ('KDEN', 'Denver International Airport', 'Denver', 'CO', 'US', 39.8561, -104.6737, 5431, FALSE),
+      ('KMIA', 'Miami International Airport', 'Miami', 'FL', 'US', 25.7959, -80.2870, 8, FALSE),
+      ('KPHX', 'Phoenix Sky Harbor International Airport', 'Phoenix', 'AZ', 'US', 33.4342, -112.0116, 1135, FALSE),
+      ('KLAS', 'Harry Reid International Airport', 'Las Vegas', 'NV', 'US', 36.0840, -115.1537, 2181, FALSE)
       ON CONFLICT (icao) DO NOTHING;
   become_user: postgres
   tags: [app, data]
